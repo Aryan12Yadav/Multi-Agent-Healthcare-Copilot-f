@@ -1,0 +1,2 @@
+"""logging_middleware module"""
+

@@ -1,0 +1,2 @@
+"""hospital_router module"""
+

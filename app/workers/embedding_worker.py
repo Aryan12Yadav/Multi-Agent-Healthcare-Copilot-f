@@ -1,0 +1,2 @@
+"""embedding_worker module"""
+

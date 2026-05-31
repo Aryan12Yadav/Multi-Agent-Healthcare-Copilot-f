@@ -1,0 +1,2 @@
+"""pharmacy_router module"""
+
