@@ -49,6 +49,8 @@ class Settings(BaseSettings):
 
     DEEPSEEK_API_KEY: str
 
+    JWT_ALGORITHM: str
+
     class Config:
         env_file = ".env"
 
