@@ -70,3 +70,54 @@ def upload_report(
         "report_name": report.report_name,
         "status": report.processing_status
     }
+
+@router.get("")
+def get_reports(
+    db: Session = Depends(get_db)
+):
+
+    controller = (
+        get_controller(db)
+    )
+
+    reports = (
+        controller.get_reports(
+            patient_id=1
+        )
+    )
+
+    return reports
+
+@router.get("/{report_id}")
+def get_report(
+    report_id: int,
+    db: Session = Depends(get_db)
+):
+
+    controller = (
+        get_controller(db)
+    )
+
+    return (
+        controller.get_report(
+            report_id
+        )
+    )
+
+@router.delete("/{report_id}")
+def delete_report(
+    report_id: int,
+    db: Session = Depends(get_db)
+):
+
+    controller = (
+        get_controller(db)
+    )
+
+    controller.delete_report(
+        report_id
+    )
+
+    return {
+        "message": "deleted"
+    }

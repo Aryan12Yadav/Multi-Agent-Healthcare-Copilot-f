@@ -38,3 +38,9 @@ pillow
 httpx
 
 loguru
+
+paddleocr
+paddlepaddle
+pdf2image
+opencv-python
+numpy

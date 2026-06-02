@@ -70,5 +70,52 @@ class ReportRepository:
             .first()
         )
 
+    def get_reports_by_patient(self, patient_id):
+
+        return (
+            self.db.query(Report)
+            .filter(
+                Report.patient_id == patient_id
+            )
+            .all()
+        )
+
+
+    def get_report_by_id(self, report_id):
+
+        return (
+            self.db.query(Report)
+            .filter(
+                Report.id == report_id
+            )
+            .first()
+        )
+
+
+    def delete_report(self, report):
+
+            self.db.delete(report)
+
+            self.db.commit()
+
+    def update_status(self, report_id, status):
+
+        report = (
+            self.get_report_by_id(
+                report_id
+            )
+        )
+
+        if not report:
+
+            return None
+
+        report.processing_status = status
+
+        self.db.commit()
+
+        self.db.refresh(report)
+
+        return report
 
 

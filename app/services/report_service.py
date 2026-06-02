@@ -114,3 +114,45 @@ class ReportService:
         return self.repository.create_report(
             report
         )
+    
+    def get_reports(self, patient_id):
+
+        return (
+            self.repository
+            .get_reports_by_patient(
+                patient_id
+            )
+        )
+
+
+    def get_report(self, report_id):
+
+        return (
+            self.repository
+            .get_report_by_id(
+                report_id
+            )
+        )
+
+
+    def delete_report(self, report_id):
+
+        report = (
+            self.repository
+            .get_report_by_id(
+                report_id
+            )
+        )
+
+        if not report:
+
+            raise ValueError(
+                "Report not found."
+            )
+
+        return (
+            self.repository
+            .delete_report(
+                report
+            )
+        )
