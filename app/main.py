@@ -11,6 +11,7 @@ from fastapi import FastAPI
 
 from app.core.config import settings
 from app.api.v1.auth_router import router as auth_router
+from app.api.v1.report_router import router as report_router
 
 
 class ApplicationFactory:
@@ -35,11 +36,16 @@ class ApplicationFactory:
                 "project": settings.APP_NAME,
                 "status": "running"
             }
-        
+
         app.include_router(
-        auth_router,
-        prefix=settings.API_V1_PREFIX
-          )
+            auth_router,
+            prefix=settings.API_V1_PREFIX
+        )
+
+        app.include_router(
+            report_router,
+            prefix=settings.API_V1_PREFIX
+        )
 
         return app
 
