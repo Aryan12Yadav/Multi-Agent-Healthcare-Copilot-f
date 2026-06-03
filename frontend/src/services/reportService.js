@@ -23,3 +23,12 @@ export const uploadReport = async(file) => {
 
     return response.data;
 };
+
+export const getAnalysis = async(reportId) => {
+
+    const response = await api.get(
+        `/reports/${reportId}/analysis`
+    );
+
+    return response.data;
+};

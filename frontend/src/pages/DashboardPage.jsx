@@ -11,11 +11,25 @@ function DashboardPage() {
                 MedSphere AI
             </h1>
 
+            <br />
+
             <Link to="/upload">
 
                 Upload Report
 
             </Link>
+
+            <br />
+
+            <br />
+
+            <Link to="/analysis/1">
+
+                View Analysis
+
+            </Link>
+
+            <br />
 
             <br />
 
