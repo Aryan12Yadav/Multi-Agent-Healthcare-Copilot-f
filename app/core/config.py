@@ -47,11 +47,12 @@ class Settings(BaseSettings):
 
     UPLOAD_DIRECTORY: str
 
-    DEEPSEEK_API_KEY: str
-
-    DEEPSEEK_MODEL: str
 
     JWT_ALGORITHM: str
+
+    NVIDIA_API_KEY: str
+    NVIDIA_BASE_URL: str
+    NVIDIA_MODEL: str
 
     class Config:
         env_file = ".env"

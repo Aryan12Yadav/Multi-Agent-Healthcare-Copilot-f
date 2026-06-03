@@ -1,8 +1,8 @@
 """
 JSON Parser
 
-Extract JSON from
-LLM responses.
+Utility for parsing
+LLM JSON responses.
 """
 
 import json
@@ -34,9 +34,7 @@ class JsonParser:
 
             try:
 
-                return json.loads(
-                    match.group()
-                )
+                return json.loads(match.group())
 
             except Exception:
 

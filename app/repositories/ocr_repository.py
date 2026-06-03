@@ -58,3 +58,6 @@ class OCRRepository:
         self.db.refresh(record)
 
         return record
+    
+
+  

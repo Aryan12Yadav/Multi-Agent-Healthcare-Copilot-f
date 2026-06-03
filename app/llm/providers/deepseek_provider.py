@@ -1,7 +1,8 @@
 """
-deepseek_provider.py
+NVIDIA LLM Provider
 
-Production DeepSeek Provider
+Handles all communication
+with NVIDIA hosted models.
 """
 
 from openai import OpenAI
@@ -11,36 +12,28 @@ from app.core.config import settings
 
 class DeepSeekProvider:
     """
-    DeepSeek Provider
-
-    Centralized LLM access layer.
+    NVIDIA Provider
     """
 
     def __init__(self):
 
         self.client = OpenAI(
-            api_key=settings.DEEPSEEK_API_KEY,
-            base_url="https://api.deepseek.com"
+            base_url=settings.NVIDIA_BASE_URL,
+            api_key=settings.NVIDIA_API_KEY
         )
 
     def generate(self, prompt):
 
-        response = (
-            self.client.chat.completions.create(
-                model=settings.DEEPSEEK_MODEL,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature=0.2
-            )
+        response = self.client.chat.completions.create(
+            model=settings.NVIDIA_MODEL,
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.2,
+            max_tokens=1500
         )
 
-        return (
-            response
-            .choices[0]
-            .message
-            .content
-        )
+        return response.choices[0].message.content

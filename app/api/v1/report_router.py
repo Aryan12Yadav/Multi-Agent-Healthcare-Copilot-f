@@ -121,3 +121,38 @@ def delete_report(
     return {
         "message": "deleted"
     }
+
+@router.post("/{report_id}/analyze")
+def analyze_report(report_id: int, db: Session = Depends(get_db)):
+
+    ocr_repository = OCRRepository(db)
+
+    medical_repository = (
+        MedicalFindingRepository(db)
+    )
+
+    ocr_record = (
+        ocr_repository.get_by_report_id(
+            report_id
+        )
+    )
+
+    if not ocr_record:
+
+        return {
+            "message":
+            "OCR not completed"
+        }
+
+    service = (
+        ReportAnalysisService(
+            medical_repository
+        )
+    )
+
+    result = service.analyze_report(
+        report_id,
+        ocr_record.raw_text
+    )
+
+    return result

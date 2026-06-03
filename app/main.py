@@ -15,6 +15,10 @@ from app.api.v1.report_router import router as report_router
 from app.api.v1.analysis_router import router as analysis_router
 from app.api.v1.chat_router import router as chat_router
 from app.api.v1.report_chat_router import router as report_chat_router
+from app.api.v1.ocr_router import router as ocr_router
+from app.api.v1.llm_router import router as llm_router
+
+
 
 
 
@@ -66,7 +70,17 @@ class ApplicationFactory:
             prefix=settings.API_V1_PREFIX
         )
 
+        app.include_router(
+            ocr_router,
+            prefix = settings.API_V1_PREFIX
+        )
+
+        app.include_router(
+            llm_router,
+            prefix = "/api/v1"
+        )
         return app
+    
 
 
 app = ApplicationFactory.create_application()
