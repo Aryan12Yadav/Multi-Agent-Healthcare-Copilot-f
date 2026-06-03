@@ -1,45 +1,57 @@
-import { Link } from "react-router-dom";
+import DashboardLayout from "../layouts/DashboardLayout";
+
+import DashboardCard from "../components/DashboardCard";
+
+import QuickActions from "../components/QuickActions";
 
 
 function DashboardPage() {
 
     return (
 
-        <div>
+        <DashboardLayout>
 
-            <h1>
-                MedSphere AI
-            </h1>
+            <div className="p-8">
 
-            <br />
+                <h1 className="text-3xl font-bold mb-8">
 
-            <Link to="/upload">
+                    Welcome to MedSphere AI
 
-                Upload Report
+                </h1>
 
-            </Link>
+                <div className="grid grid-cols-4 gap-6">
 
-            <br />
+                    <DashboardCard
+                        title="Reports"
+                        value="12"
+                    />
 
-            <br />
+                    <DashboardCard
+                        title="Analyses"
+                        value="8"
+                    />
 
-            <Link to="/analysis/1">
+                    <DashboardCard
+                        title="Chats"
+                        value="25"
+                    />
 
-                View Analysis
+                    <DashboardCard
+                        title="Health Score"
+                        value="84"
+                    />
 
-            </Link>
+                </div>
 
-            <br />
+                <div className="mt-8">
 
-            <br />
+                    <QuickActions />
 
-            <Link to="/chat">
+                </div>
 
-                Medical Chat
+            </div>
 
-            </Link>
-
-        </div>
+        </DashboardLayout>
     );
 }
 
