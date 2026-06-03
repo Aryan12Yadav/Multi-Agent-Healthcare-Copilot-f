@@ -1,44 +1,46 @@
 """
 deepseek_provider.py
 
-Wrapper around DeepSeek API.
-
-All LLM communication
-must go through this layer.
-
+Production DeepSeek Provider
 """
 
-import json
+from openai import OpenAI
+
+from app.core.config import settings
+
 
 class DeepSeekProvider:
     """
     DeepSeek Provider
 
-    Handles communication
-    with DeepSeek models.
+    Centralized LLM access layer.
     """
 
     def __init__(self):
 
-        pass
+        self.client = OpenAI(
+            api_key=settings.DEEPSEEK_API_KEY,
+            base_url="https://api.deepseek.com"
+        )
 
     def generate(self, prompt):
 
-        """
-        Temporary mock response.
+        response = (
+            self.client.chat.completions.create(
+                model=settings.DEEPSEEK_MODEL,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature=0.2
+            )
+        )
 
-        Replace with actual
-        API integration later.
-        """
-
-        return json.dumps(
-            {
-                "report_type": "Unknown",
-                "patient_friendly_summary":
-                "Analysis pending.",
-                "findings": [],
-                "measurements": [],
-                "abnormalities": [],
-                "recommendations": []
-            }
+        return (
+            response
+            .choices[0]
+            .message
+            .content
         )

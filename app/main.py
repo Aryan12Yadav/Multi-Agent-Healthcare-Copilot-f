@@ -14,6 +14,7 @@ from app.api.v1.auth_router import router as auth_router
 from app.api.v1.report_router import router as report_router
 from app.api.v1.analysis_router import router as analysis_router
 from app.api.v1.chat_router import router as chat_router
+from app.api.v1.report_chat_router import router as report_chat_router
 
 
 
@@ -59,6 +60,12 @@ class ApplicationFactory:
             chat_router,
             prefix=settings.API_V1_PREFIX
         )
+
+        app.include_router(
+            report_chat_router,
+            prefix=settings.API_V1_PREFIX
+        )
+
         return app
 
 

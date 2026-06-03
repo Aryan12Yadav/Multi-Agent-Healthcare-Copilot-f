@@ -1,8 +1,7 @@
 """
 Paddle OCR Service
 
-Responsible for extracting
-text from medical reports.
+Extract text from images.
 """
 
 from paddleocr import PaddleOCR
@@ -10,7 +9,7 @@ from paddleocr import PaddleOCR
 
 class PaddleOCRService:
     """
-    OCR Engine Wrapper
+    OCR Service
     """
 
     def __init__(self):

@@ -22,13 +22,9 @@ class MedicalChatService:
 
     def __init__(self):
 
-        self.provider = (
-            DeepSeekProvider()
-        )
+        self.provider = DeepSeekProvider()
 
-        self.builder = (
-            ContextBuilder()
-        )
+        self.builder = ContextBuilder()
 
     def ask(
         self,
@@ -36,27 +32,14 @@ class MedicalChatService:
         report_data=None
     ):
 
-        context = (
-            self.builder.build(
-                question=question,
-                report_data=report_data
-            )
+        context = self.builder.build(
+            question=question,
+            report_data=report_data
         )
 
-        prompt = (
-            MEDICAL_CHAT_PROMPT
-            .replace(
-                "{context}",
-                str(context)
-            )
-            .replace(
-                "{question}",
-                question
-            )
+        prompt = MEDICAL_CHAT_PROMPT.replace(
+            "{question}",
+            question
         )
 
-        return (
-            self.provider.generate(
-                prompt
-            )
-        )
+        return self.provider.generate(prompt)
