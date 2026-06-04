@@ -4,7 +4,7 @@ function ChatBubble({ sender, message }) {
 
     return (
 
-        <div className={`flex mb-6 ${isUser ? "justify-end" : "justify-start"}`}>
+        <div className={`flex mb-5 ${isUser ? "justify-end" : "justify-start"}`}>
 
             <div
                 className={`
@@ -13,7 +13,7 @@ function ChatBubble({ sender, message }) {
                     py-4
                     rounded-2xl
                     shadow
-                    ${isUser ? "bg-purple-600 text-white" : "bg-white"}
+                    ${isUser ? "bg-violet-600 text-white" : "bg-white"}
                 `}
             >
 
@@ -22,6 +22,7 @@ function ChatBubble({ sender, message }) {
             </div>
 
         </div>
+
     );
 }
 

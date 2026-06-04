@@ -3,13 +3,15 @@ from app.rag.embeddings.nvidia_embedding import NvidiaEmbedding
 from app.rag.vector_store.chroma_store import ChromaStore
 
 
-class EmbeddingWorker:
+class ReportEmbeddingWorker:
 
-    def process_report(self, report_id, text):
+    def process(self, report_id, text):
 
-        chunks = TextChunker().chunk_text(text)
+        chunks = TextChunker().chunk_text(
+            text
+        )
 
-        embeddings = NvidiaEmbedding().embed(
+        embeddings = NvidiaEmbedding().embed_passages(
             chunks
         )
 

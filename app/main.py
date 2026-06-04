@@ -18,7 +18,7 @@ from app.api.v1.report_chat_router import router as report_chat_router
 from app.api.v1.ocr_router import router as ocr_router
 from app.api.v1.llm_router import router as llm_router
 from app.api.v1.dashboard_router import router as dashboard_router
-
+from app.api.v1.report_chat_router import router as report_chat_router
 
 
 
@@ -85,6 +85,12 @@ class ApplicationFactory:
             llm_router,
             prefix = "/api/v1"
         )
+
+        app.include_router(
+            report_chat_router,
+            prefix = "/api/v1"
+        )
+        
         return app
     
 

@@ -1,8 +1,12 @@
 from fastapi import APIRouter
 
-from app.schemas.report_chat_schema import  ReportChatRequest
+from app.schemas.report_chat_schema import (
+    ReportChatRequest
+)
 
-
+from app.services.report_chat_service import (
+    ReportChatService
+)
 
 router = APIRouter(
     prefix="/report-chat",
@@ -11,11 +15,13 @@ router = APIRouter(
 
 
 @router.post("")
-def report_chat(
-    request: ReportChatRequest
-):
+def ask_report(request: ReportChatRequest):
+
+    response = ReportChatService().ask(
+        request.report_id,
+        request.question
+    )
 
     return {
-        "message":
-        "Report chat endpoint ready"
+        "response": response
     }

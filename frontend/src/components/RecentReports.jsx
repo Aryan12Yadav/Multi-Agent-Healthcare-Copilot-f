@@ -1,110 +1,70 @@
-import { useEffect } from "react";
-import { useState } from "react";
-
-import { Link } from "react-router-dom";
-
-import { getReports } from "../services/reportService";
-
-
 function RecentReports() {
 
-    const [reports, setReports] = useState([]);
-
-    useEffect(() => {
-
-        loadReports();
-
-    }, []);
-
-
-    const loadReports = async() => {
-
-        try {
-
-            const response = await getReports();
-
-            setReports(response);
-
+    const reports = [
+        {
+            name: "Blood Test Report",
+            date: "2026-06-01",
+            status: "Analyzed"
+        },
+        {
+            name: "MRI Brain",
+            date: "2026-05-28",
+            status: "Analyzed"
+        },
+        {
+            name: "Chest X-Ray",
+            date: "2026-05-20",
+            status: "Pending"
         }
-
-        catch(error) {
-
-            console.log(error);
-        }
-    };
+    ];
 
     return (
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        <div className="bg-white rounded-3xl shadow p-6">
 
-            <h2 className="text-xl font-semibold mb-6">
+            <h2 className="text-2xl font-bold mb-6">
 
                 Recent Reports
 
             </h2>
 
-            <table className="w-full">
+            <div className="space-y-4">
 
-                <thead>
+                {
+                    reports.map(report => (
 
-                    <tr>
+                        <div
+                            key={report.name}
+                            className="flex justify-between items-center border-b pb-4"
+                        >
 
-                        <th>Name</th>
+                            <div>
 
-                        <th>Type</th>
+                                <h3 className="font-semibold">
 
-                        <th>Status</th>
+                                    {report.name}
 
-                        <th>Action</th>
+                                </h3>
 
-                    </tr>
+                                <p className="text-sm text-gray-500">
 
-                </thead>
+                                    {report.date}
 
-                <tbody>
+                                </p>
 
-                    {
-                        reports.map((report) => (
+                            </div>
 
-                            <tr key={report.id}>
+                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full">
 
-                                <td>
+                                {report.status}
 
-                                    {report.report_name}
+                            </span>
 
-                                </td>
+                        </div>
+                    ))
+                }
 
-                                <td>
-
-                                    {report.report_type}
-
-                                </td>
-
-                                <td>
-
-                                    {report.processing_status}
-
-                                </td>
-
-                                <td>
-
-                                    <Link
-                                        to={`/analysis/${report.id}`}
-                                    >
-
-                                        View
-
-                                    </Link>
-
-                                </td>
-
-                            </tr>
-                        ))
-                    }
-
-                </tbody>
-
-            </table>
+            </div>
 
         </div>
     );

@@ -6,6 +6,10 @@ OCR business logic.
 
 from app.models.ocr_text import OCRText
 
+from app.workers.report_embedding_worker import (
+    ReportEmbeddingWorker
+)
+
 
 class OCRService:
     """

@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import String
-from sqlalchemy import Text
 from sqlalchemy import Integer
+from sqlalchemy import Float
+from sqlalchemy import String
 from sqlalchemy import DateTime
 
 from sqlalchemy.orm import Mapped
@@ -11,24 +11,28 @@ from sqlalchemy.orm import mapped_column
 from app.database.base import Base
 
 
-class ChatMessage(Base):
+class HealthTrend(Base):
 
-    __tablename__ = "chat_messages"
+    __tablename__ = "health_trends"
 
     id: Mapped[int] = mapped_column(
         primary_key=True
     )
 
-    user_id: Mapped[int] = mapped_column(
+    patient_id: Mapped[int] = mapped_column(
         Integer
     )
 
-    role: Mapped[str] = mapped_column(
-        String(50)
+    parameter_name: Mapped[str] = mapped_column(
+        String(255)
     )
 
-    message: Mapped[str] = mapped_column(
-        Text
+    value: Mapped[float] = mapped_column(
+        Float
+    )
+
+    report_id: Mapped[int] = mapped_column(
+        Integer
     )
 
     created_at: Mapped[datetime] = mapped_column(

@@ -1,168 +1,34 @@
-"""
-report_service.py
+from app.rag.retrievers.report_retriever import ReportRetriever
 
-Handles report related
-business operations.
-"""
+from app.chat.prompts.report_chat_prompt import (
+    REPORT_CHAT_PROMPT
+)
 
-import os
-import uuid
-
-from pathlib import Path
-
-from app.models.report import Report
-
-from app.core.constants import (
-    ALLOWED_REPORT_EXTENSIONS
+from app.llm.providers.deepseek_provider import (
+    DeepSeekProvider
 )
 
 
-class ReportService:
-    """
-    Report Service
+class ReportChatService:
 
-    Responsible for report validation,
-    storage and database operations.
-    """
+    def __init__(self):
 
-    def __init__(self, repository):
+        self.retriever = ReportRetriever()
 
-        self.repository = repository
+        self.llm = DeepSeekProvider()
 
-    def validate_file(self, file):
+    def ask(self, report_id, question):
 
-        extension = (
-            Path(
-                file.filename
-            ).suffix.lower()
+        context = self.retriever.retrieve(
+            report_id,
+            question
         )
 
-        if extension not in ALLOWED_REPORT_EXTENSIONS:
-
-            raise ValueError(
-                "Unsupported file type."
-            )
-
-        return True
-
-    def generate_storage_path(self, original_name):
-
-        extension = (
-            Path(
-                original_name
-            ).suffix
+        prompt = REPORT_CHAT_PROMPT.format(
+            context=context,
+            question=question
         )
 
-        generated_name = (
-            f"{uuid.uuid4()}"
-            f"{extension}"
+        return self.llm.generate(
+            prompt
         )
-
-        return generated_name
-
-    def save_report_file(self, file):
-
-        return self.generate_storage_path(
-            file.filename
-        )
-
-    def upload_report(self, file, patient_id):
-
-        self.validate_file(file)
-
-        generated_name = (
-            self.save_report_file(file)
-        )
-
-        upload_directory = (
-            "storage/reports"
-        )
-
-        os.makedirs(
-            upload_directory,
-            exist_ok=True
-        )
-
-        file_path = (
-            f"{upload_directory}/"
-            f"{generated_name}"
-        )
-
-        with open(
-            file_path,
-            "wb"
-        ) as report_file:
-
-            report_file.write(
-                file.file.read()
-            )
-        print("PATIENT ID:", patient_id)
-        report = Report(
-            patient_id=patient_id,
-            report_name=file.filename,
-            report_type="unknown",
-            original_file_name=file.filename,
-            stored_file_name=generated_name,
-            file_path=file_path,
-            file_size=os.path.getsize(
-                file_path
-            ),
-            mime_type=file.content_type,
-            processing_status="uploaded"
-        )
-
-        return self.repository.create_report(
-            report
-        )
-    
-    def get_reports(self, patient_id):
-
-        return (
-            self.repository
-            .get_reports_by_patient(
-                patient_id
-            )
-        )
-
-
-    def get_report(self, report_id):
-
-        return (
-            self.repository
-            .get_report_by_id(
-                report_id
-            )
-        )
-
-
-    def delete_report(self, report_id):
-
-        report = (
-            self.repository
-            .get_report_by_id(
-                report_id
-            )
-        )
-
-        if not report:
-
-            raise ValueError(
-                "Report not found."
-            )
-
-        return (
-            self.repository
-            .delete_report(
-                report
-            )
-        )
-
-    def get_recent_reports(self):
-
-        return (
-            self.repository
-            .get_recent_reports()
-        )
-    
-def get_report_by_id(self,report_id):
-    return self.repository.get_report_by_id(report_id)

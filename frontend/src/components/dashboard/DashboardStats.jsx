@@ -1,59 +1,53 @@
 function DashboardStats({ metrics }) {
 
+    const cards = [
+        {
+            title: "Reports",
+            value: metrics?.report_count || 0
+        },
+        {
+            title: "Analysis",
+            value: metrics?.analysis_count || 0
+        },
+        {
+            title: "Chats",
+            value: metrics?.chat_count || 0
+        },
+        {
+            title: "Health Score",
+            value: metrics?.health_score || 78
+        }
+    ];
+
     return (
 
         <div className="grid grid-cols-4 gap-6">
 
-            <div className="bg-white shadow rounded-2xl p-6">
+            {
+                cards.map(card => (
 
-                <h3>Total Reports</h3>
+                    <div
+                        key={card.title}
+                        className="bg-white rounded-3xl shadow p-6"
+                    >
 
-                <h1 className="text-3xl font-bold">
+                        <p className="text-gray-500">
 
-                    {metrics?.report_count || 0}
+                            {card.title}
 
-                </h1>
+                        </p>
 
-            </div>
+                        <h1 className="text-4xl font-bold mt-3">
 
-            <div className="bg-white shadow rounded-2xl p-6">
+                            {card.value}
 
-                <h3>Abnormal Findings</h3>
+                        </h1>
 
-                <h1 className="text-3xl font-bold">
-
-                    {metrics?.analysis_count || 0}
-
-                </h1>
-
-            </div>
-
-            <div className="bg-white shadow rounded-2xl p-6">
-
-                <h3>Reminders</h3>
-
-                <h1 className="text-3xl font-bold">
-
-                    0
-
-                </h1>
-
-            </div>
-
-            <div className="bg-white shadow rounded-2xl p-6">
-
-                <h3>Health Score</h3>
-
-                <h1 className="text-3xl font-bold">
-
-                    {metrics?.health_score || 0}
-
-                </h1>
-
-            </div>
+                    </div>
+                ))
+            }
 
         </div>
-
     );
 }
 

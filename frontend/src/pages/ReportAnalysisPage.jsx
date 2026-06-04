@@ -1,126 +1,85 @@
-import { useEffect } from "react";
-
-import { useState } from "react";
-
-import { useParams } from "react-router-dom";
-
 import DashboardLayout from "../layouts/DashboardLayout";
 
-import AnalysisCard from "../components/AnalysisCard";
-
-import { getAnalysis } from "../services/reportService";
-
-
 function ReportAnalysisPage() {
-
-    const { id } = useParams();
-
-    const [analysis, setAnalysis] = useState(null);
-
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-
-        loadAnalysis();
-
-    }, []);
-
-
-    const loadAnalysis = async() => {
-
-        try {
-
-            const response = await getAnalysis(id);
-
-            setAnalysis(response);
-
-        } catch(error) {
-
-            console.log(error);
-
-        } finally {
-
-            setLoading(false);
-        }
-    };
-
-    if (loading) {
-
-        return (
-
-            <DashboardLayout>
-
-                <div className="p-8">
-
-                    Loading Analysis...
-
-                </div>
-
-            </DashboardLayout>
-        );
-    }
 
     return (
 
         <DashboardLayout>
 
-            <div className="p-8">
+            <div className="p-8 bg-slate-50 min-h-screen">
 
-                <h1 className="text-3xl font-bold mb-8">
+                <div className="bg-white rounded-3xl shadow p-8 mb-8">
 
-                    Medical Analysis
+                    <h1 className="text-4xl font-bold">
 
-                </h1>
+                        Report Analysis
+                    </h1>
+
+                    <p className="text-slate-500 mt-2">
+
+                        AI generated medical insights
+                    </p>
+
+                </div>
 
                 <div className="grid grid-cols-2 gap-6">
 
-                    <AnalysisCard
-                        title="Report Type"
-                        value={analysis?.report_type}
-                    />
+                    <div className="bg-white rounded-3xl shadow p-6">
 
-                    <AnalysisCard
-                        title="Summary"
-                        value={analysis?.summary}
-                    />
+                        <h2 className="text-2xl font-bold mb-4">
+
+                            AI Summary
+                        </h2>
+
+                        <p>
+
+                            Report appears mostly normal.
+                            Minor abnormalities detected.
+                        </p>
+
+                    </div>
+
+                    <div className="bg-white rounded-3xl shadow p-6">
+
+                        <h2 className="text-2xl font-bold mb-4">
+
+                            Health Score
+                        </h2>
+
+                        <h1 className="text-6xl font-bold text-green-600">
+
+                            82
+                        </h1>
+
+                    </div>
+
+                </div>
+
+                <div className="bg-white rounded-3xl shadow p-6 mt-6">
+
+                    <h2 className="text-2xl font-bold mb-4">
+
+                        Recommendations
+                    </h2>
+
+                    <ul className="space-y-3">
+
+                        <li>Maintain healthy diet</li>
+
+                        <li>Exercise regularly</li>
+
+                        <li>Follow physician guidance</li>
+
+                        <li>Repeat test after 3 months</li>
+
+                    </ul>
 
                 </div>
 
             </div>
 
-            {
-    analysis?.finding_json?.recommendations && (
-
-        <div className="mt-8">
-
-            <h2 className="text-2xl font-semibold mb-4">
-
-                Recommendations
-
-            </h2>
-
-            <ul>
-
-                {
-                    analysis.finding_json.recommendations.map(
-                        (item, index) => (
-
-                            <li key={index}>
-
-                                {item}
-
-                            </li>
-                        )
-                    )
-                }
-
-            </ul>
-
-        </div>
-    )
-}
-
         </DashboardLayout>
+
     );
 }
 

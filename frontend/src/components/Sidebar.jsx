@@ -4,59 +4,47 @@ function Sidebar() {
 
     return (
 
-        <aside className="w-72 min-h-screen bg-white border-r">
+        <div className="w-72 bg-white border-r min-h-screen">
 
-            <div className="p-6 border-b">
+            <div className="p-8">
 
-                <h1 className="text-3xl font-bold text-purple-600">
+                <h1 className="text-3xl font-bold text-violet-600">
 
                     MedSphere AI
 
                 </h1>
 
-                <p className="text-gray-500 mt-2">
-
-                    Personal Healthcare Assistant
-
-                </p>
-
             </div>
 
-            <nav className="p-6 space-y-3">
+            <div className="px-5 space-y-2">
 
-                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/dashboard">
+                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/dashboard">
 
                     Dashboard
 
                 </Link>
 
-                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/upload-report">
+                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/upload-report">
 
                     Upload Report
 
                 </Link>
 
-                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/reports">
+                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/report-analysis">
 
-                    My Reports
-
-                </Link>
-
-                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/chat">
-
-                    AI Chat
+                    Report Analysis
 
                 </Link>
 
-                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/profile">
+                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/chat">
 
-                    Profile
+                    Medical Chat
 
                 </Link>
 
-            </nav>
+            </div>
 
-        </aside>
+        </div>
     );
 }
 

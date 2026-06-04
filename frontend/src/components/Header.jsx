@@ -4,24 +4,36 @@ function Header() {
 
         <header className="bg-white border-b px-8 py-5">
 
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
 
-                <input
-                    type="text"
-                    placeholder="Search reports, medicines, diseases..."
-                    className="w-96 border rounded-xl px-4 py-3"
-                />
+                <div>
+
+                    <h2 className="text-2xl font-bold text-slate-800">
+
+                        MedSphere AI
+
+                    </h2>
+
+                    <p className="text-sm text-slate-500">
+
+                        AI Powered Healthcare Platform
+
+                    </p>
+
+                </div>
 
                 <div className="flex items-center gap-4">
 
-                    <button className="border px-4 py-2 rounded-xl">
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="border rounded-xl px-4 py-2 w-72"
+                    />
 
-                        English
-                    </button>
-
-                    <div className="h-12 w-12 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                    <div className="h-12 w-12 rounded-full bg-violet-600 text-white flex items-center justify-center font-bold">
 
                         A
+
                     </div>
 
                 </div>

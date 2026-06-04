@@ -4,7 +4,7 @@ function ChatInput({ onSend }) {
 
     const [question, setQuestion] = useState("");
 
-    const handleSubmit = () => {
+    const submit = () => {
 
         if (!question.trim()) return;
 
@@ -15,10 +15,9 @@ function ChatInput({ onSend }) {
 
     return (
 
-        <div className="bg-white border rounded-2xl p-4 flex gap-4">
+        <div className="bg-white rounded-2xl shadow p-4 flex gap-4">
 
             <input
-                type="text"
                 value={question}
                 onChange={e => setQuestion(e.target.value)}
                 placeholder="Ask any medical question..."
@@ -26,8 +25,8 @@ function ChatInput({ onSend }) {
             />
 
             <button
-                onClick={handleSubmit}
-                className="bg-purple-600 text-white px-6 py-3 rounded-xl"
+                onClick={submit}
+                className="bg-violet-600 text-white px-6 py-3 rounded-xl"
             >
 
                 Send
@@ -35,6 +34,7 @@ function ChatInput({ onSend }) {
             </button>
 
         </div>
+
     );
 }
 

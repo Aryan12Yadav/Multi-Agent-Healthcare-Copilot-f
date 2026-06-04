@@ -1,7 +1,3 @@
-"""
-chat_repository.py
-"""
-
 from app.models.chat_message import ChatMessage
 
 
@@ -11,7 +7,7 @@ class ChatRepository:
 
         self.db = db
 
-    def create_message(self, message):
+    def create(self, message):
 
         self.db.add(message)
 
@@ -21,11 +17,10 @@ class ChatRepository:
 
         return message
 
-    def get_messages(self, user_id):
+    def get_history(self, user_id):
 
-        return (
-            self.db.query(ChatMessage)
-            .filter(ChatMessage.user_id == user_id)
-            .order_by(ChatMessage.id.asc())
-            .all()
-        )
+        return self.db.query(
+            ChatMessage
+        ).filter(
+            ChatMessage.user_id == user_id
+        ).all()
