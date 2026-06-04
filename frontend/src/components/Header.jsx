@@ -2,17 +2,29 @@ function Header() {
 
     return (
 
-        <header className="bg-white shadow p-5 flex justify-between">
+        <header className="bg-white border-b px-8 py-5">
 
-            <h2 className="font-bold text-xl">
+            <div className="flex justify-between items-center">
 
-                MedSphere AI
+                <input
+                    type="text"
+                    placeholder="Search reports, medicines, diseases..."
+                    className="w-96 border rounded-xl px-4 py-3"
+                />
 
-            </h2>
+                <div className="flex items-center gap-4">
 
-            <div>
+                    <button className="border px-4 py-2 rounded-xl">
 
-                Aryan
+                        English
+                    </button>
+
+                    <div className="h-12 w-12 rounded-full bg-purple-600 text-white flex items-center justify-center">
+
+                        A
+                    </div>
+
+                </div>
 
             </div>
 

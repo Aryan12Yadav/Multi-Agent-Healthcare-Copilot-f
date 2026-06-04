@@ -1,6 +1,5 @@
 import api from "../api/axios";
 
-
 export const sendMessage = async(question) => {
 
     const response = await api.post(

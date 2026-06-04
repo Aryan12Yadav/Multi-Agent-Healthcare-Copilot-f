@@ -17,6 +17,7 @@ from app.api.v1.chat_router import router as chat_router
 from app.api.v1.report_chat_router import router as report_chat_router
 from app.api.v1.ocr_router import router as ocr_router
 from app.api.v1.llm_router import router as llm_router
+from app.api.v1.dashboard_router import router as dashboard_router
 
 
 
@@ -72,6 +73,11 @@ class ApplicationFactory:
 
         app.include_router(
             ocr_router,
+            prefix = settings.API_V1_PREFIX
+        )
+        
+        app.include_router(
+            dashboard_router,
             prefix = settings.API_V1_PREFIX
         )
 

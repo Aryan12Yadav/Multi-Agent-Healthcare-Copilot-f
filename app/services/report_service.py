@@ -156,3 +156,13 @@ class ReportService:
                 report
             )
         )
+
+    def get_recent_reports(self):
+
+        return (
+            self.repository
+            .get_recent_reports()
+        )
+    
+def get_report_by_id(self,report_id):
+    return self.repository.get_report_by_id(report_id)

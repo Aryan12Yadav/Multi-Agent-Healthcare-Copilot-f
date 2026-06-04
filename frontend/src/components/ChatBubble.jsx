@@ -1,32 +1,20 @@
-function ChatBubble({ message, sender }) {
+function ChatBubble({ sender, message }) {
 
     const isUser = sender === "user";
 
     return (
 
-        <div
-            className={
-                `flex ${
-                    isUser
-                    ? "justify-end"
-                    : "justify-start"
-                }`
-            }
-        >
+        <div className={`flex mb-6 ${isUser ? "justify-end" : "justify-start"}`}>
 
             <div
-                className={
-                    `
-                    max-w-[70%]
-                    p-4
-                    rounded-xl
-                    ${
-                        isUser
-                        ? "bg-blue-600 text-white"
-                        : "bg-white shadow"
-                    }
-                    `
-                }
+                className={`
+                    max-w-3xl
+                    px-5
+                    py-4
+                    rounded-2xl
+                    shadow
+                    ${isUser ? "bg-purple-600 text-white" : "bg-white"}
+                `}
             >
 
                 {message}

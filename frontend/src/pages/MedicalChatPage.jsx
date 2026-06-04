@@ -3,57 +3,38 @@ import { useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import ChatBubble from "../components/ChatBubble";
-
 import ChatInput from "../components/ChatInput";
+import QuickMedicalQuestions from "../components/QuickMedicalQuestions";
 
 import { sendMessage } from "../services/chatService";
-
 
 function MedicalChatPage() {
 
     const [messages, setMessages] = useState([]);
 
-    const [loading, setLoading] = useState(false);
-
-    const handleSend = async(question) => {
+    const askQuestion = async(question) => {
 
         const userMessage = {
             sender: "user",
             message: question
         };
 
-        setMessages((prev) => [
-            ...prev,
-            userMessage
-        ]);
+        setMessages(prev => [...prev, userMessage]);
 
         try {
 
-            setLoading(true);
-
-            const result = await sendMessage(
-                question
-            );
+            const response = await sendMessage(question);
 
             const aiMessage = {
                 sender: "ai",
-                message:
-                    result.response
-                    || "No response"
+                message: response.response
             };
 
-            setMessages((prev) => [
-                ...prev,
-                aiMessage
-            ]);
+            setMessages(prev => [...prev, aiMessage]);
 
         } catch(error) {
 
             console.log(error);
-
-        } finally {
-
-            setLoading(false);
         }
     };
 
@@ -61,91 +42,37 @@ function MedicalChatPage() {
 
         <DashboardLayout>
 
-            <div className="p-8">
+            <div className="p-8 bg-slate-50 min-h-screen">
 
-                <h1 className="text-3xl font-bold mb-6">
+                <h1 className="text-4xl font-bold mb-2">
 
-                    Medical Chat
+                    Medical AI Assistant
 
                 </h1>
 
-                <div
-                    className="
-                        bg-gray-100
-                        rounded-xl
-                        p-6
-                        h-[500px]
-                        overflow-y-auto
-                        space-y-4
-                    "
-                >
+                <p className="text-gray-500 mb-8">
+
+                    Ask health related questions instantly
+                </p>
+
+                <QuickMedicalQuestions onSelect={askQuestion} />
+
+                <div className="bg-slate-100 rounded-2xl p-6 min-h-[500px] mb-6">
 
                     {
-                        messages.map(
-                            (item, index) => (
-
-                                <ChatBubble
-                                    key={index}
-                                    sender={item.sender}
-                                    message={item.message}
-                                />
-                            )
-                        )
-                    }
-
-                    {
-                        loading && (
+                        messages.map((item, index) => (
 
                             <ChatBubble
-                                sender="ai"
-                                message="Thinking..."
+                                key={index}
+                                sender={item.sender}
+                                message={item.message}
                             />
-                        )
+                        ))
                     }
 
                 </div>
 
-
-            <div className="flex gap-3 mb-4">
-
-                <button
-                    onClick={() => {
-                        handleSend(
-                            "What is diabetes?"
-                        );
-                    }}
-                >
-                    Diabetes
-                </button>
-
-                <button
-                    onClick={() => {
-                        handleSend(
-                            "Explain my report"
-                        );
-                    }}
-                >
-                    Explain Report
-                </button>
-
-                <button
-                    onClick={() => {
-                        handleSend(
-                            "What is an X-Ray?"
-                        );
-                    }}
-                >
-                    X-Ray
-                </button>
-
-            </div>
-                <div className="mt-4">
-
-                    <ChatInput
-                        onSend={handleSend}
-                    />
-
-                </div>
+                <ChatInput onSend={askQuestion} />
 
             </div>
 

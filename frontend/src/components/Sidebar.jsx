@@ -1,51 +1,60 @@
 import { Link } from "react-router-dom";
 
-
 function Sidebar() {
 
     return (
 
-        <aside className="w-64 min-h-screen bg-slate-900 text-white p-5">
+        <aside className="w-72 min-h-screen bg-white border-r">
 
-            <h2 className="text-xl font-bold mb-8">
+            <div className="p-6 border-b">
 
-                MedSphere AI
+                <h1 className="text-3xl font-bold text-purple-600">
 
-            </h2>
+                    MedSphere AI
 
-            <ul className="space-y-4">
+                </h1>
 
-                <li>
+                <p className="text-gray-500 mt-2">
 
-                    <Link to="/dashboard">
+                    Personal Healthcare Assistant
 
-                        Dashboard
+                </p>
 
-                    </Link>
+            </div>
 
-                </li>
+            <nav className="p-6 space-y-3">
 
-                <li>
+                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/dashboard">
 
-                    <Link to="/upload">
+                    Dashboard
 
-                        Upload Report
+                </Link>
 
-                    </Link>
+                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/upload-report">
 
-                </li>
+                    Upload Report
 
-                <li>
+                </Link>
 
-                    <Link to="/chat">
+                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/reports">
 
-                        Medical Chat
+                    My Reports
 
-                    </Link>
+                </Link>
 
-                </li>
+                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/chat">
 
-            </ul>
+                    AI Chat
+
+                </Link>
+
+                <Link className="block p-3 rounded-xl hover:bg-purple-50" to="/profile">
+
+                    Profile
+
+                </Link>
+
+            </nav>
 
         </aside>
     );

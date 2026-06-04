@@ -1,74 +1,50 @@
 import { useState } from "react";
 
-import { useNavigate } from "react-router-dom";
-
-import { loginUser } from "../services/authService";
-
-
 function LoginPage() {
 
-    const navigate = useNavigate();
-
     const [email, setEmail] = useState("");
-
     const [password, setPassword] = useState("");
 
-    const handleSubmit = async(e) => {
-
-        e.preventDefault();
-
-        try {
-
-            const response = await loginUser({
-                email,
-                password
-            });
-
-            localStorage.setItem(
-                "token",
-                response.access_token
-            );
-
-            navigate("/dashboard");
-
-        } catch(error) {
-
-            console.log(error);
-        }
-    };
-
     return (
-        <div>
 
-            <h1>
-                Login
-            </h1>
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
 
-            <form onSubmit={handleSubmit}>
+            <div className="bg-white shadow-xl rounded-3xl p-10 w-full max-w-md">
+
+                <h1 className="text-4xl font-bold mb-8 text-center">
+
+                    Welcome Back
+
+                </h1>
 
                 <input
                     type="email"
                     placeholder="Email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full border rounded-xl p-4 mb-4"
                 />
 
                 <input
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full border rounded-xl p-4 mb-6"
                 />
 
-                <button type="submit">
+                <button
+                    className="w-full bg-purple-600 text-white py-4 rounded-xl"
+                >
+
                     Login
+
                 </button>
 
-            </form>
+            </div>
 
         </div>
     );
 }
-
 
 export default LoginPage;

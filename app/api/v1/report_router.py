@@ -4,28 +4,19 @@ report_router.py
 Report upload endpoints.
 """
 
-from fastapi import (
-    APIRouter,
-    UploadFile,
-    File,
-    Depends
-)
-
+from fastapi import APIRouter, UploadFile, File, Depends
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
 
-from app.repositories.report_repository import (
-    ReportRepository
-)
+from app.repositories.report_repository import ReportRepository
+from app.repositories.medical_finding_repository import MedicalFindingRepository
 
-from app.services.report_service import (
-    ReportService
-)
+from app.services.report_service import ReportService
+from app.services.report_analysis_service import ReportAnalysisService
 
-from app.controllers.report_controller import (
-    ReportController
-)
+from app.controllers.report_controller import ReportController
+
 
 router = APIRouter(
     prefix="/reports",
@@ -35,34 +26,21 @@ router = APIRouter(
 
 def get_controller(db):
 
-    repository = (
-        ReportRepository(db)
-    )
+    repository = ReportRepository(db)
 
-    service = (
-        ReportService(repository)
-    )
+    service = ReportService(repository)
 
-    return ReportController(
-        service
-    )
+    return ReportController(service)
 
 
 @router.post("/upload")
-def upload_report(
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
-):
+def upload_report(file: UploadFile = File(...), db: Session = Depends(get_db)):
 
-    controller = (
-        get_controller(db)
-    )
+    controller = get_controller(db)
 
-    report = (
-        controller.upload_report(
-            file=file,
-            patient_id=1
-        )
+    report = controller.upload_report(
+        file=file,
+        patient_id=1
     )
 
     return {
@@ -71,88 +49,48 @@ def upload_report(
         "status": report.processing_status
     }
 
+
 @router.get("")
-def get_reports(
-    db: Session = Depends(get_db)
-):
+def get_reports(db: Session = Depends(get_db)):
 
-    controller = (
-        get_controller(db)
-    )
+    controller = get_controller(db)
 
-    reports = (
-        controller.get_reports(
-            patient_id=1
-        )
-    )
+    return controller.get_reports(patient_id=1)
 
-    return reports
 
 @router.get("/{report_id}")
-def get_report(
-    report_id: int,
-    db: Session = Depends(get_db)
-):
+def get_report(report_id: int, db: Session = Depends(get_db)):
 
-    controller = (
-        get_controller(db)
-    )
+    controller = get_controller(db)
 
-    return (
-        controller.get_report(
-            report_id
-        )
-    )
+    return controller.get_report(report_id)
+
 
 @router.delete("/{report_id}")
-def delete_report(
-    report_id: int,
-    db: Session = Depends(get_db)
-):
+def delete_report(report_id: int, db: Session = Depends(get_db)):
 
-    controller = (
-        get_controller(db)
-    )
+    controller = get_controller(db)
 
-    controller.delete_report(
-        report_id
-    )
+    controller.delete_report(report_id)
 
     return {
         "message": "deleted"
     }
 
-@router.post("/{report_id}/analyze")
-def analyze_report(report_id: int, db: Session = Depends(get_db)):
 
-    ocr_repository = OCRRepository(db)
+@router.get("/{report_id}/analysis")
+def get_analysis(report_id: int, db: Session = Depends(get_db)):
 
-    medical_repository = (
-        MedicalFindingRepository(db)
-    )
+    repository = MedicalFindingRepository(db)
 
-    ocr_record = (
-        ocr_repository.get_by_report_id(
-            report_id
-        )
-    )
+    service = ReportAnalysisService(repository)
 
-    if not ocr_record:
+    result = service.get_analysis(report_id)
+
+    if not result:
 
         return {
-            "message":
-            "OCR not completed"
+            "message": "Analysis not found"
         }
-
-    service = (
-        ReportAnalysisService(
-            medical_repository
-        )
-    )
-
-    result = service.analyze_report(
-        report_id,
-        ocr_record.raw_text
-    )
 
     return result

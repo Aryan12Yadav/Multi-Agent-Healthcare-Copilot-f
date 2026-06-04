@@ -118,4 +118,15 @@ class ReportRepository:
 
         return report
 
+            
+    def get_recent_reports(self):
+
+        from app.models.report import Report
+
+        return (
+            self.db.query(Report)
+            .order_by(Report.id.desc())
+            .limit(10)
+            .all()
+        )
 

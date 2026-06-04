@@ -2,9 +2,9 @@ function Footer() {
 
     return (
 
-        <footer className="bg-white p-4 text-center border-t">
+        <footer className="bg-white border-t py-6 text-center text-gray-500">
 
-            MedSphere AI © 2026
+            © 2026 MedSphere AI
 
         </footer>
     );

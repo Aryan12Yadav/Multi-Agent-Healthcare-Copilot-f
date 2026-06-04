@@ -41,3 +41,25 @@ class MedicalFindingRepository:
             )
             .first()
         )
+
+"""
+Medical Finding Repository
+"""
+
+
+class MedicalFindingRepository:
+
+    def __init__(self, db):
+
+        self.db = db
+
+    def get_analysis_count(self):
+
+        from app.models.medical_finding import MedicalFinding
+
+        return (
+            self.db.query(
+                MedicalFinding
+            )
+            .count()
+        )
