@@ -12,3 +12,12 @@ export const sendMessage = async(question) => {
 
     return response.data;
 };
+
+export const getHistory = async() => {
+
+    const response = await api.get(
+        "/chat/history"
+    );
+
+    return response.data;
+};

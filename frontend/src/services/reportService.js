@@ -32,3 +32,74 @@ export const getAnalysis = async(reportId) => {
 
     return response.data;
 };
+
+export const getReports = async() => {
+
+    const response = await api.get(
+        "/reports"
+    );
+
+    return response.data;
+};
+
+export const getReport = async(reportId) => {
+
+    const response = await api.get(`/reports/${reportId}`);
+
+    return response.data;
+};
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,63 +1,155 @@
 import { useState } from "react";
 
+import DashboardLayout from "../layouts/DashboardLayout";
+
+import ChatBubble from "../components/ChatBubble";
+
+import ChatInput from "../components/ChatInput";
+
 import { sendMessage } from "../services/chatService";
 
 
 function MedicalChatPage() {
 
-    const [question, setQuestion] = useState("");
+    const [messages, setMessages] = useState([]);
 
-    const [response, setResponse] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleAsk = async() => {
+    const handleSend = async(question) => {
+
+        const userMessage = {
+            sender: "user",
+            message: question
+        };
+
+        setMessages((prev) => [
+            ...prev,
+            userMessage
+        ]);
 
         try {
+
+            setLoading(true);
 
             const result = await sendMessage(
                 question
             );
 
-            setResponse(
-                result.response
-            );
+            const aiMessage = {
+                sender: "ai",
+                message:
+                    result.response
+                    || "No response"
+            };
+
+            setMessages((prev) => [
+                ...prev,
+                aiMessage
+            ]);
 
         } catch(error) {
 
             console.log(error);
+
+        } finally {
+
+            setLoading(false);
         }
     };
 
     return (
 
-        <div>
+        <DashboardLayout>
 
-            <h1>
-                Medical Chat
-            </h1>
+            <div className="p-8">
 
-            <input
-                type="text"
-                value={question}
-                onChange={(e) => {
-                    setQuestion(
-                        e.target.value
-                    );
-                }}
-            />
+                <h1 className="text-3xl font-bold mb-6">
 
-            <button onClick={handleAsk}>
+                    Medical Chat
 
-                Ask
+                </h1>
 
-            </button>
+                <div
+                    className="
+                        bg-gray-100
+                        rounded-xl
+                        p-6
+                        h-[500px]
+                        overflow-y-auto
+                        space-y-4
+                    "
+                >
 
-            <p>
+                    {
+                        messages.map(
+                            (item, index) => (
 
-                {response}
+                                <ChatBubble
+                                    key={index}
+                                    sender={item.sender}
+                                    message={item.message}
+                                />
+                            )
+                        )
+                    }
 
-            </p>
+                    {
+                        loading && (
 
-        </div>
+                            <ChatBubble
+                                sender="ai"
+                                message="Thinking..."
+                            />
+                        )
+                    }
+
+                </div>
+
+
+            <div className="flex gap-3 mb-4">
+
+                <button
+                    onClick={() => {
+                        handleSend(
+                            "What is diabetes?"
+                        );
+                    }}
+                >
+                    Diabetes
+                </button>
+
+                <button
+                    onClick={() => {
+                        handleSend(
+                            "Explain my report"
+                        );
+                    }}
+                >
+                    Explain Report
+                </button>
+
+                <button
+                    onClick={() => {
+                        handleSend(
+                            "What is an X-Ray?"
+                        );
+                    }}
+                >
+                    X-Ray
+                </button>
+
+            </div>
+                <div className="mt-4">
+
+                    <ChatInput
+                        onSend={handleSend}
+                    />
+
+                </div>
+
+            </div>
+
+        </DashboardLayout>
     );
 }
 

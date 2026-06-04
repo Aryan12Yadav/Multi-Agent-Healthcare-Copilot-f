@@ -1,11 +1,43 @@
+import { useEffect } from "react";
+import { useState } from "react";
+
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import DashboardCard from "../components/DashboardCard";
 
 import QuickActions from "../components/QuickActions";
 
+import RecentReports from "../components/RecentReports";
+
+import { getDashboardMetrics } from "../services/dashboardService";
+
 
 function DashboardPage() {
+
+    const [metrics, setMetrics] = useState(null);
+
+    useEffect(() => {
+
+        loadDashboard();
+
+    }, []);
+
+
+    const loadDashboard = async() => {
+
+        try {
+
+            const response = await getDashboardMetrics();
+
+            setMetrics(response);
+
+        }
+
+        catch(error) {
+
+            console.log(error);
+        }
+    };
 
     return (
 
@@ -15,30 +47,29 @@ function DashboardPage() {
 
                 <h1 className="text-3xl font-bold mb-8">
 
-                    Welcome to MedSphere AI
-
+                    Dashboard
                 </h1>
 
                 <div className="grid grid-cols-4 gap-6">
 
                     <DashboardCard
                         title="Reports"
-                        value="12"
+                        value={metrics?.report_count || 0}
                     />
 
                     <DashboardCard
-                        title="Analyses"
-                        value="8"
+                        title="Analysis"
+                        value={metrics?.analysis_count || 0}
                     />
 
                     <DashboardCard
                         title="Chats"
-                        value="25"
+                        value={metrics?.chat_count || 0}
                     />
 
                     <DashboardCard
                         title="Health Score"
-                        value="84"
+                        value={metrics?.health_score || 0}
                     />
 
                 </div>
@@ -46,6 +77,12 @@ function DashboardPage() {
                 <div className="mt-8">
 
                     <QuickActions />
+
+                </div>
+
+                <div className="mt-8">
+
+                    <RecentReports />
 
                 </div>
 

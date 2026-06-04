@@ -2,13 +2,9 @@ function Footer() {
 
     return (
 
-        <footer>
+        <footer className="bg-white p-4 text-center border-t">
 
-            <p>
-
-                MedSphere AI © 2026
-
-            </p>
+            MedSphere AI © 2026
 
         </footer>
     );

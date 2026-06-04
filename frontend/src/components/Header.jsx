@@ -2,16 +2,21 @@ function Header() {
 
     return (
 
-        <header>
+        <header className="bg-white shadow p-5 flex justify-between">
 
-            <h2>
+            <h2 className="font-bold text-xl">
 
                 MedSphere AI
 
             </h2>
 
-        </header>
+            <div>
 
+                Aryan
+
+            </div>
+
+        </header>
     );
 }
 

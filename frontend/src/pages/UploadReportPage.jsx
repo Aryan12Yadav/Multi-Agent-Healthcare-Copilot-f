@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import DashboardLayout from "../layouts/DashboardLayout";
+
 import { uploadReport } from "../services/reportService";
 
 
@@ -9,13 +11,15 @@ function UploadReportPage() {
 
     const [loading, setLoading] = useState(false);
 
-    const [response, setResponse] = useState(null);
+    const [message, setMessage] = useState("");
 
     const handleUpload = async() => {
 
         if (!file) {
 
-            alert("Select file first");
+            setMessage(
+                "Please select a file"
+            );
 
             return;
         }
@@ -24,18 +28,25 @@ function UploadReportPage() {
 
             setLoading(true);
 
-            const result = await uploadReport(file);
+            const response = await uploadReport(
+                file
+            );
 
-            setResponse(result);
+            setMessage(
+                "Report uploaded successfully"
+            );
+
+            console.log(response);
 
         } catch(error) {
 
             console.log(error);
 
-            alert("Upload failed");
-        }
+            setMessage(
+                "Upload failed"
+            );
 
-        finally {
+        } finally {
 
             setLoading(false);
         }
@@ -43,54 +54,84 @@ function UploadReportPage() {
 
     return (
 
-        <div>
+        <DashboardLayout>
 
-            <h1>
-                Upload Medical Report
-            </h1>
+            <div className="p-8">
 
-            <input
-                type="file"
-                onChange={(e) => {
-                    setFile(
-                        e.target.files[0]
-                    );
-                }}
-            />
+                <h1 className="text-3xl font-bold mb-8">
 
-            <button onClick={handleUpload}>
+                    Upload Medical Report
 
-                Upload
+                </h1>
 
-            </button>
+                <div className="bg-white p-8 rounded-xl shadow">
 
-            {
-                loading && (
+                    <input
+                        type="file"
+                        accept=".pdf,.png,.jpg,.jpeg"
+                        onChange={(e) => {
+                            setFile(
+                                e.target.files[0]
+                            );
+                        }}
+                    />
 
-                    <p>
-                        Uploading...
-                    </p>
-                )
-            }
+                    {
+                        file && (
 
-            {
-                response && (
+                            <div className="mt-4">
 
-                    <pre>
+                                <p>
+
+                                    File Name:
+
+                                </p>
+
+                                <p>
+
+                                    {file.name}
+
+                                </p>
+
+                                <p>
+
+                                    {(file.size / 1024).toFixed(2)} KB
+
+                                </p>
+
+                            </div>
+                        )
+                    }
+
+                    <button
+                        onClick={handleUpload}
+                        className="mt-6 bg-blue-600 text-white px-6 py-2 rounded"
+                    >
 
                         {
-                            JSON.stringify(
-                                response,
-                                null,
-                                4
-                            )
+                            loading
+                            ? "Uploading..."
+                            : "Upload Report"
                         }
 
-                    </pre>
-                )
-            }
+                    </button>
 
-        </div>
+                    {
+                        message && (
+
+                            <div className="mt-4">
+
+                                {message}
+
+                            </div>
+                        )
+                    }
+
+                </div>
+
+            </div>
+
+        </DashboardLayout>
     );
 }
 

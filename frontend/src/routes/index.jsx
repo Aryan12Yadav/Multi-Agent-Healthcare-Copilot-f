@@ -10,6 +10,8 @@ import DashboardPage from "../pages/DashboardPage";
 import UploadReportPage from "../pages/UploadReportPage";
 import ReportAnalysisPage from "../pages/ReportAnalysisPage";
 import MedicalChatPage from "../pages/MedicalChatPage";
+import LandingPage from "../pages/LandingPage";
+import ReportDetailsPage from "../pages/ReportDetailsPage";
 
 
 function AppRoutes() {
@@ -19,10 +21,8 @@ function AppRoutes() {
 
             <Routes>
 
-                <Route
-                    path="/"
-                    element={<LoginPage />}
-                />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
 
                 <Route
                     path="/register"
@@ -43,6 +43,8 @@ function AppRoutes() {
                     path="/analysis/:id"
                     element={<ReportAnalysisPage />}
                 />
+
+                <Route path="/reports/:id" element={<ReportDetailsPage />} />
 
                 <Route
                     path="/chat"

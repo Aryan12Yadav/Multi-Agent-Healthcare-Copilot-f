@@ -4,6 +4,10 @@ import { useState } from "react";
 
 import { useParams } from "react-router-dom";
 
+import DashboardLayout from "../layouts/DashboardLayout";
+
+import AnalysisCard from "../components/AnalysisCard";
+
 import { getAnalysis } from "../services/reportService";
 
 
@@ -17,18 +21,16 @@ function ReportAnalysisPage() {
 
     useEffect(() => {
 
-        fetchAnalysis();
+        loadAnalysis();
 
     }, []);
 
 
-    const fetchAnalysis = async() => {
+    const loadAnalysis = async() => {
 
         try {
 
-            const response = await getAnalysis(
-                id
-            );
+            const response = await getAnalysis(id);
 
             setAnalysis(response);
 
@@ -45,33 +47,80 @@ function ReportAnalysisPage() {
     if (loading) {
 
         return (
-            <h2>
-                Loading Analysis...
-            </h2>
+
+            <DashboardLayout>
+
+                <div className="p-8">
+
+                    Loading Analysis...
+
+                </div>
+
+            </DashboardLayout>
         );
     }
 
     return (
 
-        <div>
+        <DashboardLayout>
 
-            <h1>
-                Report Analysis
-            </h1>
+            <div className="p-8">
 
-            <pre>
+                <h1 className="text-3xl font-bold mb-8">
+
+                    Medical Analysis
+
+                </h1>
+
+                <div className="grid grid-cols-2 gap-6">
+
+                    <AnalysisCard
+                        title="Report Type"
+                        value={analysis?.report_type}
+                    />
+
+                    <AnalysisCard
+                        title="Summary"
+                        value={analysis?.summary}
+                    />
+
+                </div>
+
+            </div>
+
+            {
+    analysis?.finding_json?.recommendations && (
+
+        <div className="mt-8">
+
+            <h2 className="text-2xl font-semibold mb-4">
+
+                Recommendations
+
+            </h2>
+
+            <ul>
 
                 {
-                    JSON.stringify(
-                        analysis,
-                        null,
-                        4
+                    analysis.finding_json.recommendations.map(
+                        (item, index) => (
+
+                            <li key={index}>
+
+                                {item}
+
+                            </li>
+                        )
                     )
                 }
 
-            </pre>
+            </ul>
 
         </div>
+    )
+}
+
+        </DashboardLayout>
     );
 }
 
