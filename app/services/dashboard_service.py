@@ -36,6 +36,10 @@ class DashboardService:
             patient_id
         )
 
+        chat_count = 0
+
+        health_score = 89
+        
         analysis_count = self.medical_repository.get_analysis_count()
 
         health_score = max(

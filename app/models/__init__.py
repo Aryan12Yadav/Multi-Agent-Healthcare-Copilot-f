@@ -12,5 +12,6 @@ from app.models.doctor_profile import DoctorProfile
 from app.models.report import Report
 from app.models.ocr_text import OCRText
 from app.models.medical_finding import MedicalFinding
+from app.models.chat_message import ChatMessage
 
 
