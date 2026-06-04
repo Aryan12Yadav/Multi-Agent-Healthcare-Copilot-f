@@ -1,34 +1,67 @@
-from app.rag.retrievers.report_retriever import ReportRetriever
+import os
+import uuid
 
-from app.chat.prompts.report_chat_prompt import (
-    REPORT_CHAT_PROMPT
-)
-
-from app.llm.providers.deepseek_provider import (
-    DeepSeekProvider
-)
+from app.models.report import Report
 
 
-class ReportChatService:
+class ReportService:
 
-    def __init__(self):
+    def __init__(self, repository):
 
-        self.retriever = ReportRetriever()
+        self.repository = repository
 
-        self.llm = DeepSeekProvider()
+    def upload_report(self, file, patient_id):
 
-    def ask(self, report_id, question):
+        extension = os.path.splitext(
+            file.filename
+        )[1]
 
-        context = self.retriever.retrieve(
-            report_id,
-            question
+        stored_name = (
+            f"{uuid.uuid4()}{extension}"
         )
 
-        prompt = REPORT_CHAT_PROMPT.format(
-            context=context,
-            question=question
+        upload_path = (
+            f"storage/reports/{stored_name}"
         )
 
-        return self.llm.generate(
-            prompt
+        with open(upload_path, "wb") as buffer:
+
+            buffer.write(
+                file.file.read()
+            )
+
+        report = Report(
+            patient_id=patient_id,
+            report_name=file.filename,
+            report_type="unknown",
+            original_file_name=file.filename,
+            stored_file_name=stored_name,
+            file_path=upload_path,
+            file_size=os.path.getsize(
+                upload_path
+            ),
+            mime_type=file.content_type,
+            processing_status="uploaded"
+        )
+
+        return self.repository.create_report(
+            report
+        )
+
+    def get_reports(self, patient_id):
+
+        return self.repository.get_reports(
+            patient_id
+        )
+
+    def get_report(self, report_id):
+
+        return self.repository.get_report(
+            report_id
+        )
+
+    def delete_report(self, report_id):
+
+        return self.repository.delete_report(
+            report_id
         )

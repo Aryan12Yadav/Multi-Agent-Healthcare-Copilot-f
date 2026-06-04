@@ -1,21 +1,25 @@
-"""
-dashboard_router.py
-
-Dashboard APIs.
-"""
-
 from fastapi import APIRouter
 from fastapi import Depends
+
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
 
-from app.services.dashboard_service import DashboardService
+from app.repositories.report_repository import (
+    ReportRepository
+)
 
-from app.repositories.report_repository import ReportRepository
+from app.repositories.chat_repository import (
+    ChatRepository
+)
 
-from app.repositories.medical_finding_repository import MedicalFindingRepository
+from app.repositories.medical_finding_repository import (
+    MedicalFindingRepository
+)
 
+from app.services.dashboard_service import (
+    DashboardService
+)
 
 router = APIRouter(
     prefix="/dashboard",
@@ -23,16 +27,15 @@ router = APIRouter(
 )
 
 
-@router.get("/metrics")
-def get_metrics(db: Session = Depends(get_db)):
-
-    report_repository = ReportRepository(db)
-
-    analysis_repository = MedicalFindingRepository(db)
+@router.get("")
+def dashboard(db: Session = Depends(get_db)):
 
     service = DashboardService(
-        report_repository,
-        analysis_repository
+        ReportRepository(db),
+        ChatRepository(db),
+        MedicalFindingRepository(db)
     )
 
-    return service.get_dashboard_metrics()
+    return service.get_metrics(
+        1
+    )

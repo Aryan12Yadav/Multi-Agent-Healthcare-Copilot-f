@@ -17,11 +17,7 @@ router = APIRouter(
 @router.post("")
 def ask_report(request: ReportChatRequest):
 
-    response = ReportChatService().ask(
+    return ReportChatService().ask(
         request.report_id,
         request.question
     )
-
-    return {
-        "response": response
-    }

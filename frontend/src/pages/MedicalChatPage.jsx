@@ -1,30 +1,25 @@
 import { useState } from "react";
-
 import DashboardLayout from "../layouts/DashboardLayout";
-
-import ChatBubble from "../components/ChatBubble";
-import ChatInput from "../components/ChatInput";
-
 import { sendMessage } from "../services/chatService";
 
 function MedicalChatPage() {
 
-    const [messages, setMessages] = useState([
-        {
-            sender: "ai",
-            message: "Hello Aryan, how can I help you today?"
-        }
-    ]);
+    const [question, setQuestion] = useState("");
+    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const askQuestion = async(question) => {
+    const handleSend = async() => {
 
-        setMessages(prev => [
-            ...prev,
-            {
-                sender: "user",
-                message: question
-            }
-        ]);
+        if (!question.trim()) return;
+
+        const userMessage = {
+            sender: "user",
+            message: question
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+
+        setLoading(true);
 
         try {
 
@@ -38,55 +33,66 @@ function MedicalChatPage() {
                 }
             ]);
 
+            setQuestion("");
+
         } catch(error) {
 
             console.log(error);
+
+        } finally {
+
+            setLoading(false);
         }
     };
 
     return (
-
         <DashboardLayout>
 
-            <div className="p-8 bg-slate-50 min-h-screen">
+            <div className="p-8 h-screen flex flex-col">
 
-                <div className="bg-white rounded-3xl shadow p-8 mb-8">
+                <h1 className="text-3xl font-bold mb-6">
+                    Medical AI Assistant
+                </h1>
 
-                    <h1 className="text-4xl font-bold">
-
-                        Medical AI Assistant
-
-                    </h1>
-
-                    <p className="text-slate-500 mt-3">
-
-                        Ask questions about diseases, reports, medicines and healthcare.
-                    </p>
-
-                </div>
-
-                <div className="bg-slate-100 rounded-3xl p-6 min-h-[500px] mb-6">
+                <div className="flex-1 overflow-y-auto border rounded-xl bg-white p-4">
 
                     {
                         messages.map((item, index) => (
-
-                            <ChatBubble
+                            <div
                                 key={index}
-                                sender={item.sender}
-                                message={item.message}
-                            />
-
+                                className={`mb-4 flex ${item.sender === "user" ? "justify-end" : "justify-start"}`}
+                            >
+                                <div className={`max-w-xl p-3 rounded-xl ${item.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-100"}`}>
+                                    {item.message}
+                                </div>
+                            </div>
                         ))
                     }
 
                 </div>
 
-                <ChatInput onSend={askQuestion} />
+                <div className="mt-4 flex gap-3">
+
+                    <input
+                        value={question}
+                        onChange={e => setQuestion(e.target.value)}
+                        placeholder="Ask medical question..."
+                        className="flex-1 border rounded-xl px-4 py-3"
+                    />
+
+                    <button
+                        onClick={handleSend}
+                        disabled={loading}
+                        className="bg-blue-600 text-white px-6 rounded-xl"
+                    >
+                        Send
+                    </button>
+
+                </div>
 
             </div>
 
         </DashboardLayout>
-
     );
 }
 

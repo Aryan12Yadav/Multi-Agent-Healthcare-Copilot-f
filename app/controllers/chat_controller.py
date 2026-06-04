@@ -26,3 +26,11 @@ class ChatController:
             user_id,
             message
         )
+    
+    def chat(self, user_id, question, report_id=None):
+
+        return self.service.process_chat(
+            user_id,
+            question,
+            report_id
+        )

@@ -1,54 +1,41 @@
-"""
-Report Chat Service
-
-Allows users to chat
-with uploaded reports.
-
-"""
-
-from app.chat.services.medical_chat_service import (
-    MedicalChatService
+from app.rag.retrievers.report_retriever import (
+    ReportRetriever
 )
 
-from app.chat.builders.report_context_builder import (
-    ReportContextBuilder
+from app.chat.prompts.report_chat_prompt import (
+    REPORT_CHAT_PROMPT
+)
+
+from app.llm.providers.deepseek_provider import (
+    DeepSeekProvider
 )
 
 
 class ReportChatService:
-    """
-    Report Chat Service
-    """
 
     def __init__(self):
 
-        self.chat_service = (
-            MedicalChatService()
+        self.retriever = ReportRetriever()
+
+        self.llm = DeepSeekProvider()
+
+    def ask(self, report_id, question):
+
+        context = self.retriever.retrieve(
+            report_id,
+            question
         )
 
-        self.builder = (
-            ReportContextBuilder()
+        prompt = REPORT_CHAT_PROMPT.format(
+            context=context,
+            question=question
         )
 
-    def ask(
-        self,
-        question,
-        report,
-        ocr_text,
-        findings
-    ):
-
-        context = (
-            self.builder.build(
-                report,
-                ocr_text,
-                findings
-            )
+        response = self.llm.generate(
+            prompt
         )
 
-        return (
-            self.chat_service.ask(
-                question,
-                context
-            )
-        )
+        return {
+            "context": context,
+            "response": response
+        }

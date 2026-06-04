@@ -1,21 +1,13 @@
 import api from "../api/axios";
 
-export const sendMessage = async(question) => {
+export const sendMessage = async(question, reportId = null) => {
 
     const response = await api.post(
         "/chat",
         {
-            question
+            question,
+            report_id: reportId
         }
-    );
-
-    return response.data;
-};
-
-export const getHistory = async() => {
-
-    const response = await api.get(
-        "/chat/history"
     );
 
     return response.data;

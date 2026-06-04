@@ -19,6 +19,11 @@ from app.api.v1.ocr_router import router as ocr_router
 from app.api.v1.llm_router import router as llm_router
 from app.api.v1.dashboard_router import router as dashboard_router
 from app.api.v1.report_chat_router import router as report_chat_router
+from app.api.v1.pharmacy_router import router as pharmacy_router
+from app.api.v1.hospital_router import router as hospital_router
+from app.api.v1.trend_router import router as trend_router
+from app.api.v1.followup_router import router as followup_router
+from app.api.v1.cost_router import router as cost_router
 
 
 
@@ -90,7 +95,15 @@ class ApplicationFactory:
             report_chat_router,
             prefix = "/api/v1"
         )
-        
+
+        app.include_router(pharmacy_router, prefix="/api/v1")
+        app.include_router(hospital_router, prefix="/api/v1")
+        app.include_router(trend_router, prefix="/api/v1")
+        app.include_router(followup_router, prefix="/api/v1")
+        app.include_router(cost_router, prefix="/api/v1")
+
+            
+
         return app
     
 

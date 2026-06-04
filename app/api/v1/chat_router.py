@@ -15,8 +15,6 @@ from app.services.chat_service import ChatService
 
 from app.controllers.chat_controller import ChatController
 
-from app.chat.services.medical_chat_service import MedicalChatService
-
 from app.schemas.chat_schema import ChatRequest
 
 
@@ -44,29 +42,20 @@ def get_history(db: Session = Depends(get_db)):
 
 
 
-
 @router.post("")
 def chat(payload: ChatRequest, db: Session = Depends(get_db)):
 
-    repository = ChatRepository(db)
-
-    service = ChatService(repository)
-
-    llm_service = MedicalChatService()
-
-    answer = llm_service.ask(
-        payload.question
+    controller = get_controller(
+        db
     )
 
-    service.save_conversation(
+    answer = controller.chat(
         1,
         payload.question,
-        answer
+        payload.report_id
     )
 
     return {
         "response": answer
     }
-
-
 

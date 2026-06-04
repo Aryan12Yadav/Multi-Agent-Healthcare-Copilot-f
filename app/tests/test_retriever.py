@@ -8,4 +8,6 @@ context = ReportRetriever().retrieve(
     "What is hemoglobin?"
 )
 
-print(context)
+print(
+    context
+)

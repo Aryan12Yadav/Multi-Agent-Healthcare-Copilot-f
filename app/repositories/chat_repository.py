@@ -24,3 +24,11 @@ class ChatRepository:
         ).filter(
             ChatMessage.user_id == user_id
         ).all()
+    
+    def get_chat_count(self, user_id):
+
+        return self.db.query(
+            ChatMessage
+        ).filter(
+            ChatMessage.user_id == user_id
+        ).count()

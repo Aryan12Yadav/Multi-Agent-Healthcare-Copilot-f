@@ -3,48 +3,33 @@ import { Link } from "react-router-dom";
 function Sidebar() {
 
     return (
+        <aside className="w-64 bg-slate-900 text-white min-h-screen">
 
-        <div className="w-72 bg-white border-r min-h-screen">
-
-            <div className="p-8">
-
-                <h1 className="text-3xl font-bold text-violet-600">
-
-                    MedSphere AI
-
-                </h1>
-
+            <div className="p-6 text-2xl font-bold">
+                MedSphere AI
             </div>
 
-            <div className="px-5 space-y-2">
+            <nav className="px-4">
 
-                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/dashboard">
-
+                <Link to="/dashboard" className="block py-3">
                     Dashboard
-
                 </Link>
 
-                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/upload-report">
-
+                <Link to="/upload-report" className="block py-3">
                     Upload Report
-
                 </Link>
 
-                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/report-analysis">
-
-                    Report Analysis
-
+                <Link to="/report-analysis" className="block py-3">
+                    Analysis
                 </Link>
 
-                <Link className="block p-4 rounded-xl hover:bg-violet-50" to="/chat">
-
+                <Link to="/medical-chat" className="block py-3">
                     Medical Chat
-
                 </Link>
 
-            </div>
+            </nav>
 
-        </div>
+        </aside>
     );
 }
 

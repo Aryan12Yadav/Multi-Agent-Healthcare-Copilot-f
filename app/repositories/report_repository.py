@@ -119,14 +119,23 @@ class ReportRepository:
         return report
 
             
-    def get_recent_reports(self):
+    def get_report_count(self, patient_id):
 
-        from app.models.report import Report
+        return self.db.query(
+            Report
+        ).filter(
+            Report.patient_id == patient_id
+        ).count()
 
-        return (
-            self.db.query(Report)
-            .order_by(Report.id.desc())
-            .limit(10)
-            .all()
-        )
 
+    def get_recent_reports(self, patient_id):
+
+        return self.db.query(
+            Report
+        ).filter(
+            Report.patient_id == patient_id
+        ).order_by(
+            Report.id.desc()
+        ).limit(
+            5
+        ).all()

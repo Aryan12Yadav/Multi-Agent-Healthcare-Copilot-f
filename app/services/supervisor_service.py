@@ -1,32 +1,49 @@
-from app.agents.report_agent.report_agent import ReportAgent
-from app.agents.medical_agent.medical_agent import MedicalAgent
+from app.chat.services.medical_chat_service import (
+    MedicalChatService
+)
 
-from app.agents.supervisor.router import SupervisorRouter
+from app.services.report_chat_service import (
+    ReportChatService
+)
 
 
 class SupervisorService:
 
     def __init__(self):
 
-        self.router = SupervisorRouter()
+        self.medical_chat = MedicalChatService()
 
-        self.report_agent = ReportAgent()
-
-        self.medical_agent = MedicalAgent()
+        self.report_chat = ReportChatService()
 
     def ask(self, question, report_id=None):
 
-        route = self.router.route(
-            question
+        keywords = [
+            "hemoglobin",
+            "platelet",
+            "wbc",
+            "rbc",
+            "cbc",
+            "thyroid",
+            "cholesterol",
+            "report"
+        ]
+
+        question_lower = question.lower()
+
+        is_report_question = any(
+            keyword in question_lower
+            for keyword in keywords
         )
 
-        if route == "report":
+        if is_report_question and report_id:
 
-            return self.report_agent.execute(
+            return self.report_chat.ask(
                 report_id,
                 question
             )
 
-        return self.medical_agent.execute(
-            question
-        )
+        return {
+            "response": self.medical_chat.ask(
+                question
+            )
+        }

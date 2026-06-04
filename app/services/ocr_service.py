@@ -1,9 +1,3 @@
-"""
-ocr_service.py
-
-OCR business logic.
-"""
-
 from app.models.ocr_text import OCRText
 
 from app.workers.report_embedding_worker import (
@@ -12,9 +6,6 @@ from app.workers.report_embedding_worker import (
 
 
 class OCRService:
-    """
-    OCR Service
-    """
 
     def __init__(self, repository):
 
@@ -22,11 +13,8 @@ class OCRService:
 
     def create_pending_record(self, report_id):
 
-        existing = (
-            self.repository
-            .get_by_report_id(
-                report_id
-            )
+        existing = self.repository.get_by_report_id(
+            report_id
         )
 
         if existing:
@@ -39,9 +27,35 @@ class OCRService:
             ocr_status="pending"
         )
 
-        return (
-            self.repository
-            .create_record(
-                record
-            )
+        return self.repository.create_record(
+            record
         )
+
+    def save_extracted_text(
+        self,
+        report_id,
+        extracted_text
+    ):
+
+        record = self.repository.get_by_report_id(
+            report_id
+        )
+
+        if not record:
+
+            return None
+
+        record.raw_text = extracted_text
+
+        record.ocr_status = "completed"
+
+        self.repository.update_record(
+            record
+        )
+
+        ReportEmbeddingWorker().process(
+            report_id,
+            extracted_text
+        )
+
+        return record
