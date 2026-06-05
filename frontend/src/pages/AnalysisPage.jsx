@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
@@ -11,6 +12,8 @@ import ErrorState from "../components/ErrorState";
 import { getReports } from "../services/reportService";
 
 function AnalysisPage() {
+
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
 
@@ -28,10 +31,13 @@ function AnalysisPage() {
 
         try {
 
-            const response = await getReports();
+            const response =
+                await getReports();
 
             setReports(
-                response || []
+                Array.isArray(response)
+                    ? response
+                    : []
             );
 
         } catch(error) {
@@ -71,7 +77,7 @@ function AnalysisPage() {
 
             <Sidebar />
 
-            <div className="flex-1">
+            <div className="flex-1 overflow-x-hidden">
 
                 <Header />
 
@@ -88,6 +94,7 @@ function AnalysisPage() {
                         <p className="text-slate-500 mt-3">
 
                             All analyzed reports and AI insights
+
                         </p>
 
                     </div>
@@ -121,7 +128,10 @@ function AnalysisPage() {
 
                                                         <h2 className="text-xl font-bold">
 
-                                                            {report.report_name}
+                                                            {
+                                                                report.report_name ||
+                                                                "Medical Report"
+                                                            }
 
                                                         </h2>
 
@@ -147,7 +157,14 @@ function AnalysisPage() {
 
                                                 <div className="mt-6">
 
-                                                    <button className="bg-violet-600 text-white px-6 py-3 rounded-2xl">
+                                                    <button
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/report/${report.id}`
+                                                            )
+                                                        }
+                                                        className="bg-violet-600 text-white px-6 py-3 rounded-2xl"
+                                                    >
 
                                                         View Analysis
 

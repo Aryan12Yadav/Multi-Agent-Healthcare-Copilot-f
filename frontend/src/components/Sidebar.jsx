@@ -1,7 +1,5 @@
 import { NavLink } from "react-router-dom";
 
-import { logoutUser } from "../services/auth";
-
 function Sidebar() {
 
     const menus = [
@@ -10,7 +8,7 @@ function Sidebar() {
             path: "/dashboard"
         },
         {
-            name: "Upload",
+            name: "Upload Report",
             path: "/upload"
         },
         {
@@ -18,7 +16,7 @@ function Sidebar() {
             path: "/analysis"
         },
         {
-            name: "Medical Chat",
+            name: "AI Assistant",
             path: "/chat"
         },
         {
@@ -32,7 +30,18 @@ function Sidebar() {
     ];
 
     return (
-        <aside className="hidden lg:flex flex-col w-72 bg-slate-950 text-white min-h-screen">
+        <aside
+            className="
+                hidden
+                lg:flex
+                flex-col
+                w-64
+                min-w-64
+                bg-slate-950
+                text-white
+                min-h-screen
+            "
+        >
 
             <div className="p-8 border-b border-slate-800">
 
@@ -59,11 +68,18 @@ function Sidebar() {
                             key={item.path}
                             to={item.path}
                             className={({ isActive }) =>
-                                `block p-4 rounded-2xl mb-3 ${
+                                `
+                                block
+                                p-4
+                                rounded-2xl
+                                mb-3
+                                transition-all
+                                ${
                                     isActive
-                                        ? "bg-violet-600"
-                                        : "hover:bg-slate-900"
-                                }`
+                                        ? "bg-violet-600 text-white"
+                                        : "hover:bg-slate-900 text-slate-300"
+                                }
+                                `
                             }
                         >
 
@@ -76,16 +92,23 @@ function Sidebar() {
 
             </div>
 
-            <div className="p-4">
+            <div className="p-4 border-t border-slate-800">
 
-                <button
-                    onClick={logoutUser}
-                    className="w-full h-14 bg-red-500 rounded-2xl"
-                >
+                <div className="bg-slate-900 rounded-2xl p-4">
 
-                    Logout
+                    <p className="text-sm text-slate-400">
 
-                </button>
+                        System Status
+
+                    </p>
+
+                    <p className="mt-2 text-green-400 font-semibold">
+
+                        All Services Online
+
+                    </p>
+
+                </div>
 
             </div>
 

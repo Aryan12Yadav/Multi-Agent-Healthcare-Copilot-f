@@ -5,14 +5,12 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import StatCard from "../components/StatCard";
-import HealthScoreCard from "../components/HealthScoreCard";
-import RecentActivity from "../components/RecentActivity";
-import AgentCard from "../components/AgentCard";
+
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
 
-import { getDashboardData } from "../services/dashboardService";
+import { getDashboardStats } from "../services/userService";
 
 function DashboardPage() {
 
@@ -34,12 +32,8 @@ function DashboardPage() {
 
         try {
 
-            setLoading(true);
-
-            setError(false);
-
             const response =
-                await getDashboardData();
+                await getDashboardStats();
 
             setDashboard(
                 response
@@ -62,7 +56,7 @@ function DashboardPage() {
         return (
             <LoadingSpinner
                 title="Loading Dashboard"
-                description="Preparing your healthcare workspace"
+                description="Fetching dashboard data"
             />
         );
     }
@@ -72,7 +66,7 @@ function DashboardPage() {
         return (
             <ErrorState
                 title="Dashboard Error"
-                description="Unable to load dashboard data"
+                description="Unable to load dashboard"
             />
         );
     }
@@ -81,8 +75,8 @@ function DashboardPage() {
 
         return (
             <EmptyState
-                title="No Dashboard Data"
-                description="Dashboard information is unavailable"
+                title="No Data Available"
+                description="Dashboard information unavailable"
             />
         );
     }
@@ -92,57 +86,45 @@ function DashboardPage() {
 
             <Sidebar />
 
-            <div className="flex-1">
+            <div className="flex-1 overflow-x-hidden">
 
                 <Header />
 
-                <div className="p-6 lg:p-8">
+                <div className="p-8">
 
-                    <div className="bg-gradient-to-r from-violet-700 via-indigo-700 to-blue-700 rounded-[32px] p-10 text-white shadow-lg">
+                    <div className="bg-gradient-to-r from-violet-700 to-indigo-700 rounded-[32px] p-10 text-white">
 
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                        <h1 className="text-5xl font-bold">
 
-                            <div>
+                            Welcome Back
 
-                                <h1 className="text-4xl lg:text-5xl font-bold">
+                        </h1>
 
-                                    Welcome Back Aryan
+                        <p className="mt-4 text-violet-100">
 
-                                </h1>
+                            AI Powered Healthcare Intelligence Platform
 
-                                <p className="mt-4 text-violet-100 text-lg">
+                        </p>
 
-                                    AI Powered Healthcare Intelligence Platform
-                                </p>
+                        <div className="flex gap-4 mt-8">
 
-                                <p className="mt-2 text-violet-200">
+                            <button
+                                onClick={() => navigate("/upload")}
+                                className="bg-white text-violet-700 px-8 py-4 rounded-2xl font-semibold"
+                            >
 
-                                    Upload reports, analyze health data and chat with AI agents.
-                                </p>
+                                Upload Report
 
-                            </div>
+                            </button>
 
-                            <div className="flex flex-wrap gap-4">
+                            <button
+                                onClick={() => navigate("/chat")}
+                                className="bg-violet-500 px-8 py-4 rounded-2xl font-semibold"
+                            >
 
-                                <button
-                                    onClick={() => navigate("/upload")}
-                                    className="bg-white text-violet-700 px-8 py-4 rounded-2xl font-semibold"
-                                >
+                                Open Assistant
 
-                                    Upload Report
-
-                                </button>
-
-                                <button
-                                    onClick={() => navigate("/chat")}
-                                    className="bg-violet-500 px-8 py-4 rounded-2xl font-semibold"
-                                >
-
-                                    Open Assistant
-
-                                </button>
-
-                            </div>
+                            </button>
 
                         </div>
 
@@ -172,191 +154,32 @@ function DashboardPage() {
 
                     </div>
 
-                    <div className="grid lg:grid-cols-3 gap-6 mt-8">
-
-                        <HealthScoreCard
-                            score={dashboard.health_score || 0}
-                        />
-
-                        <div className="lg:col-span-2 bg-white rounded-[32px] p-6 shadow-sm">
-
-                            <div className="flex justify-between items-center mb-6">
-
-                                <h2 className="text-2xl font-bold">
-
-                                    AI Insights
-
-                                </h2>
-
-                                <button
-                                    onClick={() => navigate("/analysis")}
-                                    className="text-violet-600 font-semibold"
-                                >
-
-                                    Open Analysis
-
-                                </button>
-
-                            </div>
-
-                            {
-                                dashboard.latest_insights?.length > 0
-                                    ? (
-                                        <div className="space-y-4">
-
-                                            {
-                                                dashboard.latest_insights.map(
-                                                    (
-                                                        item,
-                                                        index
-                                                    ) => (
-
-                                                        <div
-                                                            key={index}
-                                                            className="bg-violet-50 border border-violet-100 rounded-2xl p-5"
-                                                        >
-
-                                                            {item}
-
-                                                        </div>
-
-                                                    )
-                                                )
-                                            }
-
-                                        </div>
-                                    )
-                                    : (
-                                        <EmptyState
-                                            title="No Insights"
-                                            description="Upload reports to generate AI insights"
-                                        />
-                                    )
-                            }
-
-                        </div>
-
-                    </div>
-
-                    <div className="grid lg:grid-cols-3 gap-6 mt-8">
-
-                        <div className="bg-white rounded-[32px] p-6 shadow-sm">
-
-                            <h2 className="text-2xl font-bold">
-
-                                Quick Actions
-
-                            </h2>
-
-                            <div className="space-y-4 mt-6">
-
-                                <button
-                                    onClick={() => navigate("/upload")}
-                                    className="w-full h-14 bg-violet-600 text-white rounded-2xl font-semibold"
-                                >
-
-                                    Upload Report
-
-                                </button>
-
-                                <button
-                                    onClick={() => navigate("/analysis")}
-                                    className="w-full h-14 bg-blue-600 text-white rounded-2xl font-semibold"
-                                >
-
-                                    View Analysis
-
-                                </button>
-
-                                <button
-                                    onClick={() => navigate("/chat")}
-                                    className="w-full h-14 bg-green-600 text-white rounded-2xl font-semibold"
-                                >
-
-                                    Open AI Assistant
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                        <AgentCard
-                            title="Medical Agent"
-                            description="Medical reasoning and healthcare guidance."
-                            active={true}
-                        />
-
-                        <AgentCard
-                            title="Report Agent"
-                            description="Report analysis and health interpretation."
-                            active={true}
-                        />
-
-                    </div>
-
                     <div className="bg-white rounded-[32px] p-6 shadow-sm mt-8">
 
-                        <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold mb-6">
 
-                            <h2 className="text-2xl font-bold">
+                            AI Insights
 
-                                Recent Reports
-
-                            </h2>
-
-                            <button
-                                onClick={() => navigate("/analysis")}
-                                className="text-violet-600 font-semibold"
-                            >
-
-                                View All
-
-                            </button>
-
-                        </div>
+                        </h2>
 
                         {
-                            dashboard.recent_reports?.length > 0
+                            dashboard.latest_insights?.length > 0
                                 ? (
                                     <div className="space-y-4">
 
                                         {
-                                            dashboard.recent_reports.map(
-                                                report => (
+                                            dashboard.latest_insights.map(
+                                                (
+                                                    item,
+                                                    index
+                                                ) => (
 
                                                     <div
-                                                        key={report.id}
-                                                        className="border border-slate-200 rounded-2xl p-5 flex justify-between items-center hover:bg-slate-50"
+                                                        key={index}
+                                                        className="bg-violet-50 rounded-2xl p-4"
                                                     >
 
-                                                        <div>
-
-                                                            <h3 className="font-semibold text-lg">
-
-                                                                {report.report_name}
-
-                                                            </h3>
-
-                                                            <p className="text-slate-500 text-sm mt-1">
-
-                                                                Medical Report
-                                                            </p>
-
-                                                        </div>
-
-                                                        <button
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    `/report/${report.id}`
-                                                                )
-                                                            }
-                                                            className="bg-slate-100 px-5 py-3 rounded-xl font-medium"
-                                                        >
-
-                                                            View
-
-                                                        </button>
+                                                        {item}
 
                                                     </div>
 
@@ -367,26 +190,13 @@ function DashboardPage() {
                                     </div>
                                 )
                                 : (
-                                    <EmptyState
-                                        title="No Reports Found"
-                                        description="Upload your first medical report"
-                                    />
+                                    <p className="text-slate-500">
+
+                                        No insights available
+
+                                    </p>
                                 )
                         }
-
-                    </div>
-
-                    <div className="mt-8">
-
-                        <RecentActivity
-                            activities={
-                                dashboard.activities || [
-                                    "Dashboard accessed",
-                                    "AI assistant available",
-                                    "Healthcare analysis ready"
-                                ]
-                            }
-                        />
 
                     </div>
 

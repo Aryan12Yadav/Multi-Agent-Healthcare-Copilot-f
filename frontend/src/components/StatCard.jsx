@@ -1,12 +1,19 @@
-
-
 function StatCard({
     title,
     value
 }) {
 
     return (
-        <div className="bg-white rounded-[32px] p-6 shadow-sm">
+        <div
+            className="
+                bg-white
+                rounded-[32px]
+                p-6
+                shadow-sm
+                border
+                border-slate-100
+            "
+        >
 
             <p className="text-slate-500 text-sm">
 

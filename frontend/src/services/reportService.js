@@ -15,8 +15,16 @@ export const uploadReport = async(
 
 export const getReports = async() => {
 
-    return await apiGet(
-        "/reports"
+    const response =
+        await apiGet(
+            "/reports"
+        );
+
+    return (
+        response?.reports ||
+        response?.data ||
+        response ||
+        []
     );
 };
 

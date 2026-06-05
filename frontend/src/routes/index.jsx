@@ -1,161 +1,81 @@
-import { Routes } from "react-router-dom";
-import { Route } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+    Navigate
+} from "react-router-dom";
 
-import LandingPage from "../pages/LandingPage";
-import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import UploadPage from "../pages/UploadPage";
 import AnalysisPage from "../pages/AnalysisPage";
+import ReportDetailsPage from "../pages/ReportDetailsPage";
 import ChatPage from "../pages/ChatPage";
 import ProfilePage from "../pages/ProfilePage";
 import SettingsPage from "../pages/SettingsPage";
-import ReportDetailsPage from "../pages/ReportDetailsPage";
-
-import { isAuthenticated } from "../services/auth";
-
-function ProtectedRoute({ children }) {
-
-    return isAuthenticated()
-        ? children
-        : <Navigate to="/login" replace />;
-}
-
-function PublicRoute({ children }) {
-
-    return isAuthenticated()
-        ? <Navigate to="/dashboard" replace />
-        : children;
-}
+import NotFoundPage from "../pages/NotFoundPage";
 
 function AppRoutes() {
 
     return (
-        <Routes>
 
-            <Route
-                path="/"
-                element={
-                    <PublicRoute>
+        <BrowserRouter>
 
-                        <LandingPage />
+            <Routes>
 
-                    </PublicRoute>
-                }
-            />
+                <Route
+                    path="/"
+                    element={
+                        <Navigate
+                            to="/dashboard"
+                            replace
+                        />
+                    }
+                />
 
-            <Route
-                path="/login"
-                element={
-                    <PublicRoute>
+                <Route
+                    path="/dashboard"
+                    element={<DashboardPage />}
+                />
 
-                        <LoginPage />
+                <Route
+                    path="/upload"
+                    element={<UploadPage />}
+                />
 
-                    </PublicRoute>
-                }
-            />
+                <Route
+                    path="/analysis"
+                    element={<AnalysisPage />}
+                />
 
-            <Route
-                path="/register"
-                element={
-                    <PublicRoute>
+                <Route
+                    path="/report/:id"
+                    element={<ReportDetailsPage />}
+                />
 
-                        <RegisterPage />
+                <Route
+                    path="/chat"
+                    element={<ChatPage />}
+                />
 
-                    </PublicRoute>
-                }
-            />
+                <Route
+                    path="/profile"
+                    element={<ProfilePage />}
+                />
 
-            <Route
-                path="/dashboard"
-                element={
-                    <ProtectedRoute>
+                <Route
+                    path="/settings"
+                    element={<SettingsPage />}
+                />
 
-                        <DashboardPage />
+                <Route
+                    path="*"
+                    element={<NotFoundPage />}
+                />
 
-                    </ProtectedRoute>
-                }
-            />
+            </Routes>
 
-            <Route
-                path="/upload"
-                element={
-                    <ProtectedRoute>
+        </BrowserRouter>
 
-                        <UploadPage />
-
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="/analysis"
-                element={
-                    <ProtectedRoute>
-
-                        <AnalysisPage />
-
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="/chat"
-                element={
-                    <ProtectedRoute>
-
-                        <ChatPage />
-
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="/profile"
-                element={
-                    <ProtectedRoute>
-
-                        <ProfilePage />
-
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="*"
-                element={
-                    <Navigate
-                        to="/"
-                        replace
-                    />
-                }
-            />
-
-            <Route
-                path="/settings"
-                element={
-                    <ProtectedRoute>
-
-                        <SettingsPage />
-
-                    </ProtectedRoute>
-                }
-            />
-
-            <Route
-                path="/report/:id"
-                element={
-                    <ProtectedRoute>
-
-                        <ReportDetailsPage />
-
-                    </ProtectedRoute>
-                }
-            />
-        </Routes>
-
-        
     );
 }
 

@@ -1,6 +1,9 @@
 import { apiPost } from "./api";
 
-export const askMedicalAgent = async(question, reportId = null) => {
+export const askMedicalAgent = async(
+    question,
+    reportId = null
+) => {
 
     return await apiPost(
         "/chat",
@@ -11,7 +14,9 @@ export const askMedicalAgent = async(question, reportId = null) => {
     );
 };
 
-export const askHospitalAgent = async(question) => {
+export const askHospitalAgent = async(
+    question
+) => {
 
     return await apiPost(
         "/hospital/search",
@@ -21,7 +26,9 @@ export const askHospitalAgent = async(question) => {
     );
 };
 
-export const askPharmacyAgent = async(question) => {
+export const askPharmacyAgent = async(
+    question
+) => {
 
     return await apiPost(
         "/pharmacy/search",
@@ -31,7 +38,9 @@ export const askPharmacyAgent = async(question) => {
     );
 };
 
-export const askCostAgent = async(question) => {
+export const askCostAgent = async(
+    question
+) => {
 
     return await apiPost(
         "/cost",
@@ -41,7 +50,9 @@ export const askCostAgent = async(question) => {
     );
 };
 
-export const askFollowupAgent = async(question) => {
+export const askFollowupAgent = async(
+    question
+) => {
 
     return await apiPost(
         "/followup",
@@ -51,7 +62,9 @@ export const askFollowupAgent = async(question) => {
     );
 };
 
-export const askTrendAgent = async(question) => {
+export const askTrendAgent = async(
+    question
+) => {
 
     return await apiPost(
         "/trends",
