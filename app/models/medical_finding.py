@@ -1,9 +1,3 @@
-"""
-medical_finding.py
-
-Stores AI generated
-medical analysis results.
-"""
 
 from datetime import datetime
 
@@ -11,7 +5,9 @@ from sqlalchemy import (
     String,
     JSON,
     DateTime,
-    ForeignKey
+    ForeignKey,
+    Boolean,
+    Integer
 )
 
 from sqlalchemy.orm import (
@@ -23,12 +19,6 @@ from app.database.base import Base
 
 
 class MedicalFinding(Base):
-    """
-    Medical Finding Model
-
-    Stores structured analysis
-    generated from OCR text.
-    """
 
     __tablename__ = "medical_findings"
 
@@ -47,6 +37,31 @@ class MedicalFinding(Base):
         nullable=True
     )
 
+    document_category: Mapped[str] = mapped_column(
+        String(100),
+        nullable=True
+    )
+
+    document_type: Mapped[str] = mapped_column(
+        String(200),
+        nullable=True
+    )
+
+    is_medical_report: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False
+    )
+
+    health_score: Mapped[int] = mapped_column(
+        Integer,
+        default=0
+    )
+
+    risk_level: Mapped[str] = mapped_column(
+        String(50),
+        nullable=True
+    )
+
     summary: Mapped[str] = mapped_column(
         String,
         nullable=True
@@ -61,3 +76,4 @@ class MedicalFinding(Base):
         DateTime,
         default=datetime.utcnow
     )
+

@@ -1,12 +1,16 @@
+
 import json
 
 from app.models.medical_finding import MedicalFinding
 
-from app.llm.providers.deepseek_provider import DeepSeekProvider
+from app.services.document_intelligence_service import (
+    DocumentIntelligenceService
+)
 
-from app.medical.prompts.report_analysis_prompt import REPORT_ANALYSIS_PROMPT
+from app.services.health_score_service import (
+    HealthScoreService
+)
 
-from app.utils.json_parser import JsonParser
 
 class ReportAnalysisService:
 
@@ -14,40 +18,148 @@ class ReportAnalysisService:
 
         self.repository = repository
 
-        self.provider = DeepSeekProvider()
-
-
-    def analyze_report(self, report_id, report_text):
-
-        prompt = REPORT_ANALYSIS_PROMPT.replace(
-            "{report_text}",
-            report_text
+        self.document_service = (
+            DocumentIntelligenceService()
         )
 
-        response = self.provider.generate(prompt)
+        self.health_service = (
+            HealthScoreService()
+        )
 
-        try:
+    def analyze_report(
+        self,
+        report_id,
+        report_text
+    ):
 
-            result = json.loads(response)
+        analysis = (
+            self.document_service
+            .analyze_document(
+                report_text
+            )
+        )
 
-        except Exception:
+        score_data = (
+            self.health_service
+            .calculate(
+                analysis
+            )
+        )
 
-            result = {
-                "report_type": "Unknown",
-                "summary": response
-            }
+        analysis[
+            "health_score"
+        ] = score_data[
+            "health_score"
+        ]
+
+        analysis[
+            "risk_level"
+        ] = score_data[
+            "risk_level"
+        ]
+
+        analysis[
+            "score_breakdown"
+        ] = score_data[
+            "score_breakdown"
+        ]
 
         finding = MedicalFinding(
+
             report_id=report_id,
-            report_type=result.get(
-                "report_type",
+
+            document_category=
+            analysis.get(
+                "document_category",
+                "other"
+            ),
+
+            document_type=
+            analysis.get(
+                "document_type",
+                "unknown"
+            ),
+
+            is_medical_report=
+            analysis.get(
+                "is_medical_report",
+                False
+            ),
+
+            health_score=
+            analysis.get(
+                "health_score",
+                0
+            ),
+
+            risk_level=
+            analysis.get(
+                "risk_level",
                 "Unknown"
             ),
-            summary=result.get(
+
+            report_type=
+            analysis.get(
+                "document_type",
+                "unknown"
+            ),
+
+            summary=
+            analysis.get(
                 "summary",
                 ""
             ),
-            finding_json=result
+
+            finding_json=analysis
         )
 
-        return self.repository.create_finding(finding)
+        return (
+            self.repository
+            .create_finding(
+                finding
+            )
+        )
+
+    def get_analysis(
+        self,
+        report_id
+    ):
+
+        finding = (
+            self.repository
+            .get_by_report_id(
+                report_id
+            )
+        )
+
+        if not finding:
+
+            return None
+
+        return {
+
+            "report_id":
+                finding.report_id,
+
+            "document_category":
+                finding.document_category,
+
+            "document_type":
+                finding.document_type,
+
+            "is_medical_report":
+                finding.is_medical_report,
+
+            "health_score":
+                finding.health_score,
+
+            "risk_level":
+                finding.risk_level,
+
+            "summary":
+                finding.summary,
+
+            "analysis":
+                finding.finding_json
+        }
+

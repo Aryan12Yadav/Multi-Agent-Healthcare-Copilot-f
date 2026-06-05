@@ -1,61 +1,120 @@
-from app.models.ocr_text import OCRText
 
-from app.workers.report_embedding_worker import (
-    ReportEmbeddingWorker
-)
+import os
+
+import pdfplumber
+
+import pytesseract
+
+from PIL import Image
 
 
 class OCRService:
 
-    def __init__(self, repository):
+    def __init__(self):
 
-        self.repository = repository
+        pass
 
-    def create_pending_record(self, report_id):
-
-        existing = self.repository.get_by_report_id(
-            report_id
-        )
-
-        if existing:
-
-            return existing
-
-        record = OCRText(
-            report_id=report_id,
-            raw_text="",
-            ocr_status="pending"
-        )
-
-        return self.repository.create_record(
-            record
-        )
-
-    def save_extracted_text(
+    def extract_text(
         self,
-        report_id,
-        extracted_text
+        file_path
     ):
 
-        record = self.repository.get_by_report_id(
-            report_id
-        )
+        extension = os.path.splitext(
+            file_path
+        )[1].lower()
 
-        if not record:
+        if extension == ".pdf":
 
-            return None
+            return self.extract_pdf_text(
+                file_path
+            )
 
-        record.raw_text = extracted_text
+        if extension in [
+            ".png",
+            ".jpg",
+            ".jpeg"
+        ]:
 
-        record.ocr_status = "completed"
+            return self.extract_image_text(
+                file_path
+            )
 
-        self.repository.update_record(
-            record
-        )
+        return ""
 
-        ReportEmbeddingWorker().process(
-            report_id,
-            extracted_text
-        )
+    def extract_pdf_text(
+        self,
+        file_path
+    ):
 
-        return record
+        extracted_text = ""
+
+        try:
+
+            with pdfplumber.open(
+                file_path
+            ) as pdf:
+
+                for page in pdf.pages:
+
+                    page_text = (
+                        page.extract_text()
+                    )
+
+                    if page_text:
+
+                        extracted_text += (
+                            page_text + "\n"
+                        )
+
+        except Exception as error:
+
+            print(
+                "PDF OCR Error:",
+                str(error)
+            )
+
+        return extracted_text
+
+    def extract_image_text(
+        self,
+        file_path
+    ):
+
+        try:
+
+            image = Image.open(
+                file_path
+            )
+
+            text = pytesseract.image_to_string(
+                image
+            )
+
+            return text
+
+        except Exception as error:
+
+            print(
+                "Image OCR Error:",
+                str(error)
+            )
+
+            return ""
+
+    def is_empty_text(
+        self,
+        text
+    ):
+
+        if not text:
+
+            return True
+
+        if len(
+            text.strip()
+        ) < 20:
+
+            return True
+
+        return False
+

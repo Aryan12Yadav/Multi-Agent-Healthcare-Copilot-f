@@ -1,3 +1,4 @@
+
 """
 report_controller.py
 
@@ -23,3 +24,22 @@ class ReportController:
             file,
             patient_id
         )
+
+    def get_reports(self, patient_id):
+
+        return self.service.get_reports(
+            patient_id
+        )
+
+    def get_report(self, report_id):
+
+        return self.service.get_report(
+            report_id
+        )
+
+    def delete_report(self, report_id):
+
+        return self.service.delete_report(
+            report_id
+        )
+
