@@ -1,9 +1,15 @@
-import AppRoutes from "./routes";
+import AppRoutes from "./routes/AppRoutes";
+import FloatingAssistant from "./components/FloatingAssistant";
 
 function App() {
 
     return (
-        <AppRoutes />
+
+        <>
+            <AppRoutes />
+            <FloatingAssistant />
+        </>
+
     );
 }
 
