@@ -19,17 +19,66 @@ class MedicalChatService:
 
         self.llm = DeepSeekProvider()
 
-    def ask(self, question):
+    def ask(
+        self,
+        question
+    ):
 
-        context = self.retriever.retrieve(
-            question
-        )
+        try:
 
-        prompt = MEDICAL_CHAT_PROMPT.format(
-            context=context,
-            question=question
-        )
+            context = self.retriever.retrieve(
+                question
+            )
 
-        return self.llm.generate(
-            prompt
+        except Exception as error:
+
+            print(
+                "Retriever Error:",
+                str(error)
+            )
+
+            context = ""
+
+        try:
+
+            prompt = MEDICAL_CHAT_PROMPT.format(
+                context=context,
+                question=question
+            )
+
+        except Exception as error:
+
+            print(
+                "Prompt Error:",
+                str(error)
+            )
+
+            prompt = f"""
+Question:
+{question}
+
+Answer as a helpful medical assistant.
+"""
+
+        try:
+
+            response = self.llm.generate(
+                prompt
+            )
+
+            if response:
+
+                return response
+
+        except Exception as error:
+
+            print(
+                "LLM Error:",
+                str(error)
+            )
+
+        return (
+            "I am currently unable to generate "
+            "a medical response. Please try again "
+            "after a few moments."
         )

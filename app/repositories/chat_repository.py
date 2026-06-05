@@ -7,7 +7,10 @@ class ChatRepository:
 
         self.db = db
 
-    def create(self, message):
+    def create(
+        self,
+        message
+    ):
 
         self.db.add(message)
 
@@ -17,18 +20,35 @@ class ChatRepository:
 
         return message
 
-    def get_history(self, user_id):
+    def get_history(
+        self,
+        user_id
+    ):
 
-        return self.db.query(
-            ChatMessage
-        ).filter(
-            ChatMessage.user_id == user_id
-        ).all()
-    
-    def get_chat_count(self, user_id):
+        return (
+            self.db.query(
+                ChatMessage
+            )
+            .filter(
+                ChatMessage.user_id == user_id
+            )
+            .order_by(
+                ChatMessage.id.asc()
+            )
+            .all()
+        )
 
-        return self.db.query(
-            ChatMessage
-        ).filter(
-            ChatMessage.user_id == user_id
-        ).count()
+    def get_chat_count(
+        self,
+        user_id
+    ):
+
+        return (
+            self.db.query(
+                ChatMessage
+            )
+            .filter(
+                ChatMessage.user_id == user_id
+            )
+            .count()
+        )

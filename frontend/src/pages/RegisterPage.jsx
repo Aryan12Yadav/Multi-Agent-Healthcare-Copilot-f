@@ -43,10 +43,10 @@ function RegisterPage() {
             return;
         }
 
-        if (password.length < 6) {
+        if (!password.trim()) {
 
             setError(
-                "Password must be at least 6 characters"
+                "Password is required"
             );
 
             return;
@@ -92,19 +92,19 @@ function RegisterPage() {
     return (
         <AuthLayout>
 
-            <div className="bg-white w-full max-w-md rounded-[40px] shadow-xl p-10">
+            <div className="bg-white rounded-[40px] shadow-xl p-10 border border-slate-200">
 
                 <div className="text-center">
 
-                    <h1 className="text-5xl font-bold">
+                    <h1 className="text-5xl font-bold text-slate-900">
 
                         Create Account
 
                     </h1>
 
-                    <p className="text-slate-500 mt-4">
+                    <p className="text-slate-500 mt-4 text-lg">
 
-                        Start managing your healthcare with AI
+                        Join MedSphere AI Healthcare Platform
 
                     </p>
 
@@ -113,7 +113,7 @@ function RegisterPage() {
                 {
                     error && (
 
-                        <div className="bg-red-50 border border-red-200 text-red-600 rounded-2xl p-4 mt-8">
+                        <div className="mt-6 bg-red-50 border border-red-200 text-red-600 p-4 rounded-2xl">
 
                             {error}
 
@@ -131,10 +131,11 @@ function RegisterPage() {
                     </label>
 
                     <input
+                        type="text"
                         value={fullName}
                         onChange={e => setFullName(e.target.value)}
-                        placeholder="Enter full name"
-                        className="w-full h-14 border rounded-2xl px-5 outline-none"
+                        placeholder="Enter your full name"
+                        className="w-full h-14 border border-slate-300 rounded-2xl px-5"
                     />
 
                 </div>
@@ -151,8 +152,8 @@ function RegisterPage() {
                         type="email"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
-                        placeholder="Enter email"
-                        className="w-full h-14 border rounded-2xl px-5 outline-none"
+                        placeholder="Enter your email"
+                        className="w-full h-14 border border-slate-300 rounded-2xl px-5"
                     />
 
                 </div>
@@ -169,8 +170,8 @@ function RegisterPage() {
                         type="password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
-                        placeholder="Enter password"
-                        className="w-full h-14 border rounded-2xl px-5 outline-none"
+                        placeholder="Create password"
+                        className="w-full h-14 border border-slate-300 rounded-2xl px-5"
                     />
 
                 </div>
@@ -188,7 +189,7 @@ function RegisterPage() {
                         value={confirmPassword}
                         onChange={e => setConfirmPassword(e.target.value)}
                         placeholder="Confirm password"
-                        className="w-full h-14 border rounded-2xl px-5 outline-none"
+                        className="w-full h-14 border border-slate-300 rounded-2xl px-5"
                     />
 
                 </div>
@@ -196,25 +197,35 @@ function RegisterPage() {
                 <button
                     onClick={handleRegister}
                     disabled={loading}
-                    className="w-full h-14 bg-violet-600 text-white rounded-2xl mt-8 font-medium"
+                    className="w-full h-14 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl mt-8 font-semibold"
                 >
 
                     {
                         loading
                             ? "Creating Account..."
-                            : "Register"
+                            : "Create Account"
                     }
 
                 </button>
 
-                <button
-                    onClick={() => navigate("/login")}
-                    className="w-full h-14 border rounded-2xl mt-4 font-medium"
-                >
+                <div className="mt-8 text-center">
 
-                    Already Have Account
+                    <p className="text-slate-500">
 
-                </button>
+                        Already have an account?
+
+                    </p>
+
+                    <button
+                        onClick={() => navigate("/login")}
+                        className="mt-3 text-violet-600 font-semibold"
+                    >
+
+                        Login Here
+
+                    </button>
+
+                </div>
 
             </div>
 

@@ -6,36 +6,35 @@ function Sidebar() {
 
     const menus = [
         {
-            title: "Dashboard",
-            path: "/dashboard",
-            icon: "📊"
+            name: "Dashboard",
+            path: "/dashboard"
         },
         {
-            title: "Upload Report",
-            path: "/upload",
-            icon: "📄"
+            name: "Upload",
+            path: "/upload"
         },
         {
-            title: "Analysis",
-            path: "/analysis",
-            icon: "🧠"
+            name: "Analysis",
+            path: "/analysis"
         },
         {
-            title: "Medical Chat",
-            path: "/chat",
-            icon: "💬"
+            name: "Medical Chat",
+            path: "/chat"
         },
         {
-            title: "Profile",
-            path: "/profile",
-            icon: "👤"
+            name: "Profile",
+            path: "/profile"
+        },
+        {
+            name: "Settings",
+            path: "/settings"
         }
     ];
 
     return (
-        <aside className="w-72 bg-slate-950 text-white min-h-screen flex flex-col">
+        <aside className="hidden lg:flex flex-col w-72 bg-slate-950 text-white min-h-screen">
 
-            <div className="px-8 py-8 border-b border-slate-800">
+            <div className="p-8 border-b border-slate-800">
 
                 <h1 className="text-3xl font-bold text-violet-400">
 
@@ -45,7 +44,7 @@ function Sidebar() {
 
                 <p className="text-slate-400 mt-2">
 
-                    Healthcare Intelligence
+                    Healthcare Platform
 
                 </p>
 
@@ -53,38 +52,22 @@ function Sidebar() {
 
             <div className="flex-1 p-4">
 
-                <p className="text-slate-500 uppercase text-xs tracking-widest px-4 mb-4">
-
-                    Navigation
-
-                </p>
-
                 {
-                    menus.map(item => (
+                    menus.map((item) => (
 
                         <NavLink
                             key={item.path}
                             to={item.path}
                             className={({ isActive }) =>
-                                `flex items-center gap-4 px-5 py-4 rounded-2xl mb-3 transition-all ${
+                                `block p-4 rounded-2xl mb-3 ${
                                     isActive
-                                        ? "bg-violet-600 text-white shadow-lg"
-                                        : "text-slate-300 hover:bg-slate-900"
+                                        ? "bg-violet-600"
+                                        : "hover:bg-slate-900"
                                 }`
                             }
                         >
 
-                            <span className="text-xl">
-
-                                {item.icon}
-
-                            </span>
-
-                            <span className="font-medium">
-
-                                {item.title}
-
-                            </span>
+                            {item.name}
 
                         </NavLink>
 
@@ -93,36 +76,11 @@ function Sidebar() {
 
             </div>
 
-            <div className="px-4 pb-4">
-
-                <div className="bg-slate-900 rounded-3xl p-5">
-
-                    <p className="text-slate-400 text-sm">
-
-                        Overall Health Score
-
-                    </p>
-
-                    <h2 className="text-5xl font-bold text-green-400 mt-3">
-
-                        89
-
-                    </h2>
-
-                    <p className="text-green-400 mt-2">
-
-                        Excellent
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div className="p-4 border-t border-slate-800">
+            <div className="p-4">
 
                 <button
                     onClick={logoutUser}
-                    className="w-full bg-red-500 hover:bg-red-600 h-12 rounded-2xl font-medium transition"
+                    className="w-full h-14 bg-red-500 rounded-2xl"
                 >
 
                     Logout

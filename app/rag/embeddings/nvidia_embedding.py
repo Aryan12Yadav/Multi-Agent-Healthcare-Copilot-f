@@ -21,6 +21,16 @@ class NvidiaEmbedding:
             timeout=60
         )
 
+        print(
+            "EMBED STATUS:",
+            response.status_code
+        )
+
+        print(
+            "EMBED RESPONSE:",
+            response.text
+        )
+
         response.raise_for_status()
 
         data = response.json()
@@ -41,6 +51,16 @@ class NvidiaEmbedding:
                 "input_type": "passage"
             },
             timeout=60
+        )
+
+        print(
+            "PASSAGE STATUS:",
+            response.status_code
+        )
+
+        print(
+            "PASSAGE RESPONSE:",
+            response.text
         )
 
         response.raise_for_status()

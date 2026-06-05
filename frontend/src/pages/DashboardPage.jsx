@@ -6,7 +6,11 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import StatCard from "../components/StatCard";
 
-import { apiGet } from "../services/api";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorState from "../components/ErrorState";
+import EmptyState from "../components/EmptyState";
+
+import { getDashboardData } from "../services/dashboardService";
 
 function DashboardPage() {
 
@@ -14,14 +18,9 @@ function DashboardPage() {
 
     const [loading, setLoading] = useState(true);
 
-    const [dashboard, setDashboard] = useState({
-        report_count: 0,
-        analysis_count: 0,
-        chat_count: 0,
-        health_score: 0,
-        recent_reports: [],
-        latest_insights: []
-    });
+    const [error, setError] = useState(false);
+
+    const [dashboard, setDashboard] = useState(null);
 
     useEffect(() => {
 
@@ -33,9 +32,9 @@ function DashboardPage() {
 
         try {
 
-            const response = await apiGet(
-                "/dashboard"
-            );
+            setLoading(true);
+
+            const response = await getDashboardData();
 
             setDashboard(
                 response
@@ -44,6 +43,8 @@ function DashboardPage() {
         } catch(error) {
 
             console.log(error);
+
+            setError(true);
 
         } finally {
 
@@ -54,11 +55,30 @@ function DashboardPage() {
     if (loading) {
 
         return (
-            <div className="min-h-screen flex items-center justify-center text-2xl">
+            <LoadingSpinner
+                title="Loading Dashboard"
+                description="Fetching healthcare data"
+            />
+        );
+    }
 
-                Loading...
+    if (error) {
 
-            </div>
+        return (
+            <ErrorState
+                title="Dashboard Error"
+                description="Unable to load dashboard"
+            />
+        );
+    }
+
+    if (!dashboard) {
+
+        return (
+            <EmptyState
+                title="No Dashboard Data"
+                description="No healthcare information available"
+            />
         );
     }
 
@@ -73,36 +93,27 @@ function DashboardPage() {
 
                 <div className="p-8">
 
-                    <div className="bg-gradient-to-r from-violet-700 to-indigo-700 rounded-[40px] p-10 text-white">
+                    <div className="bg-gradient-to-r from-violet-700 to-indigo-700 rounded-[32px] p-10 text-white">
 
-                        <div className="flex justify-between items-center">
+                        <h1 className="text-5xl font-bold">
 
-                            <div>
+                            Welcome Back Aryan
 
-                                <h1 className="text-5xl font-bold">
+                        </h1>
 
-                                    Welcome Back Aryan
+                        <p className="mt-4 text-violet-100 text-lg">
 
-                                </h1>
+                            AI Powered Healthcare Intelligence Platform
+                        </p>
 
-                                <p className="text-violet-100 mt-4 text-lg">
+                        <button
+                            onClick={() => navigate("/upload")}
+                            className="mt-8 bg-white text-violet-700 px-8 py-4 rounded-2xl font-semibold"
+                        >
 
-                                    AI Powered Healthcare Dashboard
+                            Upload New Report
 
-                                </p>
-
-                            </div>
-
-                            <button
-                                onClick={() => navigate("/upload")}
-                                className="bg-white text-violet-700 px-8 py-4 rounded-2xl font-semibold"
-                            >
-
-                                Upload Report
-
-                            </button>
-
-                        </div>
+                        </button>
 
                     </div>
 
@@ -110,22 +121,22 @@ function DashboardPage() {
 
                         <StatCard
                             title="Reports"
-                            value={dashboard.report_count}
+                            value={dashboard.report_count || 0}
                         />
 
                         <StatCard
                             title="Analysis"
-                            value={dashboard.analysis_count}
+                            value={dashboard.analysis_count || 0}
                         />
 
                         <StatCard
                             title="Chats"
-                            value={dashboard.chat_count}
+                            value={dashboard.chat_count || 0}
                         />
 
                         <StatCard
                             title="Health Score"
-                            value={dashboard.health_score}
+                            value={dashboard.health_score || 0}
                         />
 
                     </div>
@@ -165,7 +176,7 @@ function DashboardPage() {
                                     className="w-full h-14 bg-green-600 text-white rounded-2xl"
                                 >
 
-                                    Ask Medical AI
+                                    Open AI Assistant
 
                                 </button>
 
@@ -175,29 +186,36 @@ function DashboardPage() {
 
                         <div className="lg:col-span-2 bg-white rounded-[32px] p-6 shadow-sm">
 
-                            <h2 className="text-2xl font-bold">
+                            <h2 className="text-2xl font-bold mb-6">
 
                                 AI Insights
 
                             </h2>
 
-                            <div className="space-y-4 mt-6">
+                            <div className="space-y-4">
 
                                 {
-                                    dashboard.latest_insights?.map(
-                                        (item, index) => (
+                                    dashboard.latest_insights?.length > 0
+                                        ? dashboard.latest_insights.map(
+                                            (item, index) => (
 
-                                            <div
-                                                key={index}
-                                                className="bg-violet-50 rounded-2xl p-4"
-                                            >
+                                                <div
+                                                    key={index}
+                                                    className="bg-violet-50 rounded-2xl p-4"
+                                                >
 
-                                                {item}
+                                                    {item}
 
-                                            </div>
+                                                </div>
 
+                                            )
                                         )
-                                    )
+                                        : (
+                                            <EmptyState
+                                                title="No Insights"
+                                                description="AI insights will appear here"
+                                            />
+                                        )
                                 }
 
                             </div>
@@ -208,53 +226,73 @@ function DashboardPage() {
 
                     <div className="bg-white rounded-[32px] p-6 shadow-sm mt-8">
 
-                        <h2 className="text-2xl font-bold mb-6">
+                        <div className="flex justify-between items-center mb-6">
 
-                            Recent Reports
+                            <h2 className="text-2xl font-bold">
 
-                        </h2>
+                                Recent Reports
 
-                        <div className="space-y-4">
+                            </h2>
 
-                            {
-                                dashboard.recent_reports?.map(report => (
+                            <button
+                                onClick={() => navigate("/analysis")}
+                                className="text-violet-600 font-semibold"
+                            >
 
-                                    <div
-                                        key={report.id}
-                                        className="border border-slate-200 rounded-2xl p-5 flex justify-between items-center"
-                                    >
+                                View All
 
-                                        <div>
-
-                                            <h3 className="font-semibold">
-
-                                                {report.report_name}
-
-                                            </h3>
-
-                                            <p className="text-slate-500 mt-1">
-
-                                                {report.created_at}
-
-                                            </p>
-
-                                        </div>
-
-                                        <button
-                                            onClick={() => navigate("/analysis")}
-                                            className="bg-slate-100 px-5 py-2 rounded-xl"
-                                        >
-
-                                            View
-
-                                        </button>
-
-                                    </div>
-
-                                ))
-                            }
+                            </button>
 
                         </div>
+
+                        {
+                            dashboard.recent_reports?.length > 0
+                                ? (
+                                    <div className="space-y-4">
+
+                                        {
+                                            dashboard.recent_reports.map(
+                                                report => (
+
+                                                    <div
+                                                        key={report.id}
+                                                        className="border border-slate-200 rounded-2xl p-5 flex justify-between items-center"
+                                                    >
+
+                                                        <div>
+
+                                                            <h3 className="font-semibold">
+
+                                                                {report.report_name}
+
+                                                            </h3>
+
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() => navigate(`/report/${report.id}`)}
+                                                            className="bg-slate-100 px-5 py-2 rounded-xl"
+                                                        >
+
+                                                            View
+
+                                                        </button>
+
+                                                    </div>
+
+                                                )
+                                            )
+                                        }
+
+                                    </div>
+                                )
+                                : (
+                                    <EmptyState
+                                        title="No Reports Found"
+                                        description="Upload your first report"
+                                    />
+                                )
+                        }
 
                     </div>
 

@@ -10,6 +10,8 @@ import UploadPage from "../pages/UploadPage";
 import AnalysisPage from "../pages/AnalysisPage";
 import ChatPage from "../pages/ChatPage";
 import ProfilePage from "../pages/ProfilePage";
+import SettingsPage from "../pages/SettingsPage";
+import ReportDetailsPage from "../pages/ReportDetailsPage";
 
 import { isAuthenticated } from "../services/auth";
 
@@ -130,7 +132,30 @@ function AppRoutes() {
                 }
             />
 
+            <Route
+                path="/settings"
+                element={
+                    <ProtectedRoute>
+
+                        <SettingsPage />
+
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/report/:id"
+                element={
+                    <ProtectedRoute>
+
+                        <ReportDetailsPage />
+
+                    </ProtectedRoute>
+                }
+            />
         </Routes>
+
+        
     );
 }
 

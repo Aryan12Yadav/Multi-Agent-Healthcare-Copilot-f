@@ -1,40 +1,45 @@
 import { useEffect } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
-import { getReportDetails } from "../services/reportService";
-import { getAnalysis } from "../services/reportService";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorState from "../components/ErrorState";
+
+import {
+    getReportDetails,
+    getAnalysis
+} from "../services/reportService";
 
 function ReportDetailsPage() {
 
-    const navigate = useNavigate();
+    const { id } = useParams();
 
     const [loading, setLoading] = useState(true);
 
-    const [report, setReport] = useState({});
+    const [error, setError] = useState(false);
 
-    const [analysis, setAnalysis] = useState({});
+    const [report, setReport] = useState(null);
+
+    const [analysis, setAnalysis] = useState(null);
 
     useEffect(() => {
 
-        loadData();
+        loadReport();
 
-    }, []);
+    }, [id]);
 
-    const loadData = async() => {
+    const loadReport = async() => {
 
         try {
 
-            const reportResponse = await getReportDetails(
-                1
-            );
+            const reportResponse =
+                await getReportDetails(id);
 
-            const analysisResponse = await getAnalysis(
-                1
-            );
+            const analysisResponse =
+                await getAnalysis(id);
 
             setReport(
                 reportResponse
@@ -48,6 +53,8 @@ function ReportDetailsPage() {
 
             console.log(error);
 
+            setError(true);
+
         } finally {
 
             setLoading(false);
@@ -57,11 +64,20 @@ function ReportDetailsPage() {
     if (loading) {
 
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <LoadingSpinner
+                title="Loading Report"
+                description="Fetching report details"
+            />
+        );
+    }
 
-                Loading Report...
+    if (error) {
 
-            </div>
+        return (
+            <ErrorState
+                title="Unable To Load Report"
+                description="Please try again later"
+            />
         );
     }
 
@@ -84,24 +100,25 @@ function ReportDetailsPage() {
 
                                 <h1 className="text-4xl font-bold">
 
-                                    {report.report_name || "Medical Report"}
+                                    {
+                                        report?.report_name ||
+                                        "Medical Report"
+                                    }
 
                                 </h1>
 
-                                <p className="text-slate-500 mt-2">
+                                <p className="text-slate-500 mt-3">
 
-                                    Uploaded Report Details
+                                    Detailed AI Analysis
                                 </p>
 
                             </div>
 
-                            <button
-                                className="bg-violet-600 text-white px-8 py-3 rounded-2xl"
-                            >
+                            <div className="bg-green-100 text-green-700 px-5 py-3 rounded-2xl font-semibold">
 
-                                Download PDF
+                                Completed
 
-                            </button>
+                            </div>
 
                         </div>
 
@@ -119,7 +136,10 @@ function ReportDetailsPage() {
 
                             <h2 className="text-5xl font-bold text-green-600 mt-4">
 
-                                {analysis.health_score || 89}
+                                {
+                                    analysis?.health_score ||
+                                    89
+                                }
 
                             </h2>
 
@@ -136,7 +156,8 @@ function ReportDetailsPage() {
                             <h2 className="text-5xl font-bold mt-4">
 
                                 {
-                                    analysis.findings?.length || 0
+                                    analysis?.findings?.length ||
+                                    0
                                 }
 
                             </h2>
@@ -154,7 +175,8 @@ function ReportDetailsPage() {
                             <h2 className="text-5xl font-bold mt-4">
 
                                 {
-                                    analysis.recommendations?.length || 0
+                                    analysis?.recommendations?.length ||
+                                    0
                                 }
 
                             </h2>
@@ -171,7 +193,7 @@ function ReportDetailsPage() {
 
                             <h2 className="text-3xl font-bold text-green-600 mt-4">
 
-                                Analyzed
+                                Normal
 
                             </h2>
 
@@ -185,15 +207,16 @@ function ReportDetailsPage() {
 
                             <h2 className="text-2xl font-bold mb-6">
 
-                                OCR Extracted Text
+                                Report Content
 
                             </h2>
 
-                            <div className="bg-slate-50 rounded-2xl p-5 min-h-[400px] whitespace-pre-wrap">
+                            <div className="bg-slate-50 rounded-2xl p-5 min-h-[350px] whitespace-pre-wrap">
 
                                 {
-                                    report.ocr_text ||
-                                    "No OCR Data Available"
+                                    report?.ocr_text ||
+                                    report?.content ||
+                                    "No report content available"
                                 }
 
                             </div>
@@ -208,11 +231,11 @@ function ReportDetailsPage() {
 
                             </h2>
 
-                            <div className="bg-violet-50 rounded-2xl p-5 min-h-[400px]">
+                            <div className="bg-violet-50 rounded-2xl p-5 min-h-[350px]">
 
                                 {
-                                    analysis.summary ||
-                                    "No Summary Available"
+                                    analysis?.summary ||
+                                    "No summary available"
                                 }
 
                             </div>
@@ -234,12 +257,15 @@ function ReportDetailsPage() {
                             <div className="space-y-4">
 
                                 {
-                                    analysis.findings?.map(
-                                        (item, index) => (
+                                    analysis?.findings?.map(
+                                        (
+                                            item,
+                                            index
+                                        ) => (
 
                                             <div
                                                 key={index}
-                                                className="bg-red-50 border border-red-200 rounded-2xl p-4"
+                                                className="bg-red-50 border border-red-100 rounded-2xl p-4"
                                             >
 
                                                 {item}
@@ -265,12 +291,15 @@ function ReportDetailsPage() {
                             <div className="space-y-4">
 
                                 {
-                                    analysis.recommendations?.map(
-                                        (item, index) => (
+                                    analysis?.recommendations?.map(
+                                        (
+                                            item,
+                                            index
+                                        ) => (
 
                                             <div
                                                 key={index}
-                                                className="bg-green-50 border border-green-200 rounded-2xl p-4"
+                                                className="bg-green-50 border border-green-100 rounded-2xl p-4"
                                             >
 
                                                 {item}
@@ -282,52 +311,6 @@ function ReportDetailsPage() {
                                 }
 
                             </div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="bg-white rounded-[32px] p-8 shadow-sm mt-8">
-
-                        <h2 className="text-2xl font-bold mb-6">
-
-                            Quick Actions
-                        </h2>
-
-                        <div className="grid lg:grid-cols-4 gap-4">
-
-                            <button
-                                onClick={() => navigate("/chat")}
-                                className="h-14 bg-violet-600 text-white rounded-2xl"
-                            >
-
-                                Ask AI
-
-                            </button>
-
-                            <button
-                                className="h-14 bg-blue-600 text-white rounded-2xl"
-                            >
-
-                                Find Hospital
-
-                            </button>
-
-                            <button
-                                className="h-14 bg-green-600 text-white rounded-2xl"
-                            >
-
-                                Find Pharmacy
-
-                            </button>
-
-                            <button
-                                className="h-14 bg-orange-600 text-white rounded-2xl"
-                            >
-
-                                Cost Estimate
-
-                            </button>
 
                         </div>
 

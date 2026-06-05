@@ -1,6 +1,10 @@
-function ChatBubble({ sender, message }) {
+function ChatBubble({
+    sender,
+    message
+}) {
 
-    const isUser = sender === "user";
+    const isUser =
+        sender === "user";
 
     return (
         <div
@@ -12,64 +16,24 @@ function ChatBubble({ sender, message }) {
         >
 
             <div
-                className={`flex items-start gap-4 max-w-[75%] ${
+                className={`max-w-[75%] ${
                     isUser
-                        ? "flex-row-reverse"
-                        : ""
-                }`}
+                        ? "items-end"
+                        : "items-start"
+                } flex flex-col`}
             >
 
                 <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
+                    className={`px-6 py-4 rounded-[24px] shadow-sm ${
                         isUser
-                            ? "bg-violet-600"
-                            : "bg-slate-700"
+                            ? "bg-violet-600 text-white"
+                            : "bg-white border border-slate-200"
                     }`}
                 >
 
-                    {
-                        isUser
-                            ? "A"
-                            : "AI"
-                    }
+                    <p className="leading-8 whitespace-pre-wrap break-words">
 
-                </div>
-
-                <div>
-
-                    <div
-                        className={`px-6 py-4 rounded-3xl shadow-sm ${
-                            isUser
-                                ? "bg-violet-600 text-white"
-                                : "bg-white border border-slate-200 text-slate-800"
-                        }`}
-                    >
-
-                        <p className="leading-8 whitespace-pre-wrap break-words">
-
-                            {message}
-
-                        </p>
-
-                    </div>
-
-                    <p
-                        className={`text-xs text-slate-400 mt-2 ${
-                            isUser
-                                ? "text-right"
-                                : "text-left"
-                        }`}
-                    >
-
-                        {
-                            new Date().toLocaleTimeString(
-                                [],
-                                {
-                                    hour: "2-digit",
-                                    minute: "2-digit"
-                                }
-                            )
-                        }
+                        {message}
 
                     </p>
 

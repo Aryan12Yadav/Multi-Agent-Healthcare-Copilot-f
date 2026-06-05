@@ -1,7 +1,3 @@
-"""
-chat_service.py
-"""
-
 from app.models.chat_message import ChatMessage
 
 from app.services.supervisor_service import (
@@ -15,7 +11,11 @@ class ChatService:
 
         self.repository = repository
 
-    def save_user_message(self, user_id, message):
+    def save_user_message(
+        self,
+        user_id,
+        message
+    ):
 
         chat = ChatMessage(
             user_id=user_id,
@@ -23,9 +23,15 @@ class ChatService:
             message=message
         )
 
-        return self.repository.create_message(chat)
+        return self.repository.create(
+            chat
+        )
 
-    def save_ai_message(self, user_id, message):
+    def save_ai_message(
+        self,
+        user_id,
+        message
+    ):
 
         chat = ChatMessage(
             user_id=user_id,
@@ -33,17 +39,35 @@ class ChatService:
             message=message
         )
 
-        return self.repository.create_message(chat)
+        return self.repository.create(
+            chat
+        )
 
-    def get_history(self, user_id):
+    def get_history(
+        self,
+        user_id
+    ):
 
-        return self.repository.get_messages(user_id)
+        return self.repository.get_history(
+            user_id
+        )
 
-    def save_conversation(self, user_id, question, answer):
+    def save_conversation(
+        self,
+        user_id,
+        question,
+        answer
+    ):
 
-        self.save_user_message(user_id, question)
+        self.save_user_message(
+            user_id,
+            question
+        )
 
-        self.save_ai_message(user_id, answer)
+        self.save_ai_message(
+            user_id,
+            answer
+        )
 
     def process_chat(
         self,

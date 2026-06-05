@@ -1,5 +1,10 @@
-from app.rag.embeddings.nvidia_embedding import NvidiaEmbedding
-from app.rag.vector_store.medical_knowledge_store import MedicalKnowledgeStore
+from app.rag.embeddings.nvidia_embedding import (
+    NvidiaEmbedding
+)
+
+from app.rag.vector_store.medical_knowledge_store import (
+    MedicalKnowledgeStore
+)
 
 
 class MedicalRetriever:
@@ -10,16 +15,43 @@ class MedicalRetriever:
 
         self.store = MedicalKnowledgeStore()
 
-    def retrieve(self, question):
+    def retrieve(
+        self,
+        question
+    ):
 
-        vector = self.embedding.embed_query(
-            [question]
-        )[0]
+        try:
 
-        result = self.store.search(
-            vector
-        )
+            vector = self.embedding.embed_query(
+                question
+            )
 
-        return "\n".join(
-            result["documents"][0]
-        )
+            result = self.store.search(
+                vector
+            )
+
+            documents = result.get(
+                "documents",
+                []
+            )
+
+            if not documents:
+
+                return ""
+
+            if not documents[0]:
+
+                return ""
+
+            return "\n".join(
+                documents[0]
+            )
+
+        except Exception as error:
+
+            print(
+                "Retriever Error:",
+                str(error)
+            )
+
+            return ""

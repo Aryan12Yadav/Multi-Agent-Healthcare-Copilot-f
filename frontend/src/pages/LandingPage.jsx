@@ -4,97 +4,65 @@ function LandingPage() {
 
     const navigate = useNavigate();
 
-    const features = [
-        {
-            title: "AI Report Analysis",
-            description: "Understand complex medical reports instantly."
-        },
-        {
-            title: "Medical Assistant",
-            description: "Ask health related questions anytime."
-        },
-        {
-            title: "Health Tracking",
-            description: "Monitor trends and health scores."
-        },
-        {
-            title: "Smart Recommendations",
-            description: "Receive personalized AI suggestions."
-        }
-    ];
-
     return (
-        <div className="min-h-screen bg-slate-950 text-white overflow-hidden">
+        <div className="min-h-screen bg-slate-50">
 
-            <nav className="max-w-7xl mx-auto px-8 py-6 flex justify-between items-center">
+            <div className="max-w-7xl mx-auto px-6">
 
-                <h1 className="text-4xl font-bold text-violet-400">
+                <nav className="h-24 flex items-center justify-between">
 
-                    MedSphere AI
+                    <h1 className="text-4xl font-black text-violet-600">
 
-                </h1>
+                        MedSphere AI
 
-                <div className="flex gap-4">
+                    </h1>
 
-                    <button
-                        onClick={() => navigate("/login")}
-                        className="px-6 py-3 rounded-xl border border-slate-700"
-                    >
+                    <div className="flex gap-4">
 
-                        Login
+                        <button
+                            onClick={() => navigate("/login")}
+                            className="px-6 py-3 rounded-2xl border"
+                        >
 
-                    </button>
+                            Login
 
-                    <button
-                        onClick={() => navigate("/register")}
-                        className="px-6 py-3 rounded-xl bg-violet-600"
-                    >
+                        </button>
 
-                        Register
+                        <button
+                            onClick={() => navigate("/register")}
+                            className="px-6 py-3 rounded-2xl bg-violet-600 text-white"
+                        >
 
-                    </button>
+                            Register
 
-                </div>
+                        </button>
 
-            </nav>
+                    </div>
 
-            <section className="max-w-7xl mx-auto px-8 py-24">
+                </nav>
 
-                <div className="grid lg:grid-cols-2 gap-20 items-center">
+                <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
 
                     <div>
 
-                        <div className="inline-flex bg-violet-500/20 text-violet-300 px-5 py-2 rounded-full">
+                        <h1 className="text-7xl font-black leading-tight">
 
-                            AI Powered Healthcare Platform
-
-                        </div>
-
-                        <h1 className="text-7xl font-bold leading-tight mt-8">
-
-                            Understand
-                            <br />
-
-                            Medical Reports
-                            <br />
-
-                            In Seconds
-
+                            AI Powered Healthcare Intelligence
                         </h1>
 
-                        <p className="text-slate-400 text-xl leading-9 mt-8 max-w-2xl">
+                        <p className="text-xl text-slate-600 mt-8 leading-9">
 
                             Upload reports, get AI analysis,
-                            track health trends and chat
-                            with an intelligent medical assistant.
-
+                            track health metrics, chat with medical AI,
+                            find hospitals and pharmacies,
+                            estimate treatment costs.
                         </p>
 
-                        <div className="flex gap-5 mt-12">
+                        <div className="flex gap-5 mt-10">
 
                             <button
                                 onClick={() => navigate("/register")}
-                                className="bg-violet-600 px-8 py-4 rounded-2xl text-lg font-semibold"
+                                className="px-8 py-4 bg-violet-600 text-white rounded-2xl"
                             >
 
                                 Get Started
@@ -103,10 +71,10 @@ function LandingPage() {
 
                             <button
                                 onClick={() => navigate("/login")}
-                                className="border border-slate-700 px-8 py-4 rounded-2xl text-lg"
+                                className="px-8 py-4 border rounded-2xl"
                             >
 
-                                Sign In
+                                Login
 
                             </button>
 
@@ -116,58 +84,66 @@ function LandingPage() {
 
                     <div>
 
-                        <div className="bg-slate-900 rounded-[40px] p-8 border border-slate-800">
+                        <div className="bg-white rounded-[40px] p-10 shadow-xl">
 
-                            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-8">
+                            <div className="grid grid-cols-2 gap-5">
 
-                                <h2 className="text-2xl font-semibold">
+                                <div className="bg-violet-50 p-6 rounded-3xl">
 
-                                    Health Score
+                                    <h2 className="text-4xl font-bold">
 
-                                </h2>
+                                        AI
 
-                                <h3 className="text-8xl font-bold mt-8">
+                                    </h2>
 
-                                    89
+                                    <p className="mt-3">
 
-                                </h3>
-
-                                <p className="text-violet-100 mt-4">
-
-                                    Excellent Condition
-
-                                </p>
-
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-5 mt-6">
-
-                                <div className="bg-slate-800 rounded-2xl p-6">
-
-                                    <h3 className="text-4xl font-bold">
-
-                                        120+
-
-                                    </h3>
-
-                                    <p className="text-slate-400 mt-2">
-
-                                        Reports
+                                        Medical Analysis
                                     </p>
 
                                 </div>
 
-                                <div className="bg-slate-800 rounded-2xl p-6">
+                                <div className="bg-blue-50 p-6 rounded-3xl">
 
-                                    <h3 className="text-4xl font-bold">
+                                    <h2 className="text-4xl font-bold">
 
-                                        500+
+                                        OCR
 
-                                    </h3>
+                                    </h2>
 
-                                    <p className="text-slate-400 mt-2">
+                                    <p className="mt-3">
 
-                                        Analysis
+                                        Report Extraction
+                                    </p>
+
+                                </div>
+
+                                <div className="bg-green-50 p-6 rounded-3xl">
+
+                                    <h2 className="text-4xl font-bold">
+
+                                        Chat
+
+                                    </h2>
+
+                                    <p className="mt-3">
+
+                                        Medical Assistant
+                                    </p>
+
+                                </div>
+
+                                <div className="bg-orange-50 p-6 rounded-3xl">
+
+                                    <h2 className="text-4xl font-bold">
+
+                                        Live
+
+                                    </h2>
+
+                                    <p className="mt-3">
+
+                                        Health Tracking
                                     </p>
 
                                 </div>
@@ -180,81 +156,7 @@ function LandingPage() {
 
                 </div>
 
-            </section>
-
-            <section className="max-w-7xl mx-auto px-8 pb-24">
-
-                <h2 className="text-5xl font-bold text-center">
-
-                    Everything You Need
-
-                </h2>
-
-                <p className="text-center text-slate-400 mt-6 text-xl">
-
-                    Healthcare tools powered by AI
-
-                </p>
-
-                <div className="grid lg:grid-cols-4 gap-6 mt-16">
-
-                    {
-                        features.map((feature, index) => (
-
-                            <div
-                                key={index}
-                                className="bg-slate-900 border border-slate-800 rounded-3xl p-8"
-                            >
-
-                                <h3 className="text-2xl font-bold">
-
-                                    {feature.title}
-
-                                </h3>
-
-                                <p className="text-slate-400 mt-4 leading-8">
-
-                                    {feature.description}
-
-                                </p>
-
-                            </div>
-
-                        ))
-                    }
-
-                </div>
-
-            </section>
-
-            <section className="max-w-7xl mx-auto px-8 pb-24">
-
-                <div className="bg-gradient-to-r from-violet-700 to-indigo-700 rounded-[40px] p-16 text-center">
-
-                    <h2 className="text-6xl font-bold">
-
-                        Start Your AI Healthcare Journey
-
-                    </h2>
-
-                    <p className="text-xl mt-6 text-violet-100">
-
-                        Join thousands of users using AI for healthcare management.
-
-                    </p>
-
-                    <button
-                        onClick={() => navigate("/register")}
-                        className="bg-white text-violet-700 px-10 py-4 rounded-2xl mt-10 text-lg font-semibold"
-                    >
-
-                        Create Free Account
-
-                    </button>
-
-                </div>
-
-            </section>
+            </div>
 
         </div>
     );

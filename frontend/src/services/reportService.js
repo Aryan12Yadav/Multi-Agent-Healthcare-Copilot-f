@@ -1,7 +1,11 @@
-import { apiGet } from "./api";
-import { apiUpload } from "./api";
+import {
+    apiGet,
+    apiUpload
+} from "./api";
 
-export const uploadReport = async(formData) => {
+export const uploadReport = async(
+    formData
+) => {
 
     return await apiUpload(
         "/reports/upload",
@@ -16,14 +20,18 @@ export const getReports = async() => {
     );
 };
 
-export const getReportDetails = async(reportId) => {
+export const getReportDetails = async(
+    reportId
+) => {
 
     return await apiGet(
         `/reports/${reportId}`
     );
 };
 
-export const getAnalysis = async(reportId) => {
+export const getAnalysis = async(
+    reportId
+) => {
 
     return await apiGet(
         `/analysis/${reportId}`
