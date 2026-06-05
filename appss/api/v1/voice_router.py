@@ -1,2 +1,0 @@
-"""voice_router module"""
-
