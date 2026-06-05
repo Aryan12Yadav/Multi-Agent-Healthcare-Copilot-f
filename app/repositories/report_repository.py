@@ -1,89 +1,24 @@
-
 from sqlalchemy.orm import Session
 
 from app.models.report import Report
-from app.models.patient_profile import (
-    PatientProfile
-)
 
 
 class ReportRepository:
 
-    def __init__(self, db):
-
+    def __init__(
+        self,
+        db: Session
+    ):
         self.db = db
 
-    def create_report(self, report):
+    def create(
+        self,
+        report: Report
+    ) -> Report:
 
-        self.db.add(report)
-
-        self.db.commit()
-
-        self.db.refresh(report)
-
-        return report
-
-    def get_reports(self, patient_id):
-
-        return (
-            self.db.query(Report)
-            .filter(
-                Report.patient_id == patient_id
-            )
-            .all()
-        )
-
-    def get_report(self, report_id):
-
-        return (
-            self.db.query(Report)
-            .filter(
-                Report.id == report_id
-            )
-            .first()
-        )
-
-    def delete_report(self, report_id):
-
-        report = self.get_report(
-            report_id
-        )
-
-        if not report:
-
-            return False
-
-        self.db.delete(
+        self.db.add(
             report
         )
-
-        self.db.commit()
-
-        return True
-
-    def get_patient_by_user_id(self, user_id):
-
-        return (
-            self.db.query(
-                PatientProfile
-            )
-            .filter(
-                PatientProfile.user_id == user_id
-            )
-            .first()
-        )
-
-    def update_status(self, report_id, status):
-
-        report = self.get_report(
-            report_id
-        )
-
-        if not report:
-
-            return None
-
-        report.processing_status = status
 
         self.db.commit()
 
@@ -93,27 +28,85 @@ class ReportRepository:
 
         return report
 
-    def get_report_count(self, patient_id):
+    def get_by_id(
+        self,
+        report_id: int
+    ) -> Report | None:
 
         return (
-            self.db.query(Report)
-            .filter(
-                Report.patient_id == patient_id
+            self.db.query(
+                Report
             )
-            .count()
+            .filter(
+                Report.id == report_id
+            )
+            .first()
         )
 
-    def get_recent_reports(self, patient_id):
+    def get_user_reports(
+        self,
+        user_id: int
+    ):
 
         return (
-            self.db.query(Report)
+            self.db.query(
+                Report
+            )
             .filter(
-                Report.patient_id == patient_id
+                Report.user_id == user_id
             )
             .order_by(
                 Report.id.desc()
             )
-            .limit(5)
             .all()
         )
 
+    def delete(
+        self,
+        report: Report
+    ) -> bool:
+
+        self.db.delete(
+            report
+        )
+
+        self.db.commit()
+
+        return True
+
+    def get_report_count(
+        self,
+        user_id: int
+    ) -> int:
+
+        return (
+            self.db.query(
+                Report
+            )
+            .filter(
+                Report.user_id == user_id
+            )
+            .count()
+        )
+
+    def get_recent_reports(
+        self,
+        user_id: int,
+        limit: int = 5
+    ):
+
+        return (
+            self.db.query(
+                Report
+            )
+            .filter(
+                Report.user_id == user_id
+            )
+            .order_by(
+                Report.id.desc()
+            )
+            .limit(
+                limit
+            )
+            .all()
+        )

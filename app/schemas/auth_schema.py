@@ -1,18 +1,10 @@
-"""
-auth_schema.py
-
-Authentication request
-and response schemas.
-"""
-
 from pydantic import BaseModel
 from pydantic import EmailStr
 
 
 class RegisterRequest(BaseModel):
-    """
-    Register API payload.
-    """
+
+    username: str
 
     full_name: str
 
@@ -22,9 +14,6 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    """
-    Login API payload.
-    """
 
     email: EmailStr
 
@@ -32,10 +21,7 @@ class LoginRequest(BaseModel):
 
 
 class TokenResponse(BaseModel):
-    """
-    Authentication response.
-    """
 
     access_token: str
 
-    token_type: str
+    token_type: str = "bearer"

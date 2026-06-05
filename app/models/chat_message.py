@@ -1,12 +1,18 @@
 from datetime import datetime
 
-from sqlalchemy import String
-from sqlalchemy import Text
-from sqlalchemy import Integer
-from sqlalchemy import DateTime
+from sqlalchemy import (
+    Integer,
+    String,
+    Text,
+    DateTime,
+    ForeignKey
+)
 
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship
+)
 
 from app.database.base import Base
 
@@ -20,7 +26,7 @@ class ChatMessage(Base):
     )
 
     user_id: Mapped[int] = mapped_column(
-        Integer
+        ForeignKey("users.id")
     )
 
     role: Mapped[str] = mapped_column(
@@ -34,4 +40,9 @@ class ChatMessage(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow
+    )
+
+    user = relationship(
+        "User",
+        back_populates="chat_messages"
     )

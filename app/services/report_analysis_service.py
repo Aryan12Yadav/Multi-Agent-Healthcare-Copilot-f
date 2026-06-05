@@ -1,7 +1,10 @@
+from app.models.medical_finding import (
+    MedicalFinding
+)
 
-import json
-
-from app.models.medical_finding import MedicalFinding
+from app.repositories.medical_finding_repository import (
+    MedicalFindingRepository
+)
 
 from app.services.document_intelligence_service import (
     DocumentIntelligenceService
@@ -14,8 +17,10 @@ from app.services.health_score_service import (
 
 class ReportAnalysisService:
 
-    def __init__(self, repository):
-
+    def __init__(
+        self,
+        repository: MedicalFindingRepository
+    ):
         self.repository = repository
 
         self.document_service = (
@@ -28,9 +33,9 @@ class ReportAnalysisService:
 
     def analyze_report(
         self,
-        report_id,
-        report_text
-    ):
+        report_id: int,
+        report_text: str
+    ) -> MedicalFinding:
 
         analysis = (
             self.document_service
@@ -39,7 +44,7 @@ class ReportAnalysisService:
             )
         )
 
-        score_data = (
+        score_result = (
             self.health_service
             .calculate(
                 analysis
@@ -48,81 +53,54 @@ class ReportAnalysisService:
 
         analysis[
             "health_score"
-        ] = score_data[
+        ] = score_result[
             "health_score"
         ]
 
         analysis[
             "risk_level"
-        ] = score_data[
+        ] = score_result[
             "risk_level"
         ]
 
-        analysis[
-            "score_breakdown"
-        ] = score_data[
-            "score_breakdown"
-        ]
-
         finding = MedicalFinding(
-
             report_id=report_id,
-
-            document_category=
-            analysis.get(
-                "document_category",
-                "other"
+            document_category=analysis.get(
+                "document_category"
             ),
-
-            document_type=
-            analysis.get(
-                "document_type",
-                "unknown"
+            document_type=analysis.get(
+                "document_type"
             ),
-
-            is_medical_report=
-            analysis.get(
+            report_type=analysis.get(
+                "document_type"
+            ),
+            is_medical_report=analysis.get(
                 "is_medical_report",
                 False
             ),
-
-            health_score=
-            analysis.get(
+            health_score=analysis.get(
                 "health_score",
                 0
             ),
-
-            risk_level=
-            analysis.get(
-                "risk_level",
-                "Unknown"
+            risk_level=analysis.get(
+                "risk_level"
             ),
-
-            report_type=
-            analysis.get(
-                "document_type",
-                "unknown"
+            summary=analysis.get(
+                "summary"
             ),
-
-            summary=
-            analysis.get(
-                "summary",
-                ""
-            ),
-
             finding_json=analysis
         )
 
         return (
             self.repository
-            .create_finding(
+            .create_or_update(
                 finding
             )
         )
 
     def get_analysis(
         self,
-        report_id
+        report_id: int
     ):
 
         finding = (
@@ -133,33 +111,15 @@ class ReportAnalysisService:
         )
 
         if not finding:
-
             return None
 
         return {
-
-            "report_id":
-                finding.report_id,
-
-            "document_category":
-                finding.document_category,
-
-            "document_type":
-                finding.document_type,
-
-            "is_medical_report":
-                finding.is_medical_report,
-
-            "health_score":
-                finding.health_score,
-
-            "risk_level":
-                finding.risk_level,
-
-            "summary":
-                finding.summary,
-
-            "analysis":
-                finding.finding_json
+            "report_id": finding.report_id,
+            "document_category": finding.document_category,
+            "document_type": finding.document_type,
+            "is_medical_report": finding.is_medical_report,
+            "health_score": finding.health_score,
+            "risk_level": finding.risk_level,
+            "summary": finding.summary,
+            "analysis": finding.finding_json
         }
-

@@ -15,46 +15,71 @@ class DashboardService:
 
     def __init__(
         self,
-        report_repository,
-        chat_repository,
-        medical_repository
+        report_repository: ReportRepository,
+        chat_repository: ChatRepository,
+        medical_repository: MedicalFindingRepository
     ):
-
-        self.report_repository = report_repository
-
-        self.chat_repository = chat_repository
-
-        self.medical_repository = medical_repository
-
-    def get_metrics(self, patient_id):
-
-        report_count = self.report_repository.get_report_count(
-            patient_id
+        self.report_repository = (
+            report_repository
         )
 
-        chat_count = self.chat_repository.get_chat_count(
-            patient_id
+        self.chat_repository = (
+            chat_repository
         )
 
-        chat_count = 0
-
-        health_score = 89
-        
-        analysis_count = self.medical_repository.get_analysis_count()
-
-        health_score = max(
-            0,
-            100 - analysis_count
+        self.medical_repository = (
+            medical_repository
         )
 
-        recent_reports = self.report_repository.get_recent_reports(
-            patient_id
+    def get_dashboard(
+        self,
+        user_id: int
+    ) -> dict:
+
+        report_count = (
+            self.report_repository
+            .get_report_count(
+                user_id
+            )
+        )
+
+        chat_count = (
+            self.chat_repository
+            .get_chat_count(
+                user_id
+            )
+        )
+
+        analysis_count = (
+            self.medical_repository
+            .get_analysis_count()
+        )
+
+        average_health_score = (
+            self.medical_repository
+            .get_average_health_score()
+        )
+
+        recent_reports = (
+            self.report_repository
+            .get_recent_reports(
+                user_id
+            )
         )
 
         return {
-            "report_count": report_count,
-            "chat_count": chat_count,
-            "analysis_count": analysis_count,
-            "health_score": health_score,
-            "recent_reports": recent_reports
+            "report_count":
+                report_count,
+
+            "chat_count":
+                chat_count,
+
+            "analysis_count":
+                analysis_count,
+
+            "average_health_score":
+                average_health_score,
+
+            "recent_reports":
+                recent_reports
         }

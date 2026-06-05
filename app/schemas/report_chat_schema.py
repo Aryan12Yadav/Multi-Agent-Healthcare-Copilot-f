@@ -1,4 +1,3 @@
- 
 from pydantic import BaseModel
 
 
@@ -16,4 +15,3 @@ class ReportChatResponse(BaseModel):
     question: str
 
     answer: str
- 

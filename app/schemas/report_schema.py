@@ -1,29 +1,40 @@
-"""
-report_schema.py
-
-Pydantic schemas used by
-report endpoints.
-"""
-
 from datetime import datetime
 
 from pydantic import BaseModel
+from pydantic import ConfigDict
 
 
 class ReportResponse(BaseModel):
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
 
     id: int
 
     report_name: str
 
+    report_type: str | None
+
     processing_status: str
 
     uploaded_at: datetime
 
-    report_id : int 
 
-    
+class ReportAnalysisResponse(BaseModel):
 
-    class Config:
+    report_id: int
 
-        from_attributes = True
+    document_category: str | None
+
+    document_type: str | None
+
+    is_medical_report: bool
+
+    health_score: int
+
+    risk_level: str | None
+
+    summary: str | None
+
+    analysis: dict

@@ -1,78 +1,71 @@
-"""
-auth_service.py
-
-Contains authentication
-business logic.
-
-Validation and security
-rules belong here.
-"""
-
-from app.models.user import User
-
-from app.auth.password_service import PasswordService
+from datetime import datetime
 
 from app.auth.jwt_service import JWTService
+from app.auth.password_service import PasswordService
+from app.models.user import User
+from app.repositories.auth_repository import AuthRepository
 
 
 class AuthService:
-    """
-    Authentication Service.
-
-    Responsible for user registration,
-    login validation and token generation.
-    """
 
     def __init__(
         self,
-        manager
+        repository: AuthRepository
     ):
-        self.manager = manager
+        self.repository = repository
 
     def register_user(
         self,
+        username: str,
         full_name: str,
         email: str,
         password: str
-    ):
+    ) -> User:
 
-        existing_user = (
-            self.manager.get_user_by_email(
+        existing_email = (
+            self.repository.get_by_email(
                 email
             )
         )
 
-        if existing_user:
+        if existing_email:
             raise ValueError(
-                "Email already exists."
+                "Email already registered."
             )
 
-        hashed_password = (
-            PasswordService.hash_password(
+        existing_username = (
+            self.repository.get_by_username(
+                username
+            )
+        )
+
+        if existing_username:
+            raise ValueError(
+                "Username already taken."
+            )
+
+        user = User(
+            username=username,
+            full_name=full_name,
+            email=email,
+            password_hash=PasswordService.hash_password(
                 password
             )
         )
 
-        user = User(
-            full_name=full_name,
-            email=email,
-            password_hash=hashed_password,
-            role_id=1
-        )
-
-        return self.manager.create_user(
+        return self.repository.create_user(
             user
         )
 
     def login_user(
         self,
-        email: str,
+        identifier: str,
         password: str
-    ):
+    ) -> str:
 
         user = (
-            self.manager.get_user_by_email(
-                email
+            self.repository.get_by_identifier(
+                identifier
             )
         )
 
@@ -81,23 +74,32 @@ class AuthService:
                 "Invalid credentials."
             )
 
-        password_valid = (
+        is_valid = (
             PasswordService.verify_password(
                 password,
                 user.password_hash
             )
         )
 
-        if not password_valid:
+        if not is_valid:
             raise ValueError(
                 "Invalid credentials."
             )
+
+        user.last_login_at = (
+            datetime.utcnow()
+        )
+
+        self.repository.update_last_login(
+            user
+        )
 
         token = (
             JWTService.create_access_token(
                 {
                     "user_id": user.id,
-                    "email": user.email
+                    "email": user.email,
+                    "username": user.username
                 }
             )
         )

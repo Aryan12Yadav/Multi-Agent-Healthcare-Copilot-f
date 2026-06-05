@@ -1,9 +1,13 @@
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import (
+    APIRouter,
+    Depends
+)
 
 from sqlalchemy.orm import Session
 
-from app.database.session import get_db
+from app.database.session import (
+    get_db
+)
 
 from app.repositories.report_repository import (
     ReportRepository
@@ -21,6 +25,7 @@ from app.services.dashboard_service import (
     DashboardService
 )
 
+
 router = APIRouter(
     prefix="/dashboard",
     tags=["Dashboard"]
@@ -28,14 +33,36 @@ router = APIRouter(
 
 
 @router.get("")
-def dashboard(db: Session = Depends(get_db)):
+def get_dashboard(
+    db: Session = Depends(
+        get_db
+    )
+):
 
-    service = DashboardService(
-        ReportRepository(db),
-        ChatRepository(db),
-        MedicalFindingRepository(db)
+    report_repository = (
+        ReportRepository(
+            db
+        )
     )
 
-    return service.get_metrics(
-        1
+    chat_repository = (
+        ChatRepository(
+            db
+        )
+    )
+
+    medical_repository = (
+        MedicalFindingRepository(
+            db
+        )
+    )
+
+    service = DashboardService(
+        report_repository=report_repository,
+        chat_repository=chat_repository,
+        medical_repository=medical_repository
+    )
+
+    return service.get_dashboard(
+        user_id=1
     )

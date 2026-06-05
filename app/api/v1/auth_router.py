@@ -1,11 +1,3 @@
-"""
-auth_router.py
-
-Authentication endpoints.
-
-Routers must remain thin.
-"""
-
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -20,11 +12,13 @@ from app.schemas.auth_schema import (
     TokenResponse
 )
 
-from app.controllers.auth_controller import AuthController
+from app.controllers.auth_controller import (
+    AuthController
+)
 
-from app.services.auth_service import AuthService
-
-from app.managers.auth_manager import AuthManager
+from app.services.auth_service import (
+    AuthService
+)
 
 from app.repositories.auth_repository import (
     AuthRepository
@@ -38,15 +32,19 @@ router = APIRouter(
 
 def get_auth_controller(
     db: Session
-):
+) -> AuthController:
 
-    repository = AuthRepository(db)
+    repository = AuthRepository(
+        db
+    )
 
-    manager = AuthManager(repository)
+    service = AuthService(
+        repository
+    )
 
-    service = AuthService(manager)
-
-    return AuthController(service)
+    return AuthController(
+        service
+    )
 
 
 @router.post("/register")
@@ -57,8 +55,8 @@ def register(
 
     try:
 
-        controller = (
-            get_auth_controller(db)
+        controller = get_auth_controller(
+            db
         )
 
         user = controller.register(
@@ -66,17 +64,16 @@ def register(
         )
 
         return {
-            "message": "User created",
+            "message": "User registered successfully",
             "user_id": user.id
         }
 
-    except Exception as e:
+    except ValueError as error:
 
         raise HTTPException(
             status_code=400,
-            detail=str(e)
+            detail=str(error)
         )
-
 
 @router.post(
     "/login",
@@ -87,24 +84,20 @@ def login(
     db: Session = Depends(get_db)
 ):
 
-    try:
+    repository = AuthRepository(
+        db
+    )
 
-        controller = (
-            get_auth_controller(db)
-        )
+    service = AuthService(
+        repository
+    )
 
-        token = controller.login(
-            payload
-        )
+    token = service.login_user(
+        payload.email,
+        payload.password
+    )
 
-        return {
-            "access_token": token,
-            "token_type": "bearer"
-        }
-
-    except Exception as e:
-
-        raise HTTPException(
-            status_code=401,
-            detail=str(e)
-        )
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }

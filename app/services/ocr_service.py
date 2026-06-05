@@ -1,31 +1,50 @@
-
 import os
 
 import pdfplumber
-
 import pytesseract
 
 from PIL import Image
+
+try:
+    from paddleocr import PaddleOCR
+except Exception:
+    PaddleOCR = None
 
 
 class OCRService:
 
     def __init__(self):
 
-        pass
+        self.paddle = None
+
+        if PaddleOCR:
+
+            try:
+
+                self.paddle = PaddleOCR(
+                    use_angle_cls=True,
+                    lang="en"
+                )
+
+            except Exception:
+
+                self.paddle = None
 
     def extract_text(
         self,
-        file_path
-    ):
+        file_path: str
+    ) -> str:
 
-        extension = os.path.splitext(
-            file_path
-        )[1].lower()
+        extension = (
+            os.path.splitext(
+                file_path
+            )[1]
+            .lower()
+        )
 
         if extension == ".pdf":
 
-            return self.extract_pdf_text(
+            return self._extract_pdf_text(
                 file_path
             )
 
@@ -35,16 +54,16 @@ class OCRService:
             ".jpeg"
         ]:
 
-            return self.extract_image_text(
+            return self._extract_image_text(
                 file_path
             )
 
         return ""
 
-    def extract_pdf_text(
+    def _extract_pdf_text(
         self,
-        file_path
-    ):
+        file_path: str
+    ) -> str:
 
         extracted_text = ""
 
@@ -63,22 +82,41 @@ class OCRService:
                     if page_text:
 
                         extracted_text += (
-                            page_text + "\n"
+                            page_text
+                            + "\n"
                         )
 
-        except Exception as error:
+        except Exception:
 
-            print(
-                "PDF OCR Error:",
-                str(error)
-            )
+            return ""
 
         return extracted_text
 
-    def extract_image_text(
+    def _extract_image_text(
         self,
-        file_path
-    ):
+        file_path: str
+    ) -> str:
+
+        paddle_text = (
+            self._extract_using_paddle(
+                file_path
+            )
+        )
+
+        if len(
+            paddle_text.strip()
+        ) > 20:
+
+            return paddle_text
+
+        return self._extract_using_tesseract(
+            file_path
+        )
+
+    def _extract_using_tesseract(
+        self,
+        file_path: str
+    ) -> str:
 
         try:
 
@@ -86,35 +124,61 @@ class OCRService:
                 file_path
             )
 
-            text = pytesseract.image_to_string(
-                image
+            return (
+                pytesseract
+                .image_to_string(
+                    image
+                )
             )
 
-            return text
-
-        except Exception as error:
-
-            print(
-                "Image OCR Error:",
-                str(error)
-            )
+        except Exception:
 
             return ""
 
-    def is_empty_text(
+    def _extract_using_paddle(
         self,
-        text
-    ):
+        file_path: str
+    ) -> str:
+
+        if not self.paddle:
+
+            return ""
+
+        try:
+
+            result = self.paddle.ocr(
+                file_path,
+                cls=True
+            )
+
+            text = ""
+
+            for page in result:
+
+                for line in page:
+
+                    text += (
+                        line[1][0]
+                        + "\n"
+                    )
+
+            return text
+
+        except Exception:
+
+            return ""
+
+    def is_empty(
+        self,
+        text: str
+    ) -> bool:
 
         if not text:
-
             return True
 
         if len(
             text.strip()
         ) < 20:
-
             return True
 
         return False
-

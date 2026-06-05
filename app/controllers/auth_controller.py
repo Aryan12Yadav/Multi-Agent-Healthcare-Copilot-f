@@ -1,20 +1,13 @@
-"""
-auth_controller.py
-
-Controller layer handles
-request orchestration.
-
-No business logic should
-be placed here.
-"""
-
-from app.services.auth_service import AuthService
+from app.schemas.auth_schema import (
+    LoginRequest,
+    RegisterRequest
+)
+from app.services.auth_service import (
+    AuthService
+)
 
 
 class AuthController:
-    """
-    Authentication Controller.
-    """
 
     def __init__(
         self,
@@ -24,10 +17,11 @@ class AuthController:
 
     def register(
         self,
-        request
+        request: RegisterRequest
     ):
 
         return self.service.register_user(
+            username=request.username,
             full_name=request.full_name,
             email=request.email,
             password=request.password
@@ -35,10 +29,10 @@ class AuthController:
 
     def login(
         self,
-        request
+        request: LoginRequest
     ):
 
         return self.service.login_user(
-            email=request.email,
+            identifier=request.identifier,
             password=request.password
         )

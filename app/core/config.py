@@ -1,23 +1,12 @@
-"""
-config.py
+from functools import lru_cache
 
-Central configuration management.
-
-Loads environment variables and provides
-typed access across the application.
-"""
-
-from pydantic_settings import BaseSettings
+from pydantic_settings import (
+    BaseSettings,
+    SettingsConfigDict
+)
 
 
 class Settings(BaseSettings):
-    """
-    Application settings container.
-
-    Loads all environment variables from .env
-    and exposes them through strongly typed
-    attributes.
-    """
 
     APP_NAME: str
 
@@ -28,6 +17,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int
+
+    JWT_ALGORITHM: str
 
     POSTGRES_HOST: str
 
@@ -47,11 +38,10 @@ class Settings(BaseSettings):
 
     UPLOAD_DIRECTORY: str
 
-
-    JWT_ALGORITHM: str
-
     NVIDIA_API_KEY: str
+
     NVIDIA_BASE_URL: str
+
     NVIDIA_MODEL: str
 
     EMBEDDING_API_KEY: str
@@ -60,9 +50,16 @@ class Settings(BaseSettings):
 
     EMBEDDING_MODEL: str
 
-    
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
 
 
-settings = Settings()
+@lru_cache
+def get_settings():
+
+    return Settings()
+
+
+settings = get_settings()

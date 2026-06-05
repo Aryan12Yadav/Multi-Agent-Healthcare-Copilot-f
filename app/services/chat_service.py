@@ -1,96 +1,103 @@
 from app.models.chat_message import ChatMessage
 
-from app.services.supervisor_service import (
-    SupervisorService
+from app.repositories.chat_repository import (
+    ChatRepository
+)
+
+from app.services.report_chat_service import (
+    ReportChatService
+)
+
+from app.chat.services.medical_chat_service import (
+    MedicalChatService
 )
 
 
 class ChatService:
 
-    def __init__(self, repository):
-
+    def __init__(
+        self,
+        repository: ChatRepository,
+        report_chat_service: ReportChatService
+    ):
         self.repository = repository
 
-    def save_user_message(
-        self,
-        user_id,
-        message
-    ):
-
-        chat = ChatMessage(
-            user_id=user_id,
-            role="user",
-            message=message
+        self.report_chat_service = (
+            report_chat_service
         )
 
-        return self.repository.create(
-            chat
-        )
-
-    def save_ai_message(
-        self,
-        user_id,
-        message
-    ):
-
-        chat = ChatMessage(
-            user_id=user_id,
-            role="assistant",
-            message=message
-        )
-
-        return self.repository.create(
-            chat
+        self.medical_chat_service = (
+            MedicalChatService()
         )
 
     def get_history(
         self,
-        user_id
+        user_id: int
     ):
 
-        return self.repository.get_history(
-            user_id
+        return (
+            self.repository.get_history(
+                user_id
+            )
         )
 
-    def save_conversation(
+    def save_message(
         self,
-        user_id,
-        question,
-        answer
+        user_id: int,
+        role: str,
+        message: str
     ):
 
-        self.save_user_message(
-            user_id,
-            question
+        chat_message = ChatMessage(
+            user_id=user_id,
+            role=role,
+            message=message
         )
 
-        self.save_ai_message(
-            user_id,
-            answer
+        return (
+            self.repository.create(
+                chat_message
+            )
         )
 
     def process_chat(
         self,
-        user_id,
-        question,
-        report_id=None
-    ):
+        user_id: int,
+        question: str,
+        report_id: int | None = None
+    ) -> str:
 
-        response = SupervisorService().ask(
-            question,
-            report_id
+        self.save_message(
+            user_id=user_id,
+            role="user",
+            message=question
         )
 
-        answer = (
-            response["response"]
-            if isinstance(response, dict)
-            else response
-        )
+        if report_id:
 
-        self.save_conversation(
-            user_id,
-            question,
-            answer
+            response = (
+                self.report_chat_service
+                .ask_question(
+                    report_id=report_id,
+                    question=question
+                )
+            )
+
+            answer = response["answer"]
+
+        else:
+
+            answer = (
+                self.medical_chat_service
+                .ask(
+                    question
+                )
+            )
+
+        self.save_message(
+            user_id=user_id,
+            role="assistant",
+            message=answer
         )
 
         return answer

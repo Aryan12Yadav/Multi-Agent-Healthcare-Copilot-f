@@ -1,7 +1,7 @@
-
 from fastapi import (
     APIRouter,
-    Depends
+    Depends,
+    HTTPException
 )
 
 from sqlalchemy.orm import Session
@@ -10,20 +10,20 @@ from app.database.session import (
     get_db
 )
 
-from app.schemas.report_chat_schema import (
-    ReportChatRequest
+from app.controllers.report_chat_controller import (
+    ReportChatController
 )
 
 from app.repositories.medical_finding_repository import (
     MedicalFindingRepository
 )
 
-from app.services.report_chat_service import (
-    ReportChatService
+from app.schemas.report_chat_schema import (
+    ReportChatRequest
 )
 
-from app.controllers.report_chat_controller import (
-    ReportChatController
+from app.services.report_chat_service import (
+    ReportChatService
 )
 
 
@@ -33,7 +33,9 @@ router = APIRouter(
 )
 
 
-def get_controller(db):
+def get_controller(
+    db: Session
+) -> ReportChatController:
 
     repository = (
         MedicalFindingRepository(
@@ -47,23 +49,39 @@ def get_controller(db):
         )
     )
 
-    return ReportChatController(
-        service
+    return (
+        ReportChatController(
+            service
+        )
     )
 
 
 @router.post("")
-def ask_report(
-    request: ReportChatRequest,
-    db: Session = Depends(get_db)
+def ask_report_question(
+    payload: ReportChatRequest,
+    db: Session = Depends(
+        get_db
+    )
 ):
 
-    controller = get_controller(
-        db
-    )
+    try:
 
-    return controller.ask_question(
-        request.report_id,
-        request.question
-    )
+        controller = (
+            get_controller(
+                db
+            )
+        )
 
+        return (
+            controller.ask_question(
+                report_id=payload.report_id,
+                question=payload.question
+            )
+        )
+
+    except Exception as error:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(error)
+        )

@@ -1,36 +1,38 @@
-"""
-chat_controller.py
-"""
+from app.services.chat_service import (
+    ChatService
+)
 
 
 class ChatController:
 
-    def __init__(self, service):
-
+    def __init__(
+        self,
+        service: ChatService
+    ):
         self.service = service
 
-    def get_history(self, user_id):
+    def get_history(
+        self,
+        user_id: int
+    ):
 
-        return self.service.get_history(user_id)
-
-    def save_user_message(self, user_id, message):
-
-        return self.service.save_user_message(
-            user_id,
-            message
+        return (
+            self.service.get_history(
+                user_id
+            )
         )
 
-    def save_ai_message(self, user_id, message):
+    def chat(
+        self,
+        user_id: int,
+        question: str,
+        report_id: int | None = None
+    ):
 
-        return self.service.save_ai_message(
-            user_id,
-            message
-        )
-    
-    def chat(self, user_id, question, report_id=None):
-
-        return self.service.process_chat(
-            user_id,
-            question,
-            report_id
+        return (
+            self.service.process_chat(
+                user_id=user_id,
+                question=question,
+                report_id=report_id
+            )
         )

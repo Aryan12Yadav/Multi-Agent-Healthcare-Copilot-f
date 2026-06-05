@@ -1,10 +1,9 @@
-
 class HealthScoreService:
 
     def calculate(
         self,
-        analysis
-    ):
+        analysis: dict
+    ) -> dict:
 
         if not analysis.get(
             "is_medical_report",
@@ -13,34 +12,33 @@ class HealthScoreService:
 
             return {
                 "health_score": 0,
-                "risk_level": "Not Applicable",
-                "score_breakdown": {}
+                "risk_level": "Not Applicable"
             }
 
         score = 100
 
-        critical_findings = len(
+        critical_count = len(
             analysis.get(
                 "critical_findings",
                 []
             )
         )
 
-        abnormal_findings = len(
+        abnormal_count = len(
             analysis.get(
                 "abnormal_findings",
                 []
             )
         )
 
-        diagnoses = len(
+        diagnosis_count = len(
             analysis.get(
                 "diagnoses",
                 []
             )
         )
 
-        medications = len(
+        medication_count = len(
             analysis.get(
                 "medications",
                 []
@@ -48,73 +46,55 @@ class HealthScoreService:
         )
 
         score -= (
-            critical_findings * 20
+            critical_count * 20
         )
 
         score -= (
-            abnormal_findings * 5
+            abnormal_count * 5
         )
 
         score -= (
-            diagnoses * 2
+            diagnosis_count * 2
         )
 
         score -= (
-            medications * 1
+            medication_count * 1
         )
 
         score = max(
-            min(score, 100),
-            0
+            0,
+            min(
+                score,
+                100
+            )
         )
 
-        risk_level = self.get_risk_level(
-            score
+        risk_level = (
+            self._get_risk_level(
+                score
+            )
         )
 
         return {
-
-            "health_score":
-                score,
-
-            "risk_level":
-                risk_level,
-
-            "score_breakdown": {
-
-                "critical_findings":
-                    critical_findings,
-
-                "abnormal_findings":
-                    abnormal_findings,
-
-                "diagnoses":
-                    diagnoses,
-
-                "medications":
-                    medications
-            }
+            "health_score": score,
+            "risk_level": risk_level
         }
 
-    def get_risk_level(
+    def _get_risk_level(
         self,
-        score
-    ):
+        score: int
+    ) -> str:
 
         if score >= 90:
-
             return "Excellent"
 
         if score >= 75:
-
             return "Low"
 
         if score >= 60:
-
             return "Medium"
 
         if score >= 40:
-
             return "High"
 
         return "Critical"

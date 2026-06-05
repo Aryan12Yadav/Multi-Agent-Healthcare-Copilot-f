@@ -1,24 +1,9 @@
-"""
-password_service.py
-
-Password hashing utilities.
-
-Responsible for secure
-password storage.
-"""
-
 from passlib.context import CryptContext
 
 
 class PasswordService:
-    """
-    Password utility service.
 
-    Encapsulates password
-    hashing and verification.
-    """
-
-    pwd_context = CryptContext(
+    _pwd_context = CryptContext(
         schemes=["bcrypt"],
         deprecated="auto"
     )
@@ -29,7 +14,9 @@ class PasswordService:
         password: str
     ) -> str:
 
-        return cls.pwd_context.hash(password)
+        return cls._pwd_context.hash(
+            password
+        )
 
     @classmethod
     def verify_password(
@@ -38,7 +25,7 @@ class PasswordService:
         hashed_password: str
     ) -> bool:
 
-        return cls.pwd_context.verify(
+        return cls._pwd_context.verify(
             plain_password,
             hashed_password
         )

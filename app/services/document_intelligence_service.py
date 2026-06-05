@@ -1,29 +1,58 @@
-from app.llm.providers.deepseek_provider import DeepSeekProvider
+from app.llm.providers.deepseek_provider import (
+    DeepSeekProvider
+)
 
-from app.medical.prompts.report_analysis_prompt import REPORT_ANALYSIS_PROMPT
+from app.utils.json_parser import (
+    JsonParser
+)
 
-from app.utils.json_parser import JsonParser
 
 class DocumentIntelligenceService:
-
 
     def __init__(self):
 
         self.provider = DeepSeekProvider()
 
-    def analyze_document(self, report_text):
+    def analyze_document(
+        self,
+        report_text: str
+    ) -> dict:
 
-        prompt = REPORT_ANALYSIS_PROMPT.replace(
-            "{report_text}",
-            report_text
+        prompt = f"""
+You are MedSphere AI.
+
+Analyze the uploaded document.
+
+Tasks:
+
+1. Detect document category.
+2. Detect document type.
+3. Detect if document is a medical report.
+4. Extract patient information.
+5. Extract diagnoses.
+6. Extract medications.
+7. Extract abnormal findings.
+8. Extract critical findings.
+9. Extract recommendations.
+10. Generate summary.
+
+Return VALID JSON only.
+
+Document:
+
+{report_text}
+"""
+
+        response = (
+            self.provider.generate(
+                prompt
+            )
         )
 
-        response = self.provider.generate(
-            prompt
-        )
-
-        analysis = JsonParser.parse(
-            response
+        analysis = (
+            JsonParser.parse(
+                response
+            )
         )
 
         if not isinstance(
@@ -31,14 +60,7 @@ class DocumentIntelligenceService:
             dict
         ):
 
-            analysis = {
-                "document_category": "other",
-                "document_type": "unknown",
-                "is_medical_report": False,
-                "confidence": 0.0,
-                "summary": str(response),
-                "detailed_analysis": str(response)
-            }
+            analysis = {}
 
         analysis.setdefault(
             "document_category",
@@ -56,18 +78,8 @@ class DocumentIntelligenceService:
         )
 
         analysis.setdefault(
-            "confidence",
-            0.0
-        )
-
-        analysis.setdefault(
             "patient_information",
             {}
-        )
-
-        analysis.setdefault(
-            "medical_entities",
-            []
         )
 
         analysis.setdefault(
@@ -91,32 +103,7 @@ class DocumentIntelligenceService:
         )
 
         analysis.setdefault(
-            "normal_findings",
-            []
-        )
-
-        analysis.setdefault(
             "recommendations",
-            []
-        )
-
-        analysis.setdefault(
-            "followup_questions",
-            []
-        )
-
-        analysis.setdefault(
-            "key_observations",
-            []
-        )
-
-        analysis.setdefault(
-            "important_values",
-            []
-        )
-
-        analysis.setdefault(
-            "doctor_notes",
             []
         )
 
@@ -125,15 +112,4 @@ class DocumentIntelligenceService:
             ""
         )
 
-        analysis.setdefault(
-            "detailed_analysis",
-            ""
-        )
-
-        analysis.setdefault(
-            "plain_english_explanation",
-            ""
-        )
-
         return analysis
-

@@ -1,16 +1,3 @@
-"""
-ocr_text.py
-
-Stores OCR extracted text
-for uploaded reports.
-
-One report can have one OCR record.
-
-Future AI analysis,
-trend engine and RAG
-will use this table.
-"""
-
 from datetime import datetime
 
 from sqlalchemy import Text
@@ -20,17 +7,12 @@ from sqlalchemy import ForeignKey
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
 from app.database.base import Base
 
 
 class OCRText(Base):
-    """
-    OCR Text Model
-
-    Stores raw extracted text
-    generated from OCR engine.
-    """
 
     __tablename__ = "ocr_texts"
 
@@ -40,18 +22,19 @@ class OCRText(Base):
     )
 
     report_id: Mapped[int] = mapped_column(
-        ForeignKey("reports.id"),
-        unique=True
+        ForeignKey("reports.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
     )
 
-    raw_text: Mapped[str] = mapped_column(
+    raw_text: Mapped[str | None] = mapped_column(
         Text,
         nullable=True
     )
 
     ocr_engine: Mapped[str] = mapped_column(
         String(100),
-        default="paddleocr"
+        default="hybrid"
     )
 
     ocr_status: Mapped[str] = mapped_column(
@@ -62,4 +45,15 @@ class OCRText(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    report = relationship(
+        "Report",
+        back_populates="ocr_text"
     )

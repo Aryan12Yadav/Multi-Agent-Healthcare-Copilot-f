@@ -1,6 +1,8 @@
 from openai import OpenAI
 
-from app.core.config import settings
+from app.core.config import (
+    settings
+)
 
 
 class DeepSeekProvider:
@@ -12,25 +14,29 @@ class DeepSeekProvider:
             api_key=settings.NVIDIA_API_KEY
         )
 
-        self.model = settings.NVIDIA_MODEL
+        self.model = (
+            settings.NVIDIA_MODEL
+        )
 
     def generate(
         self,
-        prompt
-    ):
+        prompt: str
+    ) -> str:
 
         try:
 
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature=0.2,
-                max_tokens=1500
+            response = (
+                self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    temperature=0.2,
+                    max_tokens=1500
+                )
             )
 
             return (
@@ -43,19 +49,10 @@ class DeepSeekProvider:
         except Exception as error:
 
             print(
-                "LLM Error:",
+                "DeepSeek Error:",
                 str(error)
             )
 
             return (
                 "Unable to generate response."
             )
-
-    def ask(
-        self,
-        prompt
-    ):
-
-        return self.generate(
-            prompt
-        )

@@ -1,18 +1,8 @@
-"""
-user.py
-
-Primary authentication model.
-
-Stores credentials and
-basic user information.
-"""
-
 from datetime import datetime
 
 from sqlalchemy import String
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
-from sqlalchemy import ForeignKey
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -22,20 +12,18 @@ from app.database.base import Base
 
 
 class User(Base):
-    """
-    User Model
-
-    Central identity model.
-
-    Every patient, doctor
-    and admin originates
-    from this table.
-    """
 
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(
         primary_key=True,
+        index=True
+    )
+
+    username: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=False,
         index=True
     )
 
@@ -61,8 +49,9 @@ class User(Base):
         default=True
     )
 
-    role_id: Mapped[int] = mapped_column(
-        ForeignKey("roles.id")
+    last_login_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -70,4 +59,20 @@ class User(Base):
         default=datetime.utcnow
     )
 
-    role = relationship("Role")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    reports = relationship(
+        "Report",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    chat_messages = relationship(
+        "ChatMessage",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )

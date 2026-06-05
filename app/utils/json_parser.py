@@ -1,10 +1,3 @@
-"""
-JSON Parser
-
-Utility for parsing
-LLM JSON responses.
-"""
-
 import json
 import re
 
@@ -12,11 +5,15 @@ import re
 class JsonParser:
 
     @staticmethod
-    def parse(text):
+    def parse(
+        text: str
+    ):
 
         try:
 
-            return json.loads(text)
+            return json.loads(
+                text
+            )
 
         except Exception:
 
@@ -34,7 +31,9 @@ class JsonParser:
 
             try:
 
-                return json.loads(match.group())
+                return json.loads(
+                    match.group()
+                )
 
             except Exception:
 

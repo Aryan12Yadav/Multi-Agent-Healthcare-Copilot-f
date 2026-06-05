@@ -1,8 +1,11 @@
-
 import json
 
 from app.llm.providers.deepseek_provider import (
     DeepSeekProvider
+)
+
+from app.repositories.medical_finding_repository import (
+    MedicalFindingRepository
 )
 
 
@@ -10,9 +13,8 @@ class ReportChatService:
 
     def __init__(
         self,
-        repository
+        repository: MedicalFindingRepository
     ):
-
         self.repository = repository
 
         self.provider = (
@@ -21,12 +23,13 @@ class ReportChatService:
 
     def ask_question(
         self,
-        report_id,
-        question
-    ):
+        report_id: int,
+        question: str
+    ) -> dict:
 
         finding = (
-            self.repository.get_by_report_id(
+            self.repository
+            .get_by_report_id(
                 report_id
             )
         )
@@ -37,8 +40,8 @@ class ReportChatService:
                 "report_id": report_id,
                 "question": question,
                 "answer": (
-                    "No analysis found "
-                    "for this report."
+                    "No analysis found for "
+                    "the selected report."
                 )
             }
 
@@ -51,73 +54,37 @@ class ReportChatService:
         prompt = f"""
 You are MedSphere AI.
 
-You are an expert healthcare assistant.
+Use ONLY the provided report analysis.
 
-You have access to a complete
-AI-generated report analysis.
+Never invent values.
 
-Use ONLY information present
-inside the report analysis.
+If information is missing,
+say that the report does not
+contain that information.
 
-Do not invent values.
-
-Do not hallucinate.
-
-If information is unavailable,
-say clearly that the report
-does not contain that information.
-
-==================================
 REPORT ANALYSIS
-==================================
 
 {analysis_json}
 
- HEALTH SCORE
- 
+HEALTH SCORE
+
 {finding.health_score}
 
- 
 RISK LEVEL
- 
 
 {finding.risk_level}
 
- 
-USER QUESTION
- 
+QUESTION
 
 {question}
 
- 
-INSTRUCTIONS
- 
+Provide:
 
-1. Answer professionally.
+1. Direct Answer
+2. Explanation
+3. Medical Significance
 
-2. Explain medical terms
-   in simple language.
-
-3. Reference findings when relevant.
-
-4. Reference recommendations
-   when relevant.
-
-5. Reference follow-up advice
-   when relevant.
-
-6. If document is not medical,
-   explain the document instead.
-
-7. Keep response structured.
-
-8. If user asks for food,
-   exercise, precautions or
-   lifestyle guidance, provide
-   practical advice based on
-   available report findings.
-
-Generate the best possible answer.
+Return a professional response.
 """
 
         answer = (
@@ -127,14 +94,7 @@ Generate the best possible answer.
         )
 
         return {
-
-            "report_id":
-                report_id,
-
-            "question":
-                question,
-
-            "answer":
-                answer
+            "report_id": report_id,
+            "question": question,
+            "answer": answer
         }
-

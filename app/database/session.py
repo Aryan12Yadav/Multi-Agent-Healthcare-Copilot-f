@@ -1,17 +1,12 @@
-"""
-session.py
-
-Database engine and session configuration.
-
-Provides reusable database sessions
-throughout the application.
-"""
-
 from sqlalchemy import create_engine
 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import (
+    sessionmaker
+)
 
-from app.core.config import settings
+from app.core.config import (
+    settings
+)
 
 
 DATABASE_URL = (
@@ -31,24 +26,20 @@ engine = create_engine(
 
 
 SessionLocal = sessionmaker(
-    autoflush=False,
     autocommit=False,
+    autoflush=False,
     bind=engine
 )
 
 
 def get_db():
-    """
-    Dependency used by FastAPI.
-
-    Provides database session
-    and ensures proper cleanup.
-    """
 
     db = SessionLocal()
 
     try:
+
         yield db
 
     finally:
+
         db.close()

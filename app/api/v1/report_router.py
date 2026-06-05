@@ -1,15 +1,19 @@
-
 from fastapi import (
     APIRouter,
-    UploadFile,
+    Depends,
     File,
-    Depends
+    UploadFile,
+    HTTPException
 )
 
 from sqlalchemy.orm import Session
 
 from app.database.session import (
     get_db
+)
+
+from app.controllers.report_controller import (
+    ReportController
 )
 
 from app.repositories.report_repository import (
@@ -24,17 +28,12 @@ from app.services.report_service import (
     ReportService
 )
 
-from app.services.report_analysis_service import (
-    ReportAnalysisService
-)
-
-from app.controllers.report_controller import (
-    ReportController
-)
-
-# Replace with your OCR service
 from app.services.ocr_service import (
     OCRService
+)
+
+from app.services.report_analysis_service import (
+    ReportAnalysisService
 )
 
 
@@ -44,7 +43,9 @@ router = APIRouter(
 )
 
 
-def get_controller(db):
+def get_controller(
+    db: Session
+) -> ReportController:
 
     repository = ReportRepository(
         db
@@ -59,24 +60,34 @@ def get_controller(db):
     )
 
 
-@router.post("/upload")
+@router.post(
+    "/upload"
+)
 def upload_report(
     file: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(
+        get_db
+    )
 ):
-
-    controller = get_controller(
-        db
-    )
-
-    report = controller.upload_report(
-        file=file,
-        patient_id=1
-    )
 
     try:
 
-        ocr_service = OCRService()
+        controller = (
+            get_controller(
+                db
+            )
+        )
+
+        report = (
+            controller.upload_report(
+                file=file,
+                user_id=1
+            )
+        )
+
+        ocr_service = (
+            OCRService()
+        )
 
         report_text = (
             ocr_service.extract_text(
@@ -96,7 +107,7 @@ def upload_report(
             )
         )
 
-        analysis_result = (
+        analysis = (
             analysis_service
             .analyze_report(
                 report.id,
@@ -105,112 +116,116 @@ def upload_report(
         )
 
         return {
-
             "success": True,
-
-            "report_id":
-                report.id,
-
-            "report_name":
-                report.report_name,
-
-            "processing_status":
-                report.processing_status,
-
-            "analysis_generated":
-                True,
-
-            "document_type":
-                analysis_result.document_type,
-
-            "health_score":
-                analysis_result.health_score,
-
-            "risk_level":
-                analysis_result.risk_level
+            "report_id": report.id,
+            "report_name": report.report_name,
+            "health_score": analysis.health_score,
+            "risk_level": analysis.risk_level
         }
 
     except Exception as error:
 
-        print(
-            "Analysis Error:",
-            str(error)
+        raise HTTPException(
+            status_code=500,
+            detail=str(error)
         )
-
-        return {
-
-            "success": True,
-
-            "report_id":
-                report.id,
-
-            "report_name":
-                report.report_name,
-
-            "processing_status":
-                report.processing_status,
-
-            "analysis_generated":
-                False,
-
-            "error":
-                str(error)
-        }
 
 
 @router.get("")
 def get_reports(
-    db: Session = Depends(get_db)
+    db: Session = Depends(
+        get_db
+    )
 ):
 
-    controller = get_controller(
-        db
+    controller = (
+        get_controller(
+            db
+        )
     )
 
-    return controller.get_reports(
-        patient_id=1
+    return (
+        controller.get_reports(
+            user_id=1
+        )
     )
 
 
-@router.get("/{report_id}")
+@router.get(
+    "/{report_id}"
+)
 def get_report(
     report_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(
+        get_db
+    )
 ):
 
-    controller = get_controller(
-        db
+    controller = (
+        get_controller(
+            db
+        )
     )
 
-    return controller.get_report(
-        report_id
+    report = (
+        controller.get_report(
+            report_id
+        )
     )
 
+    if not report:
 
-@router.delete("/{report_id}")
+        raise HTTPException(
+            status_code=404,
+            detail="Report not found"
+        )
+
+    return report
+
+
+@router.delete(
+    "/{report_id}"
+)
 def delete_report(
     report_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(
+        get_db
+    )
 ):
 
-    controller = get_controller(
-        db
+    controller = (
+        get_controller(
+            db
+        )
     )
 
-    controller.delete_report(
-        report_id
+    deleted = (
+        controller.delete_report(
+            report_id
+        )
     )
+
+    if not deleted:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Report not found"
+        )
 
     return {
-        "message":
-        "deleted"
+        "success": True,
+        "message": "Report deleted"
     }
 
 
-@router.get("/{report_id}/analysis")
+@router.get(
+    "/{report_id}/analysis"
+)
 def get_analysis(
     report_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(
+        get_db
+    )
 ):
 
     repository = (
@@ -225,16 +240,17 @@ def get_analysis(
         )
     )
 
-    result = service.get_analysis(
-        report_id
+    result = (
+        service.get_analysis(
+            report_id
+        )
     )
 
     if not result:
 
-        return {
-            "message":
-            "Analysis not found"
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="Analysis not found"
+        )
 
     return result
-

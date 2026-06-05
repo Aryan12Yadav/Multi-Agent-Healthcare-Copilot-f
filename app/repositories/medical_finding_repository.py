@@ -1,3 +1,4 @@
+from sqlalchemy.orm import Session
 
 from app.models.medical_finding import (
     MedicalFinding
@@ -6,24 +7,21 @@ from app.models.medical_finding import (
 
 class MedicalFindingRepository:
 
-    def __init__(self, db):
-
+    def __init__(
+        self,
+        db: Session
+    ):
         self.db = db
 
-    def create_finding(
+    def create_or_update(
         self,
-        finding
+        finding: MedicalFinding
     ):
 
         existing = (
-            self.db.query(
-                MedicalFinding
+            self.get_by_report_id(
+                finding.report_id
             )
-            .filter(
-                MedicalFinding.report_id
-                == finding.report_id
-            )
-            .first()
         )
 
         if existing:
@@ -82,7 +80,7 @@ class MedicalFindingRepository:
 
     def get_by_report_id(
         self,
-        report_id
+        report_id: int
     ):
 
         return (
@@ -96,25 +94,9 @@ class MedicalFindingRepository:
             .first()
         )
 
-    def get_by_id(
-        self,
-        finding_id
-    ):
-
-        return (
-            self.db.query(
-                MedicalFinding
-            )
-            .filter(
-                MedicalFinding.id
-                == finding_id
-            )
-            .first()
-        )
-
     def get_analysis_count(
         self
-    ):
+    ) -> int:
 
         return (
             self.db.query(
@@ -123,85 +105,9 @@ class MedicalFindingRepository:
             .count()
         )
 
-    def update_finding(
-        self,
-        report_id,
-        data
-    ):
-
-        finding = (
-            self.get_by_report_id(
-                report_id
-            )
-        )
-
-        if not finding:
-
-            return None
-
-        for key, value in data.items():
-
-            if hasattr(
-                finding,
-                key
-            ):
-
-                setattr(
-                    finding,
-                    key,
-                    value
-                )
-
-        self.db.commit()
-
-        self.db.refresh(
-            finding
-        )
-
-        return finding
-
-    def delete_finding(
-        self,
-        report_id
-    ):
-
-        finding = (
-            self.get_by_report_id(
-                report_id
-            )
-        )
-
-        if not finding:
-
-            return False
-
-        self.db.delete(
-            finding
-        )
-
-        self.db.commit()
-
-        return True
-
-    def get_recent_findings(
-        self,
-        limit=10
-    ):
-
-        return (
-            self.db.query(
-                MedicalFinding
-            )
-            .order_by(
-                MedicalFinding.id.desc()
-            )
-            .limit(limit)
-            .all()
-        )
-
     def get_average_health_score(
         self
-    ):
+    ) -> int:
 
         findings = (
             self.db.query(
@@ -210,31 +116,16 @@ class MedicalFindingRepository:
             .all()
         )
 
-        medical_findings = [
-
+        scores = [
             item.health_score
-
             for item in findings
-
             if item.is_medical_report
-
         ]
 
-        if not medical_findings:
-
+        if not scores:
             return 0
 
         return int(
-
-            sum(
-                medical_findings
-            )
-
-            /
-
-            len(
-                medical_findings
-            )
-
+            sum(scores)
+            / len(scores)
         )
-

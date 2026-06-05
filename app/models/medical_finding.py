@@ -1,19 +1,14 @@
-
 from datetime import datetime
 
-from sqlalchemy import (
-    String,
-    JSON,
-    DateTime,
-    ForeignKey,
-    Boolean,
-    Integer
-)
+from sqlalchemy import String
+from sqlalchemy import JSON
+from sqlalchemy import Boolean
+from sqlalchemy import Integer
+from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
 
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column
-)
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
 
 from app.database.base import Base
 
@@ -28,22 +23,27 @@ class MedicalFinding(Base):
     )
 
     report_id: Mapped[int] = mapped_column(
-        ForeignKey("reports.id"),
-        unique=True
+        ForeignKey(
+            "reports.id",
+            ondelete="CASCADE"
+        ),
+        unique=True,
+        nullable=False,
+        index=True
     )
 
-    report_type: Mapped[str] = mapped_column(
+    document_category: Mapped[str | None] = mapped_column(
         String(100),
         nullable=True
     )
 
-    document_category: Mapped[str] = mapped_column(
-        String(100),
-        nullable=True
-    )
-
-    document_type: Mapped[str] = mapped_column(
+    document_type: Mapped[str | None] = mapped_column(
         String(200),
+        nullable=True
+    )
+
+    report_type: Mapped[str | None] = mapped_column(
+        String(100),
         nullable=True
     )
 
@@ -57,12 +57,12 @@ class MedicalFinding(Base):
         default=0
     )
 
-    risk_level: Mapped[str] = mapped_column(
+    risk_level: Mapped[str | None] = mapped_column(
         String(50),
         nullable=True
     )
 
-    summary: Mapped[str] = mapped_column(
+    summary: Mapped[str | None] = mapped_column(
         String,
         nullable=True
     )
@@ -77,3 +77,8 @@ class MedicalFinding(Base):
         default=datetime.utcnow
     )
 
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )

@@ -1,100 +1,144 @@
-
 import os
 import uuid
 
 from pathlib import Path
 
+from fastapi import UploadFile
+
+from app.core.config import settings
 from app.models.report import Report
+from app.repositories.report_repository import (
+    ReportRepository
+)
 
 
 class ReportService:
 
-    def __init__(self, repository):
-
+    def __init__(
+        self,
+        repository: ReportRepository
+    ):
         self.repository = repository
 
-    def upload_report(self, file, patient_id):
+    def upload_report(
+        self,
+        file: UploadFile,
+        user_id: int
+    ) -> Report:
 
-        storage_directory = Path("storage/reports")
+        upload_directory = Path(
+            settings.UPLOAD_DIRECTORY
+        )
 
-        storage_directory.mkdir(
+        upload_directory.mkdir(
             parents=True,
             exist_ok=True
         )
 
-        extension = os.path.splitext(
-            file.filename
-        )[1]
+        extension = (
+            os.path.splitext(
+                file.filename
+            )[1]
+            .lower()
+        )
 
-        stored_file_name = (
+        stored_name = (
             f"{uuid.uuid4()}{extension}"
         )
 
         file_path = (
-            storage_directory /
-            stored_file_name
+            upload_directory
+            / stored_name
         )
 
-        with open(file_path, "wb") as buffer:
+        with open(
+            file_path,
+            "wb"
+        ) as output_file:
 
-            buffer.write(
+            output_file.write(
                 file.file.read()
             )
 
         report = Report(
-            patient_id=patient_id,
+            user_id=user_id,
             report_name=file.filename,
             report_type="unknown",
             original_file_name=file.filename,
-            stored_file_name=stored_file_name,
+            stored_file_name=stored_name,
             file_path=str(file_path),
-            file_size=os.path.getsize(file_path),
+            file_size=os.path.getsize(
+                file_path
+            ),
             mime_type=file.content_type,
             processing_status="uploaded"
         )
 
-        return self.repository.create_report(
-            report
+        return (
+            self.repository.create(
+                report
+            )
         )
 
-    def get_reports(self, patient_id):
+    def get_user_reports(
+        self,
+        user_id: int
+    ):
 
-        return self.repository.get_reports(
-            patient_id
+        return (
+            self.repository
+            .get_user_reports(
+                user_id
+            )
         )
 
-    def get_report(self, report_id):
+    def get_report(
+        self,
+        report_id: int
+    ):
 
-        return self.repository.get_report(
-            report_id
+        return (
+            self.repository
+            .get_by_id(
+                report_id
+            )
         )
 
-    def delete_report(self, report_id):
+    def delete_report(
+        self,
+        report_id: int
+    ) -> bool:
 
-        report = self.repository.get_report(
-            report_id
+        report = (
+            self.repository
+            .get_by_id(
+                report_id
+            )
         )
 
-        if report:
+        if not report:
+            return False
 
-            try:
+        try:
 
-                if (
-                    report.file_path and
-                    os.path.exists(
-                        report.file_path
-                    )
-                ):
+            if (
+                report.file_path
+                and
+                os.path.exists(
+                    report.file_path
+                )
+            ):
 
-                    os.remove(
-                        report.file_path
-                    )
+                os.remove(
+                    report.file_path
+                )
 
-            except Exception:
+        except Exception:
+            pass
 
-                pass
-
-        return self.repository.delete_report(
-            report_id
+        return (
+            self.repository
+            .delete(
+                report
+            )
         )
-
