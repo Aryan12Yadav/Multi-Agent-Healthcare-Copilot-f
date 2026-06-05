@@ -8,17 +8,17 @@ function RecentReportsCard() {
     ];
 
     return (
-        <div className="bg-white rounded-3xl p-6 border shadow-sm">
+        <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100">
 
             <div className="flex justify-between items-center mb-6">
 
-                <h2 className="text-xl font-bold">
+                <h2 className="text-2xl font-bold">
 
                     Recent Reports
 
                 </h2>
 
-                <button className="text-violet-600">
+                <button className="text-violet-600 font-semibold">
 
                     View All
 
@@ -30,12 +30,36 @@ function RecentReportsCard() {
 
                 {
                     reports.map((report, index) => (
+
                         <div
                             key={index}
-                            className="p-4 rounded-2xl bg-slate-50 border"
+                            className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-all"
                         >
-                            {report}
+
+                            <div>
+
+                                <h3 className="font-semibold">
+
+                                    {report}
+
+                                </h3>
+
+                                <p className="text-sm text-slate-500 mt-1">
+
+                                    Analysis Completed
+
+                                </p>
+
+                            </div>
+
+                            <span className="px-3 py-2 rounded-xl bg-green-100 text-green-700 text-sm font-medium">
+
+                                Ready
+
+                            </span>
+
                         </div>
+
                     ))
                 }
 

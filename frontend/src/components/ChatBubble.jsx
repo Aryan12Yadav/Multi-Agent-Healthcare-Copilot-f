@@ -16,18 +16,34 @@ function ChatBubble({
         >
 
             <div
-                className={`max-w-[75%] ${
+                className={`max-w-[85%] lg:max-w-[75%] flex flex-col ${
                     isUser
                         ? "items-end"
                         : "items-start"
-                } flex flex-col`}
+                }`}
             >
+
+                <span
+                    className={`text-xs mb-2 font-medium ${
+                        isUser
+                            ? "text-violet-600"
+                            : "text-slate-500"
+                    }`}
+                >
+
+                    {
+                        isUser
+                            ? "You"
+                            : "MedSphere AI"
+                    }
+
+                </span>
 
                 <div
                     className={`px-6 py-4 rounded-[24px] shadow-sm ${
                         isUser
                             ? "bg-violet-600 text-white"
-                            : "bg-white border border-slate-200"
+                            : "bg-white border border-slate-200 text-slate-800"
                     }`}
                 >
 

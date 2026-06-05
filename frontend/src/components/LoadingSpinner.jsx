@@ -4,21 +4,25 @@ function LoadingSpinner({
 }) {
 
     return (
-        <div className="flex flex-col items-center justify-center py-20">
+        <div className="min-h-[400px] flex items-center justify-center">
 
-            <div className="w-16 h-16 border-4 border-slate-200 border-t-violet-600 rounded-full animate-spin" />
+            <div className="text-center">
 
-            <h2 className="text-2xl font-bold mt-6">
+                <div className="mx-auto w-20 h-20 border-[6px] border-slate-200 border-t-violet-600 rounded-full animate-spin" />
 
-                {title}
+                <h2 className="text-3xl font-bold mt-8 text-slate-900">
 
-            </h2>
+                    {title}
 
-            <p className="text-slate-500 mt-2">
+                </h2>
 
-                {description}
+                <p className="text-slate-500 mt-3 text-lg">
 
-            </p>
+                    {description}
+
+                </p>
+
+            </div>
 
         </div>
     );

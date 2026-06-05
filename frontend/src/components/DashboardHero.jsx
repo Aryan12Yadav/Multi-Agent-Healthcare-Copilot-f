@@ -1,19 +1,31 @@
 function DashboardHero() {
 
     return (
-        <div className="rounded-3xl p-10 text-white bg-gradient-to-r from-violet-700 to-indigo-600">
+        <div className="rounded-[32px] p-10 text-white bg-gradient-to-r from-violet-700 via-indigo-700 to-blue-700 shadow-lg">
 
-            <h1 className="text-6xl font-bold">
+            <div className="max-w-3xl">
 
-                Hello 
+                <h1 className="text-4xl lg:text-6xl font-bold">
 
-            </h1>
+                    Hello Aryan
 
-            <p className="text-xl mt-4 opacity-90">
+                </h1>
 
-                Welcome back. Here's your complete health overview.
+                <p className="text-lg lg:text-xl mt-4 text-violet-100">
 
-            </p>
+                    Welcome back to MedSphere AI.
+
+                </p>
+
+                <p className="mt-3 text-violet-200 leading-8">
+
+                    Monitor health reports, track medical insights,
+                    analyze findings and interact with AI healthcare
+                    assistants from a single dashboard.
+
+                </p>
+
+            </div>
 
         </div>
     );

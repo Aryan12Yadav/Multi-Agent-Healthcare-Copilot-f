@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import StatCard from "../components/StatCard";
-
+import HealthScoreCard from "../components/HealthScoreCard";
+import RecentActivity from "../components/RecentActivity";
+import AgentCard from "../components/AgentCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
@@ -34,7 +36,10 @@ function DashboardPage() {
 
             setLoading(true);
 
-            const response = await getDashboardData();
+            setError(false);
+
+            const response =
+                await getDashboardData();
 
             setDashboard(
                 response
@@ -57,7 +62,7 @@ function DashboardPage() {
         return (
             <LoadingSpinner
                 title="Loading Dashboard"
-                description="Fetching healthcare data"
+                description="Preparing your healthcare workspace"
             />
         );
     }
@@ -67,7 +72,7 @@ function DashboardPage() {
         return (
             <ErrorState
                 title="Dashboard Error"
-                description="Unable to load dashboard"
+                description="Unable to load dashboard data"
             />
         );
     }
@@ -77,7 +82,7 @@ function DashboardPage() {
         return (
             <EmptyState
                 title="No Dashboard Data"
-                description="No healthcare information available"
+                description="Dashboard information is unavailable"
             />
         );
     }
@@ -91,29 +96,55 @@ function DashboardPage() {
 
                 <Header />
 
-                <div className="p-8">
+                <div className="p-6 lg:p-8">
 
-                    <div className="bg-gradient-to-r from-violet-700 to-indigo-700 rounded-[32px] p-10 text-white">
+                    <div className="bg-gradient-to-r from-violet-700 via-indigo-700 to-blue-700 rounded-[32px] p-10 text-white shadow-lg">
 
-                        <h1 className="text-5xl font-bold">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
-                            Welcome Back Aryan
+                            <div>
 
-                        </h1>
+                                <h1 className="text-4xl lg:text-5xl font-bold">
 
-                        <p className="mt-4 text-violet-100 text-lg">
+                                    Welcome Back Aryan
 
-                            AI Powered Healthcare Intelligence Platform
-                        </p>
+                                </h1>
 
-                        <button
-                            onClick={() => navigate("/upload")}
-                            className="mt-8 bg-white text-violet-700 px-8 py-4 rounded-2xl font-semibold"
-                        >
+                                <p className="mt-4 text-violet-100 text-lg">
 
-                            Upload New Report
+                                    AI Powered Healthcare Intelligence Platform
+                                </p>
 
-                        </button>
+                                <p className="mt-2 text-violet-200">
+
+                                    Upload reports, analyze health data and chat with AI agents.
+                                </p>
+
+                            </div>
+
+                            <div className="flex flex-wrap gap-4">
+
+                                <button
+                                    onClick={() => navigate("/upload")}
+                                    className="bg-white text-violet-700 px-8 py-4 rounded-2xl font-semibold"
+                                >
+
+                                    Upload Report
+
+                                </button>
+
+                                <button
+                                    onClick={() => navigate("/chat")}
+                                    className="bg-violet-500 px-8 py-4 rounded-2xl font-semibold"
+                                >
+
+                                    Open Assistant
+
+                                </button>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
@@ -143,6 +174,72 @@ function DashboardPage() {
 
                     <div className="grid lg:grid-cols-3 gap-6 mt-8">
 
+                        <HealthScoreCard
+                            score={dashboard.health_score || 0}
+                        />
+
+                        <div className="lg:col-span-2 bg-white rounded-[32px] p-6 shadow-sm">
+
+                            <div className="flex justify-between items-center mb-6">
+
+                                <h2 className="text-2xl font-bold">
+
+                                    AI Insights
+
+                                </h2>
+
+                                <button
+                                    onClick={() => navigate("/analysis")}
+                                    className="text-violet-600 font-semibold"
+                                >
+
+                                    Open Analysis
+
+                                </button>
+
+                            </div>
+
+                            {
+                                dashboard.latest_insights?.length > 0
+                                    ? (
+                                        <div className="space-y-4">
+
+                                            {
+                                                dashboard.latest_insights.map(
+                                                    (
+                                                        item,
+                                                        index
+                                                    ) => (
+
+                                                        <div
+                                                            key={index}
+                                                            className="bg-violet-50 border border-violet-100 rounded-2xl p-5"
+                                                        >
+
+                                                            {item}
+
+                                                        </div>
+
+                                                    )
+                                                )
+                                            }
+
+                                        </div>
+                                    )
+                                    : (
+                                        <EmptyState
+                                            title="No Insights"
+                                            description="Upload reports to generate AI insights"
+                                        />
+                                    )
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div className="grid lg:grid-cols-3 gap-6 mt-8">
+
                         <div className="bg-white rounded-[32px] p-6 shadow-sm">
 
                             <h2 className="text-2xl font-bold">
@@ -155,7 +252,7 @@ function DashboardPage() {
 
                                 <button
                                     onClick={() => navigate("/upload")}
-                                    className="w-full h-14 bg-violet-600 text-white rounded-2xl"
+                                    className="w-full h-14 bg-violet-600 text-white rounded-2xl font-semibold"
                                 >
 
                                     Upload Report
@@ -164,7 +261,7 @@ function DashboardPage() {
 
                                 <button
                                     onClick={() => navigate("/analysis")}
-                                    className="w-full h-14 bg-blue-600 text-white rounded-2xl"
+                                    className="w-full h-14 bg-blue-600 text-white rounded-2xl font-semibold"
                                 >
 
                                     View Analysis
@@ -173,7 +270,7 @@ function DashboardPage() {
 
                                 <button
                                     onClick={() => navigate("/chat")}
-                                    className="w-full h-14 bg-green-600 text-white rounded-2xl"
+                                    className="w-full h-14 bg-green-600 text-white rounded-2xl font-semibold"
                                 >
 
                                     Open AI Assistant
@@ -184,43 +281,17 @@ function DashboardPage() {
 
                         </div>
 
-                        <div className="lg:col-span-2 bg-white rounded-[32px] p-6 shadow-sm">
+                        <AgentCard
+                            title="Medical Agent"
+                            description="Medical reasoning and healthcare guidance."
+                            active={true}
+                        />
 
-                            <h2 className="text-2xl font-bold mb-6">
-
-                                AI Insights
-
-                            </h2>
-
-                            <div className="space-y-4">
-
-                                {
-                                    dashboard.latest_insights?.length > 0
-                                        ? dashboard.latest_insights.map(
-                                            (item, index) => (
-
-                                                <div
-                                                    key={index}
-                                                    className="bg-violet-50 rounded-2xl p-4"
-                                                >
-
-                                                    {item}
-
-                                                </div>
-
-                                            )
-                                        )
-                                        : (
-                                            <EmptyState
-                                                title="No Insights"
-                                                description="AI insights will appear here"
-                                            />
-                                        )
-                                }
-
-                            </div>
-
-                        </div>
+                        <AgentCard
+                            title="Report Agent"
+                            description="Report analysis and health interpretation."
+                            active={true}
+                        />
 
                     </div>
 
@@ -256,22 +327,31 @@ function DashboardPage() {
 
                                                     <div
                                                         key={report.id}
-                                                        className="border border-slate-200 rounded-2xl p-5 flex justify-between items-center"
+                                                        className="border border-slate-200 rounded-2xl p-5 flex justify-between items-center hover:bg-slate-50"
                                                     >
 
                                                         <div>
 
-                                                            <h3 className="font-semibold">
+                                                            <h3 className="font-semibold text-lg">
 
                                                                 {report.report_name}
 
                                                             </h3>
 
+                                                            <p className="text-slate-500 text-sm mt-1">
+
+                                                                Medical Report
+                                                            </p>
+
                                                         </div>
 
                                                         <button
-                                                            onClick={() => navigate(`/report/${report.id}`)}
-                                                            className="bg-slate-100 px-5 py-2 rounded-xl"
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/report/${report.id}`
+                                                                )
+                                                            }
+                                                            className="bg-slate-100 px-5 py-3 rounded-xl font-medium"
                                                         >
 
                                                             View
@@ -289,10 +369,24 @@ function DashboardPage() {
                                 : (
                                     <EmptyState
                                         title="No Reports Found"
-                                        description="Upload your first report"
+                                        description="Upload your first medical report"
                                     />
                                 )
                         }
+
+                    </div>
+
+                    <div className="mt-8">
+
+                        <RecentActivity
+                            activities={
+                                dashboard.activities || [
+                                    "Dashboard accessed",
+                                    "AI assistant available",
+                                    "Healthcare analysis ready"
+                                ]
+                            }
+                        />
 
                     </div>
 
