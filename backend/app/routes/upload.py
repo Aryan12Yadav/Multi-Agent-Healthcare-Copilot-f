@@ -1,30 +1,21 @@
-import json
-import tempfile
-
 from fastapi import APIRouter
-from fastapi import UploadFile
-from fastapi import File
 from fastapi import Depends
+from fastapi import File
+from fastapi import UploadFile
 from fastapi import HTTPException
+
+import os
+import shutil
 
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.storage.s3 import upload_file
+from app.ocr.extractor import extract_text
+from app.ai.analysis import analyze_document
 
 from app.models.report import Report
 from app.models.medical_finding import MedicalFinding
-
-from app.storage.s3 import upload_file
-
-from app.ocr.extractor import extract_text
-
-from app.ai.medical_content_classifier import classify_medical_content
-
-from app.ai.universal_medical_analyzer import analyze_medical_content
-
-from app.ai.doctor_summary import generate_doctor_summary
-
-from app.utils.health_score import calculate_health_score
 
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
@@ -35,98 +26,84 @@ def upload_report(file: UploadFile = File(...), db: Session = Depends(get_db)):
 
     try:
 
-        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        file_path = save_temp_file(file)
 
-        temp_file.write(file.file.read())
-
-        temp_file.close()
-
-        local_path = temp_file.name
+        file.file.seek(0)
 
         s3_url = upload_file(file)
-
-        content = extract_text(local_path)
-
-        classification = classify_medical_content(content)
 
         report = Report(
             user_id=1,
             file_name=file.filename,
-            local_path=local_path,
-            s3_url=s3_url,
-            document_category=classification.get("domain"),
-            document_type=classification.get("content_type")
+            local_path=file_path,
+            s3_url=s3_url
         )
 
         db.add(report)
-
         db.commit()
-
         db.refresh(report)
 
-        if not classification.get("is_medical", False):
+        report_text = extract_text(file_path)
 
-            report.health_score = 0
+        print("=" * 100)
+        print("OCR CHARACTERS:", len(report_text))
+        print("=" * 100)
+        print(report_text[:3000])
+        print("=" * 100)
 
-            report.risk_level = "Not Medical"
-
-            report.is_medical_report = False
-
-            db.commit()
-
-            return {
-                "success": True,
-                "report_id": report.id,
-                "is_medical": False,
-                "domain": classification.get("domain"),
-                "message": "Medical analysis not applicable."
-            }
-
-        analysis = analyze_medical_content(
-            content=content,
-            content_type=classification.get("content_type")
-        )
-
-        score = calculate_health_score({
-            "is_medical_report": True,
-            "abnormal_findings": analysis.get("abnormal_findings", [])
-        })
-
-        doctor_summary = generate_doctor_summary(
-            document_text=content,
-            analysis=analysis
-        )
-
-        report.health_score = score["health_score"]
-
-        report.risk_level = score["risk_level"]
-
-        report.is_medical_report = True
-
-        report.analysis_json = json.dumps(analysis)
-
-        finding = MedicalFinding(
-            report_id=report.id,
-            document_category=classification.get("domain"),
-            document_type=classification.get("content_type"),
-            is_medical_report=True,
-            health_score=score["health_score"],
-            risk_level=score["risk_level"],
-            summary=analysis.get("summary"),
-            finding_json=json.dumps(analysis)
-        )
-
-        db.add(finding)
+        report.extracted_text = report_text
+        report.ocr_characters = len(report_text)
 
         db.commit()
+
+        if len(report_text.strip()) < 20:
+
+            return {
+                "success": False,
+                "report_id": report.id,
+                "message": "OCR extraction failed",
+                "ocr_characters": len(report_text),
+                "ocr_preview": report_text
+            }
+
+        result = analyze_document(report_text)
+
+        report.document_type = result.get("document_type")
+        report.document_category = result.get("document_category")
+        report.health_score = result.get("health_score", 0)
+        report.risk_level = result.get("risk_level")
+        report.is_medical_report = result.get("is_medical_report", False)
+        report.analysis_json = str(result)
+
+        db.commit()
+
+        if result.get("is_medical_report"):
+
+            finding = MedicalFinding(
+                report_id=report.id,
+                document_category=result.get("document_category") or "Unknown",
+                document_type=result.get("document_type") or "Unknown",
+                summary=result.get("summary", ""),
+                health_score=result.get("health_score", 0),
+                risk_level=result.get("risk_level") or "Unknown",
+                is_medical_report=True,
+                finding_json=str(result)
+            )
+
+            db.add(finding)
+            db.commit()
 
         return {
             "success": True,
             "report_id": report.id,
-            "health_score": score["health_score"],
-            "risk_level": score["risk_level"],
-            "analysis": analysis,
-            "doctor_summary": doctor_summary
+            "ocr_characters": len(report_text),
+            "ocr_preview": report_text[:500],
+            "document_type": result.get("document_type"),
+            "document_category": result.get("document_category"),
+            "is_medical_report": result.get("is_medical_report"),
+            "health_score": result.get("health_score"),
+            "risk_level": result.get("risk_level"),
+            "summary": result.get("summary")
         }
 
     except Exception as error:
@@ -135,3 +112,15 @@ def upload_report(file: UploadFile = File(...), db: Session = Depends(get_db)):
             status_code=500,
             detail=str(error)
         )
+
+
+def save_temp_file(file: UploadFile):
+
+    os.makedirs("uploads", exist_ok=True)
+
+    file_path = os.path.join("uploads", file.filename)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    return file_path

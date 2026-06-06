@@ -1,9 +1,9 @@
 from datetime import datetime
 
+from sqlalchemy import Text
 from sqlalchemy import String
 from sqlalchemy import Integer
 from sqlalchemy import Boolean
-from sqlalchemy import Text
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 
@@ -21,17 +21,22 @@ class MedicalFinding(Base):
 
     report_id: Mapped[int] = mapped_column(ForeignKey("reports.id"))
 
-    document_category: Mapped[str] = mapped_column(String(100))
+    document_category: Mapped[str] = mapped_column(String(100), nullable=True)
 
-    document_type: Mapped[str] = mapped_column(String(200))
-
-    is_medical_report: Mapped[bool] = mapped_column(Boolean, default=False)
-
-    health_score: Mapped[int] = mapped_column(Integer, default=0)
-
-    risk_level: Mapped[str] = mapped_column(String(50))
+    document_type: Mapped[str] = mapped_column(
+            String(200),
+            nullable=True
+        )
 
     summary: Mapped[str] = mapped_column(Text)
+
+    health_score: Mapped[int] = mapped_column(Integer)
+
+    risk_level: Mapped[str] = mapped_column(
+            String(50),
+            nullable=True
+        )
+    is_medical_report: Mapped[bool] = mapped_column(Boolean, default=False)
 
     finding_json: Mapped[str] = mapped_column(Text)
 

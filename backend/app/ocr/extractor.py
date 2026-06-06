@@ -1,10 +1,6 @@
 import os
 
-import pandas as pd
-
 import pdfplumber
-
-import docx
 
 import pytesseract
 
@@ -19,25 +15,13 @@ def extract_text(file_path: str):
 
         return extract_pdf(file_path)
 
-    if extension == ".docx":
+    if extension in [".png", ".jpg", ".jpeg"]:
 
-        return extract_docx(file_path)
+        return extract_image(file_path)
 
     if extension == ".txt":
 
         return extract_txt(file_path)
-
-    if extension == ".csv":
-
-        return extract_csv(file_path)
-
-    if extension == ".xlsx":
-
-        return extract_excel(file_path)
-
-    if extension in [".png", ".jpg", ".jpeg"]:
-
-        return extract_image(file_path)
 
     return ""
 
@@ -58,23 +42,24 @@ def extract_pdf(file_path: str):
 
                     text += page_text + "\n"
 
+        if text.strip():
+
+            return text
+
     except Exception:
 
         pass
 
-    return text
+    return ""
 
 
-def extract_docx(file_path: str):
+def extract_image(file_path: str):
 
     try:
 
-        document = docx.Document(file_path)
+        image = Image.open(file_path)
 
-        return "\n".join([
-            paragraph.text
-            for paragraph in document.paragraphs
-        ])
+        return pytesseract.image_to_string(image)
 
     except Exception:
 
@@ -88,45 +73,6 @@ def extract_txt(file_path: str):
         with open(file_path, "r", encoding="utf-8") as file:
 
             return file.read()
-
-    except Exception:
-
-        return ""
-
-
-def extract_csv(file_path: str):
-
-    try:
-
-        dataframe = pd.read_csv(file_path)
-
-        return dataframe.to_string()
-
-    except Exception:
-
-        return ""
-
-
-def extract_excel(file_path: str):
-
-    try:
-
-        dataframe = pd.read_excel(file_path)
-
-        return dataframe.to_string()
-
-    except Exception:
-
-        return ""
-
-
-def extract_image(file_path: str):
-
-    try:
-
-        image = Image.open(file_path)
-
-        return pytesseract.image_to_string(image)
 
     except Exception:
 

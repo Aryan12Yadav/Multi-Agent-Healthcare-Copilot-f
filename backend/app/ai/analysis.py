@@ -1,64 +1,146 @@
-import json
-
 from app.ai.deepseek import ask_llm
+from app.ai.deepseek import safe_json_loads
 
 
-def safe_json_loads(data: str):
+MEDICAL_KEYWORDS = [
+    "hemoglobin",
+    "hb",
+    "wbc",
+    "rbc",
+    "platelet",
+    "creatinine",
+    "blood urea",
+    "glucose",
+    "bilirubin",
+    "alt",
+    "ast",
+    "cbc",
+    "reference range",
+    "normal range",
+    "patient",
+    "doctor",
+    "hospital",
+    "laboratory",
+    "mri",
+    "ct scan",
+    "x-ray",
+    "ultrasound",
+    "ecg",
+    "ekg",
+    "echo",
+    "prescription",
+    "diagnosis",
+    "findings",
+    "impression",
+    "pathology",
+    "radiology",
+    "thyroid",
+    "cholesterol",
+    "triglycerides"
+]
 
-    try:
 
-        return json.loads(data)
+def classify_document(content: str):
 
-    except Exception:
+    text = content.lower()
 
-        return {}
+    if any(keyword in text for keyword in MEDICAL_KEYWORDS):
 
-
-def classify_medical_content(content: str):
+        return {
+            "is_medical": True,
+            "document_type": "Medical Report",
+            "document_category": "Healthcare",
+            "confidence": 100
+        }
 
     prompt = f"""
-Classify document.
+You are an expert medical document classifier.
 
-Return JSON only.
+Determine whether the document contains healthcare,
+medical, laboratory, pathology, radiology,
+prescription, clinical or patient related information.
+
+Medical reports include:
+
+- CBC
+- Blood Tests
+- Lab Reports
+- Pathology Reports
+- Histopathology
+- Biopsy Reports
+- MRI Reports
+- CT Scan Reports
+- X-Ray Reports
+- Ultrasound Reports
+- ECG Reports
+- ECHO Reports
+- Prescriptions
+- Clinical Notes
+- Doctor Notes
+- Discharge Summaries
+- Health Checkup Reports
+
+Rules:
+
+1. If laboratory values are present, classify as medical.
+2. If patient information exists, classify as medical.
+3. If doctor information exists, classify as medical.
+4. If reference ranges exist, classify as medical.
+5. Be conservative when returning false.
+6. Return JSON only.
+
+Return:
 
 {{
-    "is_medical": false,
-    "domain": "",
-    "content_type": ""
+    "is_medical": true,
+    "document_type": "",
+    "document_category": "",
+    "confidence": 0
 }}
 
 Document:
 
-{content[:5000]}
+{content[:8000]}
 """
 
     result = safe_json_loads(
         ask_llm(prompt)
     )
 
-    if not result:
-
-        return {
-            "is_medical": False,
-            "domain": "Unknown",
-            "content_type": "Unknown"
-        }
-
     return result
 
 
-def analyze_medical_content(content: str, content_type: str):
+def analyze_document(content: str):
+
+    classification = classify_document(content)
+
+    if not classification.get("is_medical"):
+
+        return {
+            "is_medical_report": False,
+            "document_type": classification.get("document_type"),
+            "document_category": classification.get("document_category"),
+            "health_score": 0,
+            "risk_level": "Not Medical",
+            "summary": "This is not a medical report."
+        }
 
     prompt = f"""
-Analyze medical document.
+You are a medical report analysis assistant.
+
+Analyze the report strictly using information present
+inside the report.
 
 Rules:
 
-1. No diagnosis
-2. No hallucination
-3. Use only document data
+1. Do not diagnose diseases.
+2. Do not hallucinate.
+3. Do not invent findings.
+4. Use only report data.
+5. Explain abnormalities in simple language.
+6. Generate patient-friendly summary.
 
-Return JSON.
+Return JSON only.
 
 {{
     "summary": "",
@@ -66,57 +148,36 @@ Return JSON.
     "recommendations": []
 }}
 
-Type:
+Medical Report:
 
-{content_type}
-
-Document:
-
-{content[:10000]}
+{content[:12000]}
 """
 
     result = safe_json_loads(
         ask_llm(prompt)
     )
 
-    if not result:
+    score = calculate_health_score(result)
 
-        return {
-            "summary": "",
-            "abnormal_findings": [],
-            "recommendations": []
-        }
-
-    return result
-
-
-def generate_doctor_summary(document_text: str, analysis: dict):
-
-    prompt = f"""
-        Create short doctor summary.
-
-        Analysis:
-
-        {analysis}
-
-        Document:
-
-        {document_text[:5000]}
-        """
-
-    return ask_llm(prompt)
+    return {
+        "is_medical_report": True,
+        "document_type": classification.get("document_type"),
+        "document_category": classification.get("document_category"),
+        "health_score": score["health_score"],
+        "risk_level": score["risk_level"],
+        "summary": result.get("summary"),
+        "analysis": result
+    }
 
 
-def calculate_health_score(analysis: dict):
+def calculate_health_score(data: dict):
 
-    findings = analysis.get(
+    findings = data.get(
         "abnormal_findings",
         []
     )
 
-    score = 100
-
-    score -= len(findings) * 10
+    score = 100 - (len(findings) * 10)
 
     if score < 0:
 
@@ -140,20 +201,47 @@ def calculate_health_score(analysis: dict):
     }
 
 
-def generate_health_trend(findings):
+def compare_reports(old_report: dict, new_report: dict):
 
-    if len(findings) < 2:
+    old_score = old_report.get("health_score", 0)
+
+    new_score = new_report.get("health_score", 0)
+
+    difference = new_score - old_score
+
+    if difference > 0:
+
+        trend = "Improved"
+
+    elif difference < 0:
+
+        trend = "Declined"
+
+    else:
+
+        trend = "Stable"
+
+    return {
+        "old_score": old_score,
+        "new_score": new_score,
+        "difference": difference,
+        "trend": trend
+    }
+
+
+def generate_health_trend(scores: list):
+
+    if len(scores) < 2:
 
         return {
-            "trend": "Insufficient Data",
-            "change": 0
+            "trend": "Insufficient Data"
         }
 
-    first_score = findings[0].health_score
+    first_score = scores[0]
 
-    latest_score = findings[-1].health_score
+    last_score = scores[-1]
 
-    change = latest_score - first_score
+    change = last_score - first_score
 
     if change > 0:
 
@@ -169,209 +257,32 @@ def generate_health_trend(findings):
 
     return {
         "trend": trend,
-        "change": change
+        "change": change,
+        "first_score": first_score,
+        "latest_score": last_score
     }
 
 
-def generate_health_insights(findings):
-
-    if not findings:
-
-        return {
-            "summary": "No reports available.",
-            "insights": []
-        }
-
-    latest = findings[-1]
-
-    insights = []
-
-    if latest.health_score >= 80:
-
-        insights.append(
-            "Health appears stable."
-        )
-
-    elif latest.health_score >= 50:
-
-        insights.append(
-            "Monitor health regularly."
-        )
-
-    else:
-
-        insights.append(
-            "Medical consultation recommended."
-        )
-
-    return {
-        "summary": latest.summary,
-        "insights": insights
-    }
-
-
-def compare_reports(old_finding, new_finding):
-
-    score_change = (
-        new_finding.health_score
-        - old_finding.health_score
-    )
-
-    if score_change > 0:
-
-        trend = "Improved"
-
-    elif score_change < 0:
-
-        trend = "Declined"
-
-    else:
-
-        trend = "No Change"
-
-    return {
-        "old_score": old_finding.health_score,
-        "new_score": new_finding.health_score,
-        "change": score_change,
-        "trend": trend
-    }
-
-
-def predict_health_trend(findings):
-
-    if len(findings) < 2:
-
-        return {
-            "prediction": "Insufficient Data"
-        }
-
-    scores = [
-        item.health_score
-        for item in findings
-    ]
-
-    average = (
-        sum(scores)
-        / len(scores)
-    )
-
-    latest = scores[-1]
-
-    if latest > average:
-
-        prediction = "Likely Improving"
-
-    elif latest < average:
-
-        prediction = "Potential Decline"
-
-    else:
-
-        prediction = "Stable"
-
-    return {
-        "prediction": prediction
-    }
-
-
-def build_patient_profile(findings):
+def build_patient_profile(reports: str):
 
     prompt = f"""
-        Build patient profile.
+Build a patient profile from historical reports.
 
-        Data:
+Return JSON only.
 
-        {findings}
+{{
+    "possible_conditions": [],
+    "risk_factors": [],
+    "recommended_tests": []
+}}
 
-        Return JSON.
+Reports:
 
-        {{
-            "possible_conditions": [],
-            "risk_factors": [],
-            "recommended_checkups": []
-        }}
-            """
+{reports}
+"""
 
     result = safe_json_loads(
         ask_llm(prompt)
     )
-
-    if not result:
-
-        return {
-            "possible_conditions": [],
-            "risk_factors": [],
-            "recommended_checkups": []
-        }
-
-    return result
-
-
-def classify_medical_image(image_description: str):
-
-    prompt = f"""
-        Classify medical image.
-
-        Return JSON.
-
-        {{
-            "is_medical_image": false,
-            "image_type": "",
-            "body_part": ""
-        }}
-
-        Image:
-
-        {image_description}
-        """
-
-    result = safe_json_loads(
-        ask_llm(prompt)
-    )
-
-    if not result:
-
-        return {
-            "is_medical_image": False,
-            "image_type": "Unknown",
-            "body_part": ""
-        }
-
-    return result
-
-
-def analyze_medical_image(image_type: str, image_description: str):
-
-    prompt = f"""
-    Analyze medical image.
-
-    Type:
-
-    {image_type}
-
-    Description:
-
-    {image_description}
-
-    Return JSON.
-
-    {{
-        "summary": "",
-        "observations": [],
-        "recommendations": []
-    }}
-        """
-
-    result = safe_json_loads(
-        ask_llm(prompt)
-    )
-
-    if not result:
-
-        return {
-            "summary": "",
-            "observations": [],
-            "recommendations": []
-        }
 
     return result

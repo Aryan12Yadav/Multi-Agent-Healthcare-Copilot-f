@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import POSTGRES_URL
 from app.core.config import MONGO_URL
+from app.core.config import MONGO_DATABASE
 
 
 engine = create_engine(POSTGRES_URL)
@@ -16,7 +17,7 @@ Base = declarative_base()
 
 mongo_client = MongoClient(MONGO_URL)
 
-mongo_db = mongo_client["medsphere"]
+mongo_db = mongo_client[MONGO_DATABASE]
 
 
 def get_db():
@@ -24,7 +25,9 @@ def get_db():
     db = SessionLocal()
 
     try:
+
         yield db
 
     finally:
+
         db.close()

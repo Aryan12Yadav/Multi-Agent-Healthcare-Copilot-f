@@ -3,9 +3,19 @@ import os
 from dotenv import load_dotenv
 
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+load_dotenv()
 
-load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+APP_NAME = os.getenv("APP_NAME")
+
+DEBUG = os.getenv("DEBUG")
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1440))
+
 
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 
@@ -17,16 +27,30 @@ POSTGRES_USER = os.getenv("POSTGRES_USER")
 
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
+
 POSTGRES_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+
 
 MONGO_URL = os.getenv("MONGO_URI")
 
-JWT_SECRET = os.getenv("SECRET_KEY")
+MONGO_DATABASE = os.getenv("MONGO_DATABASE")
+
 
 AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 
 AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 
+AWS_REGION = os.getenv("AWS_REGION")
+
 AWS_BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
 
-AWS_REGION = os.getenv("AWS_REGION")
+
+UPLOAD_DIRECTORY = os.getenv("UPLOAD_DIRECTORY")
+
+
+DEEPSEEK_API_KEY = os.getenv("NVIDIA_API_KEY")
+
+DEEPSEEK_MODEL = os.getenv("NVIDIA_MODEL")
+
+DEEPSEEK_BASE_URL = os.getenv("NVIDIA_BASE_URL")
+UPLOAD_DIRECTORY = os.getenv("UPLOAD_DIRECTORY", "uploads")

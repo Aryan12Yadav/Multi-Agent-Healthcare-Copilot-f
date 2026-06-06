@@ -18,8 +18,6 @@ class ChatMessage(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
-    report_id: Mapped[int] = mapped_column(ForeignKey("reports.id"), nullable=True)
-
     question: Mapped[str] = mapped_column(Text)
 
     answer: Mapped[str] = mapped_column(Text)
