@@ -21,3 +21,5 @@ alembic/versions/
 chroma_db/
 
 *.sqlite3
+medical/
+uploads/

@@ -28,7 +28,21 @@ def get_memories(user_id: int, limit: int = 20):
 
     memories.reverse()
 
-    return memories
+    cleaned_memories = []
+
+    for item in memories:
+
+        cleaned_memories.append({
+            "id": str(item.get("_id")),
+            "user_id": item.get("user_id"),
+            "question": item.get("question"),
+            "answer": item.get("answer"),
+            "created_at": str(
+                item.get("created_at")
+            )
+        })
+
+    return cleaned_memories
 
 
 def build_context(user_id: int):
@@ -39,14 +53,25 @@ def build_context(user_id: int):
 
     for item in memories:
 
-        context += f"User: {item['question']}\n"
+        context += (
+            f"User: "
+            f"{item['question']}\n"
+        )
 
-        context += f"Assistant: {item['answer']}\n\n"
+        context += (
+            f"Assistant: "
+            f"{item['answer']}\n\n"
+        )
 
     return context
 
 
-def save_report_memory(user_id: int, report_id: int, question: str, answer: str):
+def save_report_memory(
+    user_id: int,
+    report_id: int,
+    question: str,
+    answer: str
+):
 
     mongo_db.report_memory.insert_one({
         "user_id": user_id,
@@ -57,7 +82,10 @@ def save_report_memory(user_id: int, report_id: int, question: str, answer: str)
     })
 
 
-def build_report_context(user_id: int, report_id: int):
+def build_report_context(
+    user_id: int,
+    report_id: int
+):
 
     memories = list(
         mongo_db.report_memory.find(
@@ -77,8 +105,14 @@ def build_report_context(user_id: int, report_id: int):
 
     for item in memories:
 
-        context += f"User: {item['question']}\n"
+        context += (
+            f"User: "
+            f"{item['question']}\n"
+        )
 
-        context += f"Assistant: {item['answer']}\n\n"
+        context += (
+            f"Assistant: "
+            f"{item['answer']}\n\n"
+        )
 
     return context

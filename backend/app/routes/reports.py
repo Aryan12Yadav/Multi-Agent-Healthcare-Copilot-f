@@ -12,44 +12,120 @@ from app.models.medical_finding import MedicalFinding
 from app.ai.analysis import compare_reports
 
 
-router = APIRouter(prefix="/reports", tags=["Reports"])
+router = APIRouter(
+    prefix="/reports",
+    tags=["Reports"]
+)
 
 
 @router.get("")
-def get_reports(db: Session = Depends(get_db)):
+def get_reports(
+    db: Session = Depends(get_db)
+):
 
-    reports = db.query(Report).order_by(Report.created_at.desc()).all()
+    reports = (
+        db.query(Report)
+        .order_by(
+            Report.created_at.desc()
+        )
+        .all()
+    )
+
+    report_list = []
+
+    for report in reports:
+
+        report_list.append(
+            {
+                "id": report.id,
+                "file_name": report.file_name,
+                "document_type": report.document_type,
+                "document_category": report.document_category,
+                "health_score": report.health_score,
+                "risk_level": report.risk_level,
+                "is_medical_report": report.is_medical_report,
+                "created_at": report.created_at
+            }
+        )
 
     return {
         "success": True,
-        "count": len(reports),
-        "reports": reports
+        "count": len(report_list),
+        "reports": report_list
     }
 
 
 @router.get("/{report_id}")
-def get_report(report_id: int, db: Session = Depends(get_db)):
+def get_report(
+    report_id: int,
+    db: Session = Depends(get_db)
+):
 
-    report = db.query(Report).filter(Report.id == report_id).first()
+    report = (
+        db.query(Report)
+        .filter(
+            Report.id == report_id
+        )
+        .first()
+    )
 
     if not report:
 
-        raise HTTPException(status_code=404, detail="Report not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Report not found"
+        )
 
     return {
         "success": True,
-        "report": report
+        "report": {
+            "id": report.id,
+            "file_name": report.file_name,
+            "local_path": report.local_path,
+            "s3_url": report.s3_url,
+            "document_type": report.document_type,
+            "document_category": report.document_category,
+            "health_score": report.health_score,
+            "risk_level": report.risk_level,
+            "is_medical_report": report.is_medical_report,
+            "ocr_characters": report.ocr_characters,
+            "created_at": report.created_at
+        }
     }
 
 
 @router.delete("/{report_id}")
-def delete_report(report_id: int, db: Session = Depends(get_db)):
+def delete_report(
+    report_id: int,
+    db: Session = Depends(get_db)
+):
 
-    report = db.query(Report).filter(Report.id == report_id).first()
+    report = (
+        db.query(Report)
+        .filter(
+            Report.id == report_id
+        )
+        .first()
+    )
 
     if not report:
 
-        raise HTTPException(status_code=404, detail="Report not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Report not found"
+        )
+
+    finding = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id == report_id
+        )
+        .first()
+    )
+
+    if finding:
+
+        db.delete(finding)
 
     db.delete(report)
 
@@ -57,35 +133,83 @@ def delete_report(report_id: int, db: Session = Depends(get_db)):
 
     return {
         "success": True,
-        "message": "Report deleted"
+        "message": "Report deleted successfully"
     }
 
 
 @router.get("/{report_id}/analysis")
-def get_analysis(report_id: int, db: Session = Depends(get_db)):
+def get_analysis(
+    report_id: int,
+    db: Session = Depends(get_db)
+):
 
-    finding = db.query(MedicalFinding).filter(MedicalFinding.report_id == report_id).first()
+    finding = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id == report_id
+        )
+        .first()
+    )
 
     if not finding:
 
-        raise HTTPException(status_code=404, detail="Analysis not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Analysis not found"
+        )
 
     return {
         "success": True,
-        "analysis": finding
+        "analysis": {
+            "report_id": finding.report_id,
+            "document_category": finding.document_category,
+            "document_type": finding.document_type,
+            "summary": finding.summary,
+            "health_score": finding.health_score,
+            "risk_level": finding.risk_level,
+            "is_medical_report": finding.is_medical_report,
+            "finding_json": finding.finding_json,
+            "created_at": finding.created_at
+        }
     }
 
 
 @router.get("/compare/{old_report_id}/{new_report_id}")
-def compare_report_api(old_report_id: int, new_report_id: int, db: Session = Depends(get_db)):
+def compare_report_api(
+    old_report_id: int,
+    new_report_id: int,
+    db: Session = Depends(get_db)
+):
 
-    old_finding = db.query(MedicalFinding).filter(MedicalFinding.report_id == old_report_id).first()
+    old_finding = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id == old_report_id
+        )
+        .first()
+    )
 
-    new_finding = db.query(MedicalFinding).filter(MedicalFinding.report_id == new_report_id).first()
+    new_finding = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id == new_report_id
+        )
+        .first()
+    )
 
-    if not old_finding or not new_finding:
+    if not old_finding:
 
-        raise HTTPException(status_code=404, detail="Report not found")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Report {old_report_id} not found"
+        )
+
+    if not new_finding:
+
+        raise HTTPException(
+            status_code=404,
+            detail=f"Report {new_report_id} not found"
+        )
 
     result = compare_reports(
         {
@@ -98,5 +222,7 @@ def compare_report_api(old_report_id: int, new_report_id: int, db: Session = Dep
 
     return {
         "success": True,
+        "old_report_id": old_report_id,
+        "new_report_id": new_report_id,
         "comparison": result
     }

@@ -7,15 +7,46 @@ import pytesseract
 from PIL import Image
 
 
+SUPPORTED_EXTENSIONS = [
+    ".pdf",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".txt"
+]
+
+
 def extract_text(file_path: str):
 
-    extension = os.path.splitext(file_path)[1].lower()
+    extension = os.path.splitext(
+        file_path
+    )[1].lower()
+
+    print(
+        "OCR FILE:",
+        file_path
+    )
+
+    print(
+        "FILE TYPE:",
+        extension
+    )
+
+    if extension not in SUPPORTED_EXTENSIONS:
+
+        raise ValueError(
+            f"Unsupported file type: {extension}"
+        )
 
     if extension == ".pdf":
 
         return extract_pdf(file_path)
 
-    if extension in [".png", ".jpg", ".jpeg"]:
+    if extension in [
+        ".png",
+        ".jpg",
+        ".jpeg"
+    ]:
 
         return extract_image(file_path)
 
@@ -34,34 +65,81 @@ def extract_pdf(file_path: str):
 
         with pdfplumber.open(file_path) as pdf:
 
-            for page in pdf.pages:
+            print(
+                "PDF PAGES:",
+                len(pdf.pages)
+            )
 
-                page_text = page.extract_text()
+            for page_number, page in enumerate(pdf.pages):
 
-                if page_text:
+                try:
 
-                    text += page_text + "\n"
+                    page_text = page.extract_text()
+
+                    if page_text:
+
+                        text += (
+                            page_text
+                            + "\n"
+                        )
+
+                except Exception as error:
+
+                    print(
+                        "PDF PAGE ERROR:",
+                        page_number + 1,
+                        str(error)
+                    )
 
         if text.strip():
 
+            print(
+                "PDF TEXT EXTRACTION SUCCESS"
+            )
+
             return text
 
-    except Exception:
+        print(
+            "PDF CONTAINS NO EXTRACTABLE TEXT"
+        )
 
-        pass
+        return ""
 
-    return ""
+    except Exception as error:
+
+        print(
+            "PDF OCR ERROR:",
+            str(error)
+        )
+
+        return ""
 
 
 def extract_image(file_path: str):
 
     try:
 
-        image = Image.open(file_path)
+        image = Image.open(
+            file_path
+        )
 
-        return pytesseract.image_to_string(image)
+        text = pytesseract.image_to_string(
+            image
+        )
 
-    except Exception:
+        print(
+            "IMAGE OCR CHARACTERS:",
+            len(text)
+        )
+
+        return text
+
+    except Exception as error:
+
+        print(
+            "IMAGE OCR ERROR:",
+            str(error)
+        )
 
         return ""
 
@@ -70,10 +148,26 @@ def extract_txt(file_path: str):
 
     try:
 
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8"
+        ) as file:
 
-            return file.read()
+            text = file.read()
 
-    except Exception:
+            print(
+                "TXT CHARACTERS:",
+                len(text)
+            )
+
+            return text
+
+    except Exception as error:
+
+        print(
+            "TXT READ ERROR:",
+            str(error)
+        )
 
         return ""
