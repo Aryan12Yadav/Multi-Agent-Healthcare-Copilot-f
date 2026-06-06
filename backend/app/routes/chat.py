@@ -1,5 +1,10 @@
 from fastapi import APIRouter
+from fastapi import Depends
 from fastapi import HTTPException
+
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
 
 from app.ai.deepseek import ask_llm
 
@@ -7,18 +12,33 @@ from app.ai.memory import save_memory
 from app.ai.memory import get_memories
 from app.ai.memory import build_context
 
+from app.models.report import Report
 from app.models.medical_finding import MedicalFinding
 
-from app.core.database import SessionLocal
+from app.routes.auth import get_current_user
 
 
-router = APIRouter(prefix="/chat", tags=["Chat"])
+router = APIRouter(
+    prefix="/chat",
+    tags=["Chat"]
+)
 
 
 @router.post("")
-def chat(question: str):
+def chat(
+    question: str,
+    token: str,
+    db: Session = Depends(get_db)
+):
 
-    context = build_context(user_id=1)
+    current_user = get_current_user(
+        token,
+        db
+    )
+
+    context = build_context(
+        user_id=current_user.id
+    )
 
     prompt = f"""
 You are MedSphere AI.
@@ -35,7 +55,7 @@ User Question:
     answer = ask_llm(prompt)
 
     save_memory(
-        user_id=1,
+        user_id=current_user.id,
         question=question,
         answer=answer
     )
@@ -47,31 +67,88 @@ User Question:
 
 
 @router.get("/history")
-def history():
+def history(
+    token: str,
+    db: Session = Depends(get_db)
+):
 
-    messages = get_memories(user_id=1)
+    current_user = get_current_user(
+        token,
+        db
+    )
+
+    messages = get_memories(
+        user_id=current_user.id
+    )
+
+    serialized_messages = []
+
+    for item in messages:
+
+        serialized_messages.append(
+            {
+                "id": str(item.get("_id")),
+                "user_id": item.get("user_id"),
+                "question": item.get("question"),
+                "answer": item.get("answer"),
+                "created_at": str(
+                    item.get("created_at")
+                )
+            }
+        )
 
     return {
         "success": True,
-        "count": len(messages),
-        "messages": messages
+        "count": len(serialized_messages),
+        "messages": serialized_messages
     }
 
 
 @router.post("/report")
-def report_chat(report_id: int, question: str):
+def report_chat(
+    report_id: int,
+    question: str,
+    token: str,
+    db: Session = Depends(get_db)
+):
 
-    db = SessionLocal()
+    current_user = get_current_user(
+        token,
+        db
+    )
 
-    try:
+    report = (
+        db.query(Report)
+        .filter(
+            Report.id == report_id,
+            Report.user_id == current_user.id
+        )
+        .first()
+    )
 
-        finding = db.query(MedicalFinding).filter(MedicalFinding.report_id == report_id).first()
+    if not report:
 
-        if not finding:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
 
-            raise HTTPException(status_code=404, detail="Report analysis not found")
+    finding = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id == report_id
+        )
+        .first()
+    )
 
-        prompt = f"""
+    if not finding:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Report analysis not found"
+        )
+
+    prompt = f"""
 You are MedSphere AI.
 
 Report Summary:
@@ -91,21 +168,19 @@ Rules:
 1. Never diagnose.
 2. Never prescribe medicine.
 3. Explain only report data.
+4. If information is not present in report, clearly say so.
 """
 
-        answer = ask_llm(prompt)
+    answer = ask_llm(prompt)
 
-        save_memory(
-            user_id=1,
-            question=f"Report {report_id}: {question}",
-            answer=answer
-        )
+    save_memory(
+        user_id=current_user.id,
+        question=f"Report {report_id}: {question}",
+        answer=answer
+    )
 
-        return {
-            "success": True,
-            "answer": answer
-        }
-
-    finally:
-
-        db.close()
+    return {
+        "success": True,
+        "report_id": report_id,
+        "answer": answer
+    }

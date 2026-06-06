@@ -17,9 +17,13 @@ password_context = CryptContext(
 )
 
 
-def hash_password(password: str):
+def hash_password(
+    password: str
+):
 
-    return password_context.hash(password)
+    return password_context.hash(
+        password
+    )
 
 
 def verify_password(
@@ -33,7 +37,9 @@ def verify_password(
     )
 
 
-def create_access_token(user_id: int):
+def create_access_token(
+    user_id: int
+):
 
     expire = (
         datetime.utcnow()
@@ -54,7 +60,9 @@ def create_access_token(user_id: int):
     )
 
 
-def decode_access_token(token: str):
+def decode_access_token(
+    token: str
+):
 
     try:
 
@@ -70,8 +78,14 @@ def decode_access_token(token: str):
 
         return None
 
+    except Exception:
 
-def get_user_id_from_token(token: str):
+        return None
+
+
+def get_user_id_from_token(
+    token: str
+):
 
     payload = decode_access_token(
         token
@@ -84,3 +98,14 @@ def get_user_id_from_token(token: str):
     return payload.get(
         "user_id"
     )
+
+
+def is_token_valid(
+    token: str
+):
+
+    payload = decode_access_token(
+        token
+    )
+
+    return payload is not None

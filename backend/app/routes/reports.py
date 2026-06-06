@@ -11,6 +11,8 @@ from app.models.medical_finding import MedicalFinding
 
 from app.ai.analysis import compare_reports
 
+from app.routes.auth import get_current_user
+
 
 router = APIRouter(
     prefix="/reports",
@@ -20,11 +22,20 @@ router = APIRouter(
 
 @router.get("")
 def get_reports(
+    token: str,
     db: Session = Depends(get_db)
 ):
 
+    current_user = get_current_user(
+        token,
+        db
+    )
+
     reports = (
         db.query(Report)
+        .filter(
+            Report.user_id == current_user.id
+        )
         .order_by(
             Report.created_at.desc()
         )
@@ -58,13 +69,20 @@ def get_reports(
 @router.get("/{report_id}")
 def get_report(
     report_id: int,
+    token: str,
     db: Session = Depends(get_db)
 ):
+
+    current_user = get_current_user(
+        token,
+        db
+    )
 
     report = (
         db.query(Report)
         .filter(
-            Report.id == report_id
+            Report.id == report_id,
+            Report.user_id == current_user.id
         )
         .first()
     )
@@ -97,13 +115,20 @@ def get_report(
 @router.delete("/{report_id}")
 def delete_report(
     report_id: int,
+    token: str,
     db: Session = Depends(get_db)
 ):
+
+    current_user = get_current_user(
+        token,
+        db
+    )
 
     report = (
         db.query(Report)
         .filter(
-            Report.id == report_id
+            Report.id == report_id,
+            Report.user_id == current_user.id
         )
         .first()
     )
@@ -140,8 +165,30 @@ def delete_report(
 @router.get("/{report_id}/analysis")
 def get_analysis(
     report_id: int,
+    token: str,
     db: Session = Depends(get_db)
 ):
+
+    current_user = get_current_user(
+        token,
+        db
+    )
+
+    report = (
+        db.query(Report)
+        .filter(
+            Report.id == report_id,
+            Report.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not report:
+
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
 
     finding = (
         db.query(MedicalFinding)
@@ -178,8 +225,46 @@ def get_analysis(
 def compare_report_api(
     old_report_id: int,
     new_report_id: int,
+    token: str,
     db: Session = Depends(get_db)
 ):
+
+    current_user = get_current_user(
+        token,
+        db
+    )
+
+    old_report = (
+        db.query(Report)
+        .filter(
+            Report.id == old_report_id,
+            Report.user_id == current_user.id
+        )
+        .first()
+    )
+
+    new_report = (
+        db.query(Report)
+        .filter(
+            Report.id == new_report_id,
+            Report.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not old_report:
+
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
+
+    if not new_report:
+
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied"
+        )
 
     old_finding = (
         db.query(MedicalFinding)
@@ -201,14 +286,14 @@ def compare_report_api(
 
         raise HTTPException(
             status_code=404,
-            detail=f"Report {old_report_id} not found"
+            detail=f"Report {old_report_id} analysis not found"
         )
 
     if not new_finding:
 
         raise HTTPException(
             status_code=404,
-            detail=f"Report {new_report_id} not found"
+            detail=f"Report {new_report_id} analysis not found"
         )
 
     result = compare_reports(

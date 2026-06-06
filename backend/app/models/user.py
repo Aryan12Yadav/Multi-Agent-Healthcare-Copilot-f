@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import String
+from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 
 from sqlalchemy.orm import Mapped
@@ -13,12 +14,39 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(
+        primary_key=True
+    )
 
-    name: Mapped[str] = mapped_column(String(200))
+    name: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False
+    )
 
-    email: Mapped[str] = mapped_column(String(255), unique=True)
+    email: Mapped[str] = mapped_column(
+        String(255),
+        unique=True,
+        nullable=False,
+        index=True
+    )
 
-    password: Mapped[str] = mapped_column(String(500))
+    password: Mapped[str] = mapped_column(
+        String(500),
+        nullable=False
+    )
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True
+    )
+
+    is_staff: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        index=True
+    )

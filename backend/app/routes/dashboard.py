@@ -10,18 +10,55 @@ from app.models.medical_finding import MedicalFinding
 
 from app.ai.analysis import generate_health_trend
 
+from app.routes.auth import get_current_user
 
-router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
+
+router = APIRouter(
+    prefix="/dashboard",
+    tags=["Dashboard"]
+)
 
 
 @router.get("")
-def dashboard(db: Session = Depends(get_db)):
+def dashboard(
+    token: str,
+    db: Session = Depends(get_db)
+):
 
-    reports = db.query(Report).all()
+    current_user = get_current_user(
+        token,
+        db
+    )
 
-    findings = db.query(MedicalFinding).order_by(MedicalFinding.created_at).all()
+    reports = (
+        db.query(Report)
+        .filter(
+            Report.user_id == current_user.id
+        )
+        .all()
+    )
 
-    total_reports = len(reports)
+    report_ids = [
+        report.id
+        for report in reports
+    ]
+
+    findings = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id.in_(
+                report_ids
+            )
+        )
+        .order_by(
+            MedicalFinding.created_at
+        )
+        .all()
+    )
+
+    total_reports = len(
+        reports
+    )
 
     medical_reports = len([
         item
@@ -34,7 +71,10 @@ def dashboard(db: Session = Depends(get_db)):
     if findings:
 
         average_health_score = int(
-            sum(item.health_score for item in findings)
+            sum(
+                item.health_score
+                for item in findings
+            )
             / len(findings)
         )
 
@@ -42,7 +82,9 @@ def dashboard(db: Session = Depends(get_db)):
 
     if findings:
 
-        latest_health_score = findings[-1].health_score
+        latest_health_score = (
+            findings[-1].health_score
+        )
 
     high_risk_reports = len([
         item
@@ -51,6 +93,7 @@ def dashboard(db: Session = Depends(get_db)):
     ])
 
     return {
+        "success": True,
         "total_reports": total_reports,
         "medical_reports": medical_reports,
         "average_health_score": average_health_score,
@@ -60,22 +103,90 @@ def dashboard(db: Session = Depends(get_db)):
 
 
 @router.get("/health-trends")
-def health_trends(db: Session = Depends(get_db)):
+def health_trends(
+    token: str,
+    db: Session = Depends(get_db)
+):
 
-    findings = db.query(MedicalFinding).order_by(MedicalFinding.created_at).all()
+    current_user = get_current_user(
+        token,
+        db
+    )
+
+    reports = (
+        db.query(Report)
+        .filter(
+            Report.user_id == current_user.id
+        )
+        .all()
+    )
+
+    report_ids = [
+        report.id
+        for report in reports
+    ]
+
+    findings = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id.in_(
+                report_ids
+            )
+        )
+        .order_by(
+            MedicalFinding.created_at
+        )
+        .all()
+    )
 
     scores = [
         item.health_score
         for item in findings
     ]
 
-    return generate_health_trend(scores)
+    trend = generate_health_trend(
+        scores
+    )
+
+    return {
+        "success": True,
+        "trend": trend
+    }
 
 
 @router.get("/alerts")
-def alerts(db: Session = Depends(get_db)):
+def alerts(
+    token: str,
+    db: Session = Depends(get_db)
+):
 
-    findings = db.query(MedicalFinding).all()
+    current_user = get_current_user(
+        token,
+        db
+    )
+
+    reports = (
+        db.query(Report)
+        .filter(
+            Report.user_id == current_user.id
+        )
+        .all()
+    )
+
+    report_ids = [
+        report.id
+        for report in reports
+    ]
+
+    findings = (
+        db.query(MedicalFinding)
+        .filter(
+            MedicalFinding.report_id.in_(
+                report_ids
+            )
+        )
+        .all()
+    )
 
     alerts = []
 
@@ -83,12 +194,15 @@ def alerts(db: Session = Depends(get_db)):
 
         if item.risk_level == "High":
 
-            alerts.append({
-                "report_id": item.report_id,
-                "message": "High risk report detected"
-            })
+            alerts.append(
+                {
+                    "report_id": item.report_id,
+                    "message": "High risk report detected"
+                }
+            )
 
     return {
+        "success": True,
         "count": len(alerts),
         "alerts": alerts
     }

@@ -23,6 +23,8 @@ from app.models.medical_finding import MedicalFinding
 
 from app.services.chunk_service import ChunkService
 
+from app.routes.auth import get_current_user
+
 
 router = APIRouter(
     prefix="/upload",
@@ -32,11 +34,35 @@ router = APIRouter(
 
 @router.post("")
 def upload_report(
+    token: str,
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
 
     try:
+
+        current_user = get_current_user(
+            token,
+            db
+        )
+
+        allowed_extensions = [
+            ".pdf",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".txt"
+        ]
+
+        extension = os.path.splitext(
+            file.filename
+        )[1].lower()
+
+        if extension not in allowed_extensions:
+
+            raise ValueError(
+                f"Unsupported file format: {extension}"
+            )
 
         file_path = save_temp_file(file)
 
@@ -49,7 +75,7 @@ def upload_report(
         print("STEP 2 - S3 UPLOADED")
 
         report = Report(
-            user_id=1,
+            user_id=current_user.id,
             file_name=file.filename,
             local_path=file_path,
             s3_url=s3_url

@@ -16,9 +16,10 @@ DEBUG = os.getenv(
     "False"
 ).lower() == "true"
 
+
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
-    "change-me"
+    ""
 )
 
 JWT_ALGORITHM = os.getenv(
@@ -140,7 +141,9 @@ def validate_config():
 
         if not value:
 
-            missing.append(key)
+            missing.append(
+                key
+            )
 
     if missing:
 
@@ -150,3 +153,8 @@ def validate_config():
         )
 
     return missing
+
+
+def is_production():
+
+    return not DEBUG

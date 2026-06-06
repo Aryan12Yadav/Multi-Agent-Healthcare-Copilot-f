@@ -3,7 +3,15 @@ from datetime import datetime
 from app.core.database import mongo_db
 
 
-def save_memory(user_id: int, question: str, answer: str):
+def save_memory(
+    user_id: int,
+    question: str,
+    answer: str
+):
+
+    if not question:
+
+        return
 
     mongo_db.chat_memory.insert_one({
         "user_id": user_id,
@@ -13,7 +21,10 @@ def save_memory(user_id: int, question: str, answer: str):
     })
 
 
-def get_memories(user_id: int, limit: int = 20):
+def get_memories(
+    user_id: int,
+    limit: int = 20
+):
 
     memories = list(
         mongo_db.chat_memory.find(
@@ -33,21 +44,35 @@ def get_memories(user_id: int, limit: int = 20):
     for item in memories:
 
         cleaned_memories.append({
-            "id": str(item.get("_id")),
-            "user_id": item.get("user_id"),
-            "question": item.get("question"),
-            "answer": item.get("answer"),
+            "id": str(
+                item.get("_id")
+            ),
+            "user_id": item.get(
+                "user_id"
+            ),
+            "question": item.get(
+                "question"
+            ),
+            "answer": item.get(
+                "answer"
+            ),
             "created_at": str(
-                item.get("created_at")
+                item.get(
+                    "created_at"
+                )
             )
         })
 
     return cleaned_memories
 
 
-def build_context(user_id: int):
+def build_context(
+    user_id: int
+):
 
-    memories = get_memories(user_id)
+    memories = get_memories(
+        user_id
+    )
 
     context = ""
 
@@ -73,6 +98,10 @@ def save_report_memory(
     answer: str
 ):
 
+    if not question:
+
+        return
+
     mongo_db.report_memory.insert_one({
         "user_id": user_id,
         "report_id": report_id,
@@ -82,9 +111,10 @@ def save_report_memory(
     })
 
 
-def build_report_context(
+def get_report_memories(
     user_id: int,
-    report_id: int
+    report_id: int,
+    limit: int = 20
 ):
 
     memories = list(
@@ -96,10 +126,50 @@ def build_report_context(
         ).sort(
             "created_at",
             -1
-        ).limit(20)
+        ).limit(limit)
     )
 
     memories.reverse()
+
+    cleaned_memories = []
+
+    for item in memories:
+
+        cleaned_memories.append({
+            "id": str(
+                item.get("_id")
+            ),
+            "user_id": item.get(
+                "user_id"
+            ),
+            "report_id": item.get(
+                "report_id"
+            ),
+            "question": item.get(
+                "question"
+            ),
+            "answer": item.get(
+                "answer"
+            ),
+            "created_at": str(
+                item.get(
+                    "created_at"
+                )
+            )
+        })
+
+    return cleaned_memories
+
+
+def build_report_context(
+    user_id: int,
+    report_id: int
+):
+
+    memories = get_report_memories(
+        user_id,
+        report_id
+    )
 
     context = ""
 

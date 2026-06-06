@@ -16,30 +16,72 @@ class Report(Base):
 
     __tablename__ = "reports"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(
+        primary_key=True
+    )
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True
+    )
 
-    file_name: Mapped[str] = mapped_column(String(500))
+    file_name: Mapped[str] = mapped_column(
+        String(500),
+        nullable=False
+    )
 
-    local_path: Mapped[str] = mapped_column(String(1000), nullable=True)
+    local_path: Mapped[str] = mapped_column(
+        String(1000),
+        nullable=True
+    )
 
-    s3_url: Mapped[str] = mapped_column(String(1000))
+    s3_url: Mapped[str] = mapped_column(
+        String(1000),
+        nullable=False
+    )
 
-    document_type: Mapped[str] = mapped_column(String(200), nullable=True)
+    document_type: Mapped[str] = mapped_column(
+        String(200),
+        nullable=True
+    )
 
-    document_category: Mapped[str] = mapped_column(String(200), nullable=True)
+    document_category: Mapped[str] = mapped_column(
+        String(200),
+        nullable=True
+    )
 
-    health_score: Mapped[int] = mapped_column(Integer, default=0)
+    health_score: Mapped[int] = mapped_column(
+        Integer,
+        default=0
+    )
 
-    risk_level: Mapped[str] = mapped_column(String(50), nullable=True)
+    risk_level: Mapped[str] = mapped_column(
+        String(50),
+        nullable=True
+    )
 
-    is_medical_report: Mapped[bool] = mapped_column(default=False)
+    is_medical_report: Mapped[bool] = mapped_column(
+        default=False
+    )
 
-    extracted_text: Mapped[str] = mapped_column(Text, nullable=True)
+    extracted_text: Mapped[str] = mapped_column(
+        Text,
+        nullable=True
+    )
 
-    ocr_characters: Mapped[int] = mapped_column(Integer, default=0)
+    ocr_characters: Mapped[int] = mapped_column(
+        Integer,
+        default=0
+    )
 
-    analysis_json: Mapped[str] = mapped_column(Text, nullable=True)
+    analysis_json: Mapped[str] = mapped_column(
+        Text,
+        nullable=True
+    )
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        index=True
+    )
