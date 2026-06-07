@@ -208,18 +208,58 @@ def get_analysis(
     return {
         "success": True,
         "analysis": {
-            "report_id": finding.report_id,
-            "document_category": finding.document_category,
-            "document_type": finding.document_type,
-            "summary": finding.summary,
-            "health_score": finding.health_score,
-            "risk_level": finding.risk_level,
-            "is_medical_report": finding.is_medical_report,
-            "finding_json": finding.finding_json,
-            "created_at": finding.created_at
-        }
-    }
 
+            "report_id": finding.report_id,
+
+            "document_category":
+            finding.document_category,
+
+            "document_type":
+            finding.document_type,
+
+            "patient_name":
+            finding.patient_name,
+
+            "person_name":
+            finding.person_name,
+
+            "age":
+            finding.age,
+
+            "gender":
+            finding.gender,
+
+            "summary":
+            finding.summary,
+
+            "structured_report":
+            finding.structured_report,
+
+            "abnormal_findings":
+            finding.abnormal_findings,
+
+            "critical_findings":
+            finding.critical_findings,
+
+            "recommendations":
+            finding.recommendations,
+
+            "health_score":
+            finding.health_score,
+
+            "risk_level":
+            finding.risk_level,
+
+            "is_medical_report":
+            finding.is_medical_report,
+
+            "finding_json":
+            finding.finding_json,
+
+            "created_at":
+            finding.created_at
+        }
+}
 
 @router.get("/compare/{old_report_id}/{new_report_id}")
 def compare_report_api(

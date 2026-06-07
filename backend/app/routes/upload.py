@@ -3,7 +3,7 @@ from fastapi import Depends
 from fastapi import File
 from fastapi import UploadFile
 from fastapi import HTTPException
-
+import json
 import os
 import shutil
 import traceback
@@ -21,7 +21,7 @@ from app.ai.analysis import analyze_document
 from app.models.report import Report
 from app.models.medical_finding import MedicalFinding
 
-from app.services.chunk_service import ChunkService
+# from app.services.chunk_service import ChunkService
 
 from app.routes.auth import get_current_user
 
@@ -140,38 +140,9 @@ def upload_report(
             "STEP 5 - BEFORE ANALYSIS"
         )
 
-        chunks = ChunkService.split_text(
+        result = analyze_document(
             report_text
         )
-
-        chunk_results = []
-
-        for chunk in chunks:
-
-            try:
-
-                result = analyze_document(
-                    chunk
-                )
-
-                chunk_results.append(
-                    result
-                )
-
-            except Exception as error:
-
-                print(
-                    "CHUNK ANALYSIS ERROR:",
-                    str(error)
-                )
-
-        if not chunk_results:
-
-            raise Exception(
-                "No chunk analysis generated"
-            )
-
-        result = chunk_results[0]
 
         print(
             "STEP 6 - AFTER ANALYSIS"
@@ -185,6 +156,22 @@ def upload_report(
 
         report.document_category = result.get(
             "document_category"
+        )
+
+        report.patient_name = result.get(
+            "patient_name"
+        )
+
+        report.person_name = result.get(
+            "person_name"
+        )
+
+        report.age = result.get(
+            "age"
+        )
+
+        report.gender = result.get(
+            "gender"
         )
 
         report.health_score = result.get(
@@ -201,7 +188,32 @@ def upload_report(
             False
         )
 
-        report.analysis_json = str(
+        report.structured_report = result.get(
+            "structured_report"
+        )
+
+        report.abnormal_findings = json.dumps(
+            result.get(
+                "abnormal_findings",
+                []
+            )
+        )
+
+        report.critical_findings = json.dumps(
+            result.get(
+                "critical_findings",
+                []
+            )
+        )
+
+        report.recommendations = json.dumps(
+            result.get(
+                "recommendations",
+                []
+            )
+        )
+
+        report.analysis_json = json.dumps(
             result
         )
 
@@ -216,31 +228,92 @@ def upload_report(
         ):
 
             finding = MedicalFinding(
-                report_id=report.id,
-                document_category=result.get(
-                    "document_category"
-                ) or "Unknown",
-                document_type=result.get(
-                    "document_type"
-                ) or "Unknown",
-                summary=result.get(
-                    "summary",
-                    ""
-                ),
-                health_score=result.get(
-                    "health_score",
-                    0
-                ),
-                risk_level=result.get(
-                    "risk_level"
-                ) or "Unknown",
-                is_medical_report=True,
-                finding_json=str(result)
-            )
+
+                    report_id=report.id,
+
+                    document_category=
+                    result.get(
+                        "document_category"
+                    ) or "Unknown",
+
+                    document_type=
+                    result.get(
+                        "document_type"
+                    ) or "Unknown",
+
+                    patient_name=
+                    result.get(
+                        "patient_name"
+                    ) or "",
+
+                    person_name=
+                    result.get(
+                        "person_name"
+                    ) or "",
+
+                    age=
+                    result.get(
+                        "age"
+                    ) or "",
+
+                    gender=
+                    result.get(
+                        "gender"
+                    ) or "",
+
+                    summary=
+                    result.get(
+                        "summary"
+                    ) or "Analysis summary unavailable",
+
+                    structured_report=
+                    result.get(
+                        "structured_report"
+                    ) or "",
+
+                    abnormal_findings=str(
+                        result.get(
+                            "abnormal_findings",
+                            []
+                        )
+                    ),
+
+                    critical_findings=str(
+                        result.get(
+                            "critical_findings",
+                            []
+                        )
+                    ),
+
+                    recommendations=str(
+                        result.get(
+                            "recommendations",
+                            []
+                        )
+                    ),
+
+                    health_score=
+                    result.get(
+                        "health_score",
+                        0
+                    ),
+
+                    risk_level=
+                    result.get(
+                        "risk_level"
+                    ) or "Unknown",
+
+                    is_medical_report=True,
+
+                    finding_json=str(
+                        result
+                    )
+                )
 
             db.add(finding)
 
             db.commit()
+
 
             print(
                 "STEP 8 - FINDING SAVED"

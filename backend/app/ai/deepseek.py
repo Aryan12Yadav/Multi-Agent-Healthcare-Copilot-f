@@ -78,8 +78,11 @@ def extract_json(text: str):
 
     return "{}"
 
-
 def safe_json_loads(text: str):
+
+    if not text:
+
+        return {}
 
     try:
 
@@ -91,9 +94,7 @@ def safe_json_loads(text: str):
 
     try:
 
-        cleaned_json = extract_json(
-            text
-        )
+        cleaned_json = extract_json(text)
 
         return json.loads(
             cleaned_json
@@ -105,5 +106,13 @@ def safe_json_loads(text: str):
             "JSON PARSE ERROR:",
             str(error)
         )
+
+        print("=" * 100)
+
+        print("RAW RESPONSE")
+
+        print(text)
+
+        print("=" * 100)
 
         return {}

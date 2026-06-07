@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -11,6 +12,9 @@ from app.ai.deepseek import ask_llm
 from app.ai.memory import save_memory
 from app.ai.memory import get_memories
 from app.ai.memory import build_context
+
+from app.ai.memory import save_report_memory
+from app.ai.memory import build_report_context
 
 from app.models.report import Report
 from app.models.medical_finding import MedicalFinding
@@ -50,9 +54,18 @@ Previous Conversation:
 User Question:
 
 {question}
+
+Rules:
+
+1. Answer clearly.
+2. Be concise.
+3. If unsure, say you do not know.
+4. Never hallucinate.
 """
 
-    answer = ask_llm(prompt)
+    answer = ask_llm(
+        prompt
+    )
 
     save_memory(
         user_id=current_user.id,
@@ -87,19 +100,29 @@ def history(
 
         serialized_messages.append(
             {
-                "id": str(item.get("_id")),
-                "user_id": item.get("user_id"),
-                "question": item.get("question"),
-                "answer": item.get("answer"),
-                "created_at": str(
-                    item.get("created_at")
+                "id": str(
+                    item.get("id")
+                ),
+                "user_id": item.get(
+                    "user_id"
+                ),
+                "question": item.get(
+                    "question"
+                ),
+                "answer": item.get(
+                    "answer"
+                ),
+                "created_at": item.get(
+                    "created_at"
                 )
             }
         )
 
     return {
         "success": True,
-        "count": len(serialized_messages),
+        "count": len(
+            serialized_messages
+        ),
         "messages": serialized_messages
     }
 
@@ -129,8 +152,8 @@ def report_chat(
     if not report:
 
         raise HTTPException(
-            status_code=403,
-            detail="Access denied"
+            status_code=404,
+            detail="Report not found"
         )
 
     finding = (
@@ -148,34 +171,114 @@ def report_chat(
             detail="Report analysis not found"
         )
 
+    report_context = build_report_context(
+        current_user.id,
+        report_id
+    )
+
     prompt = f"""
 You are MedSphere AI.
 
-Report Summary:
+You are analyzing a medical report.
+
+
+PREVIOUS REPORT CONVERSATION
+
+
+{report_context}
+
+ 
+PATIENT INFORMATION
+ 
+
+Patient Name:
+{finding.patient_name}
+
+Person Name:
+{finding.person_name}
+
+Age:
+{finding.age}
+
+Gender:
+{finding.gender}
+
+ 
+REPORT SUMMARY
+ 
 
 {finding.summary}
 
-Report Analysis:
+ 
+STRUCTURED REPORT
+ 
+
+{finding.structured_report}
+
+ 
+ABNORMAL FINDINGS
+ 
+
+{finding.abnormal_findings}
+
+ 
+CRITICAL FINDINGS
+ 
+
+{finding.critical_findings}
+
+ 
+RECOMMENDATIONS
+ 
+
+{finding.recommendations}
+
+ 
+FULL OCR TEXT
+ 
+
+{report.extracted_text}
+
+ 
+FULL ANALYSIS JSON
+ 
 
 {finding.finding_json}
 
-Question:
+ 
+USER QUESTION
+ 
 
 {question}
 
 Rules:
 
-1. Never diagnose.
-2. Never prescribe medicine.
-3. Explain only report data.
-4. If information is not present in report, clearly say so.
+1. Answer ONLY from report information.
+2. Use OCR text whenever needed.
+3. Never diagnose diseases.
+4. Never prescribe medicines.
+5. Never invent values.
+6. If answer exists in OCR, provide exact value.
+7. If answer is missing, clearly say not found.
+8. Use headings and bullet points.
+9. Highlight important abnormal values.
+10. Be medically safe.
+11. If patient information exists, always return exact patient details.
+12. If lab values exist, return exact value and reference range.
+13. Prefer OCR text over generated summaries.
+14. Preserve names exactly as written.
+15. Preserve units exactly as written.
+
 """
 
-    answer = ask_llm(prompt)
+    answer = ask_llm(
+        prompt
+    )
 
-    save_memory(
+    save_report_memory(
         user_id=current_user.id,
-        question=f"Report {report_id}: {question}",
+        report_id=report_id,
+        question=question,
         answer=answer
     )
 
@@ -184,3 +287,4 @@ Rules:
         "report_id": report_id,
         "answer": answer
     }
+ 

@@ -51,6 +51,26 @@ class Report(Base):
         nullable=True
     )
 
+    patient_name: Mapped[str] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
+    person_name: Mapped[str] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
+    age: Mapped[str] = mapped_column(
+        String(50),
+        nullable=True
+    )
+
+    gender: Mapped[str] = mapped_column(
+        String(50),
+        nullable=True
+    )
+
     health_score: Mapped[int] = mapped_column(
         Integer,
         default=0
@@ -66,6 +86,26 @@ class Report(Base):
     )
 
     extracted_text: Mapped[str] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    structured_report: Mapped[str] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    abnormal_findings: Mapped[str] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    critical_findings: Mapped[str] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    recommendations: Mapped[str] = mapped_column(
         Text,
         nullable=True
     )

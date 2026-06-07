@@ -1,6 +1,6 @@
 from app.ai.deepseek import ask_llm
 from app.ai.deepseek import safe_json_loads
-
+import re
 
 def classify_document(content: str):
 
@@ -40,9 +40,8 @@ The document may be:
 Rules:
 
 1. Classify based on document meaning.
-2. Do not rely on a single keyword.
-3. If uncertain, choose the most likely category.
-4. Return JSON only.
+2. Do not rely on keywords only.
+3. Return JSON only.
 
 Return:
 
@@ -60,9 +59,38 @@ Document:
 
     try:
 
-        result = safe_json_loads(
-            ask_llm(prompt)
+        raw_response = ask_llm(
+            prompt
         )
+
+        
+        print("LLM RESPONSE")
+        print(raw_response)
+        
+
+        result = safe_json_loads(
+            raw_response
+        )
+
+        if not result:
+
+            result = {
+                "patient_name": None,
+                "person_name": None,
+                "age": None,
+                "gender": None,
+
+                "summary":
+                "Analysis could not be generated.",
+
+                "structured_report": "",
+
+                "abnormal_findings": [],
+
+                "critical_findings": [],
+
+                "recommendations": []
+            }
 
         return result
 
@@ -93,7 +121,11 @@ def analyze_document(content: str):
         content
     )
 
-    if not classification.get("is_medical"):
+    
+
+    if not classification.get(
+        "is_medical"
+    ):
 
         return {
             "is_medical_report": False,
@@ -109,35 +141,109 @@ def analyze_document(content: str):
         }
 
     prompt = f"""
-You are a healthcare report analysis assistant.
+            You are MedSphere AI.
 
-Analyze the report strictly using information
-present inside the report.
+            You are an expert healthcare report analysis engine.
 
-Rules:
+            Analyze ONLY information explicitly present in the report.
 
-1. Do not diagnose diseases.
-2. Do not hallucinate.
-3. Do not invent values.
-4. Use report information only.
-5. Explain abnormalities in simple language.
-6. Create patient friendly summary.
-7. Highlight abnormal findings.
-8. Generate useful recommendations.
-9. If information is missing, mention it.
+            STRICT RULES:
 
-Return JSON only.
+            1. Never diagnose diseases.
+            2. Never prescribe medicines.
+            3. Never invent information.
+            4. Never hallucinate.
+            5. Extract patient details exactly as written.
+            6. Extract abnormal values exactly as written.
+            7. Extract critical findings exactly as written.
+            8. Preserve units exactly.
+            9. Preserve names exactly.
+            10. Preserve test values exactly.
+            11. If information is missing return null.
+            12. Use only report information.
+            13. Generate professional structured report.
+            14. Generate patient-friendly summary.
+            15. Highlight risk-related abnormalities.
+            16. Return valid JSON only.
 
-{{
-    "summary": "",
-    "abnormal_findings": [],
-    "recommendations": []
-}}
+            IMPORTANT:
 
-Medical Report:
+            All string values MUST be valid JSON strings.
 
-{content[:12000]}
-"""
+            Do NOT use raw line breaks inside JSON values.
+
+            Use \\n for new lines.
+
+
+
+            Return JSON ONLY:
+
+            {{
+                "patient_name": null,
+                "person_name": null,
+                "age": null,
+                "gender": null,
+
+                "summary": "",
+
+                "structured_report": "",
+
+                "abnormal_findings": [],
+
+                "critical_findings": [],
+
+                "recommendations": []
+            }}
+
+            IMPORTANT:
+
+            structured_report MUST follow this exact format:
+
+            # Patient Information
+
+            - Patient Name:
+            - Person Name:
+            - Age:
+            - Gender:
+
+            # Report Overview
+
+            Short overview of report.
+
+            # Abnormal Findings
+
+            - Finding 1
+            - Finding 2
+
+            # Critical Findings
+
+            - Critical Finding 1
+            - Critical Finding 2
+
+            # Risk Assessment
+
+            Low Risk / Medium Risk / High Risk
+
+            Reason:
+
+            - Reason 1
+            - Reason 2
+
+            # Recommendations
+
+            - Recommendation 1
+            - Recommendation 2
+
+            Rules for recommendations:
+
+            - Use general healthcare advice only.
+            - Do not prescribe medications.
+            - Do not diagnose conditions.
+
+            Medical Report:
+
+            {content[:12000]}
+            """
 
     try:
 
@@ -145,11 +251,73 @@ Medical Report:
             ask_llm(prompt)
         )
 
+        if not result:
+
+            patient_match = re.search(
+                r"Patient Name\s+([A-Z\s]+)",
+                content
+            )
+
+            person_match = re.search(
+                r"Person Name\s+([A-Z\s]+)",
+                content
+            )
+
+            age_gender_match = re.search(
+                r"Age/Gender\s+(\d+\s*Y)\s*/\s*([MF])",
+                content
+            )
+
+            result = {
+
+                "patient_name":
+                patient_match.group(1).strip()
+                if patient_match
+                else None,
+
+                "person_name":
+                person_match.group(1).strip()
+                if person_match
+                else None,
+
+                "age":
+                age_gender_match.group(1)
+                if age_gender_match
+                else None,
+
+                "gender":
+                age_gender_match.group(2)
+                if age_gender_match
+                else None,
+
+                "summary":
+                "Analysis could not be generated from AI response but OCR data was extracted.",
+
+                "structured_report": "",
+
+                "abnormal_findings": [],
+
+                "critical_findings": [],
+
+                "recommendations": []
+            }
+
     except Exception:
 
         result = {
+            "patient_name": None,
+            "person_name": None,
+            "age": None,
+            "gender": None,
+
             "summary": "Analysis could not be completed.",
+
+            "structured_report": "",
+
             "abnormal_findings": [],
+
+            "critical_findings": [],
+
             "recommendations": []
         }
 
@@ -159,15 +327,62 @@ Medical Report:
 
     return {
         "is_medical_report": True,
+
         "document_type": classification.get(
             "document_type"
         ),
+
         "document_category": classification.get(
             "document_category"
         ),
-        "health_score": score["health_score"],
-        "risk_level": score["risk_level"],
-        "summary": result.get("summary"),
+
+        "patient_name": result.get(
+            "patient_name"
+        ),
+
+        "person_name": result.get(
+            "person_name"
+        ),
+
+        "age": result.get(
+            "age"
+        ),
+
+        "gender": result.get(
+            "gender"
+        ),
+
+        "health_score": score[
+            "health_score"
+        ],
+
+        "risk_level": score[
+            "risk_level"
+        ],
+
+        "summary": result.get(
+            "summary"
+        ),
+
+        "structured_report": result.get(
+            "structured_report"
+        ),
+
+        "abnormal_findings": result.get(
+            "abnormal_findings",
+            []
+        ),
+
+        "critical_findings": result.get(
+            "critical_findings",
+            []
+        ),
+
+        "recommendations": result.get(
+            "recommendations",
+            []
+        ),
+
         "analysis": result
     }
 
@@ -179,9 +394,24 @@ def calculate_health_score(data: dict):
         []
     )
 
-    count = len(findings)
+    critical_findings = data.get(
+        "critical_findings",
+        []
+    )
 
-    score = 100 - (count * 10)
+    count = len(
+        findings
+    )
+
+    critical_count = len(
+        critical_findings
+    )
+
+    score = (
+            100
+            - (count * 5)
+            - (critical_count * 10)
+        )
 
     if score < 0:
 
@@ -220,7 +450,10 @@ def compare_reports(
         0
     )
 
-    difference = new_score - old_score
+    difference = (
+        new_score
+        - old_score
+    )
 
     if difference > 0:
 
@@ -242,7 +475,9 @@ def compare_reports(
     }
 
 
-def generate_health_trend(scores: list):
+def generate_health_trend(
+    scores: list
+):
 
     if len(scores) < 2:
 
@@ -254,7 +489,10 @@ def generate_health_trend(scores: list):
 
     last_score = scores[-1]
 
-    change = last_score - first_score
+    change = (
+        last_score
+        - first_score
+    )
 
     if change > 0:
 
@@ -276,21 +514,29 @@ def generate_health_trend(scores: list):
     }
 
 
-def build_patient_profile(reports: str):
+def build_patient_profile(
+    reports: str
+):
 
     prompt = f"""
-Build a patient profile from historical reports.
+You are MedSphere AI.
+
+Build a longitudinal patient profile.
 
 Rules:
 
 1. Use report information only.
-2. Do not diagnose.
-3. Do not hallucinate.
-4. Return JSON only.
+2. Never diagnose.
+3. Never hallucinate.
+4. Identify recurring abnormalities.
+5. Identify recurring risk factors.
+6. Identify health trends.
+7. Return JSON only.
 
 {{
     "possible_conditions": [],
     "risk_factors": [],
+    "health_trends": [],
     "recommended_tests": []
 }}
 
@@ -310,7 +556,11 @@ Reports:
     except Exception:
 
         return {
+            "patient_name": "",
+            "age": "",
+            "gender": "",
             "possible_conditions": [],
             "risk_factors": [],
+            "health_trends": [],
             "recommended_tests": []
         }
