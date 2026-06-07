@@ -346,8 +346,9 @@ def compare_report_api(
     )
 
     return {
-        "success": True,
-        "old_report_id": old_report_id,
-        "new_report_id": new_report_id,
-        "comparison": result
-    }
+    "success": True,
+    "old_score": result["old_score"],
+    "new_score": result["new_score"],
+    "difference": result["difference"],
+    "trend": result["trend"]
+}
