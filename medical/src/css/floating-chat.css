@@ -1,0 +1,353 @@
+.floating-ai {
+
+    position: fixed;
+
+    right: 20px;
+
+    bottom: 20px;
+
+    width: 90px;
+
+    height: 90px;
+
+    border: none;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    z-index: 999999;
+}
+
+.medai-core {
+
+    width: 70px;
+
+    height: 70px;
+
+    border-radius: 50%;
+
+    background:
+    radial-gradient(
+        circle,
+        #8b5cf6,
+        #4f46e5,
+        #312e81
+    );
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    color: white;
+
+    box-shadow:
+    0 0 20px #4f46e5,
+    0 0 45px rgba(79,70,229,.7);
+
+    animation:
+    medaiFloat 3s infinite;
+}
+
+.medai-core i {
+
+    font-size: 28px;
+}
+
+.floating-ai span {
+
+    display: block;
+
+    text-align: center;
+
+    margin-top: 5px;
+
+    color: #4f46e5;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+/* ===========================
+   CHAT WINDOW
+=========================== */
+
+.medai-chat-window {
+
+    position: fixed;
+
+    right: 20px;
+
+    bottom: 120px;
+
+    width: 380px;
+
+    height: 500px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    box-shadow:
+    0 10px 40px rgba(0,0,0,.15);
+
+    z-index: 999998;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.medai-chat-header {
+
+    padding: 15px 20px;
+
+    background:
+    linear-gradient(
+        135deg,
+        #4f46e5,
+        #7c3aed
+    );
+
+    color: white;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.medai-chat-header h5 {
+
+    margin: 0;
+}
+
+.medai-chat-header small {
+
+    opacity: .9;
+}
+
+.close-btn {
+
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+.clear-btn {
+
+    border: none;
+
+    padding: 6px 10px;
+
+    border-radius: 8px;
+
+    margin-right: 10px;
+
+    cursor: pointer;
+
+    background: white;
+
+    color: #4f46e5;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+.medai-chat-body {
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 15px;
+
+    background: #f8fafc;
+}
+
+.welcome-box {
+
+    text-align: center;
+
+    padding: 30px 15px;
+
+    color: #64748b;
+}
+
+.user-bubble {
+
+    background: #4f46e5;
+
+    color: white;
+
+    padding: 10px 14px;
+
+    border-radius: 14px;
+
+    margin-bottom: 10px;
+
+    margin-left: auto;
+
+    max-width: 85%;
+
+    width: fit-content;
+}
+
+.bot-bubble {
+
+    background: white;
+
+    padding: 10px 14px;
+
+    border-radius: 14px;
+
+    margin-bottom: 10px;
+
+    max-width: 85%;
+
+    border: 1px solid #e2e8f0;
+}
+
+.medai-chat-footer {
+
+    padding: 10px;
+
+    display: flex;
+
+    gap: 10px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: white;
+}
+
+.medai-chat-footer input {
+
+    flex: 1;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    padding: 10px;
+}
+
+.medai-chat-footer button {
+
+    border: none;
+
+    padding: 10px 16px;
+
+    border-radius: 10px;
+
+    background: #4f46e5;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+/* ===========================
+   ANIMATION
+=========================== */
+
+@keyframes medaiFloat {
+
+    0% {
+
+        transform: translateY(0px);
+    }
+
+    50% {
+
+        transform: translateY(-8px);
+    }
+
+    100% {
+
+        transform: translateY(0px);
+    }
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 768px) {
+
+    .medai-chat-window {
+
+        width: calc(100vw - 20px);
+
+        right: 10px;
+
+        left: 10px;
+
+        height: 70vh;
+
+        bottom: 110px;
+    }
+}
+
+.bot-bubble {
+
+    background: white;
+
+    padding: 10px 14px;
+
+    border-radius: 14px;
+
+    margin-bottom: 10px;
+
+    max-width: 85%;
+
+    border: 1px solid #e2e8f0;
+
+    word-break: break-word;
+}
+
+.user-bubble {
+
+    background: #4f46e5;
+
+    color: white;
+
+    padding: 10px 14px;
+
+    border-radius: 14px;
+
+    margin-bottom: 10px;
+
+    margin-left: auto;
+
+    max-width: 85%;
+
+    width: fit-content;
+
+    word-break: break-word;
+}
+
+.medai-chat-body::-webkit-scrollbar {
+
+    width: 6px;
+}
+
+.medai-chat-body::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+
+    border-radius: 20px;
+}

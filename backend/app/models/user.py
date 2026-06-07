@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import String
 from sqlalchemy import Boolean
+from sqlalchemy import String
 from sqlalchemy import DateTime
 
 from sqlalchemy.orm import Mapped
@@ -41,6 +41,16 @@ class User(Base):
     )
 
     is_staff: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False
+    )
+
+    role: Mapped[str] = mapped_column(
+        String(20),
+        default="user"
+    )
+
+    is_blocked: Mapped[bool] = mapped_column(
         Boolean,
         default=False
     )

@@ -115,6 +115,13 @@ def login(
             detail="Invalid credentials"
         )
 
+    if user.is_blocked:
+
+        raise HTTPException(
+            status_code=403,
+            detail="Your account has been blocked by admin."
+        )
+
     token = create_access_token(
         user.id
     )
@@ -124,7 +131,8 @@ def login(
         "token": token,
         "user_id": user.id,
         "name": user.name,
-        "email": user.email
+        "email": user.email,
+        "role": user.role
     }
 
 
@@ -188,6 +196,25 @@ def get_current_user(
         raise HTTPException(
             status_code=404,
             detail="User not found"
+        )
+
+    return user
+
+def get_current_admin(
+    token: str,
+    db: Session
+):
+
+    user = get_current_user(
+        token,
+        db
+    )
+
+    if user.role != "admin":
+
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
         )
 
     return user

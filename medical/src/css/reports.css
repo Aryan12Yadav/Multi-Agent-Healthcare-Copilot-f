@@ -1,0 +1,369 @@
+.page-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+
+    margin: 0;
+
+    font-weight: 700;
+
+    color: #1e293b;
+}
+
+.page-header p {
+
+    margin-top: 5px;
+
+    color: #64748b;
+}
+
+.reports-toolbar {
+
+    display: flex;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.reports-toolbar input {
+
+    flex: 1;
+}
+
+.reports-toolbar select {
+
+    width: 220px;
+}
+
+.report-table-card {
+
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 20px;
+
+    box-shadow:
+    0 4px 20px rgba(
+        0,
+        0,
+        0,
+        .05
+    );
+
+    overflow-x: auto;
+}
+
+.report-table-card table {
+
+    margin-bottom: 0;
+}
+
+.report-table-card th {
+
+    color: #475569;
+
+    font-weight: 700;
+
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.report-table-card td {
+
+    vertical-align: middle;
+}
+
+.score-badge {
+
+    background:
+    rgba(
+        79,
+        70,
+        229,
+        .12
+    );
+
+    color: #4f46e5;
+
+    padding: 6px 14px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.risk-low {
+
+    background:
+    rgba(
+        34,
+        197,
+        94,
+        .15
+    );
+
+    color: #22c55e;
+
+    padding: 6px 14px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.risk-medium {
+
+    background:
+    rgba(
+        245,
+        158,
+        11,
+        .15
+    );
+
+    color: #f59e0b;
+
+    padding: 6px 14px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.risk-high {
+
+    background:
+    rgba(
+        239,
+        68,
+        68,
+        .15
+    );
+
+    color: #ef4444;
+
+    padding: 6px 14px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.action-btn {
+
+    border: none;
+
+    padding: 8px 14px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    margin-right: 8px;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.view-btn {
+
+    background: #4f46e5;
+
+    color: white;
+}
+
+.view-btn:hover {
+
+    background: #4338ca;
+}
+
+.delete-btn {
+
+    background: #ef4444;
+
+    color: white;
+}
+
+.delete-btn:hover {
+
+    background: #dc2626;
+}
+
+@media (max-width: 768px) {
+
+    .page-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+    .reports-toolbar {
+
+        flex-direction: column;
+    }
+
+    .reports-toolbar select {
+
+        width: 100%;
+    }
+
+    .action-btn {
+
+        margin-bottom: 5px;
+    }
+}
+.report-id-badge {
+
+    background:
+    rgba(
+        79,
+        70,
+        229,
+        .12
+    );
+
+    color: #4f46e5;
+
+    padding: 6px 12px;
+
+    border-radius: 10px;
+
+    font-weight: 700;
+
+    font-size: 13px;
+}
+
+.custom-modal-overlay {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(
+        0,
+        0,
+        0,
+        .5
+    );
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 99999;
+}
+
+.custom-modal {
+
+    background: white;
+
+    width: 400px;
+
+    max-width: 90%;
+
+    padding: 25px;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    box-shadow:
+    0 20px 40px rgba(
+        0,
+        0,
+        0,
+        .2
+    );
+}
+
+.custom-modal h4 {
+
+    margin-bottom: 10px;
+
+    color: #1e293b;
+}
+
+.custom-modal p {
+
+    color: #64748b;
+
+    margin-bottom: 20px;
+}
+
+.modal-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+}
+
+.cancel-btn {
+
+    border: none;
+
+    padding: 10px 20px;
+
+    border-radius: 10px;
+
+    background: #e2e8f0;
+
+    color: #334155;
+
+    cursor: pointer;
+}
+
+.delete-confirm-btn {
+
+    border: none;
+
+    padding: 10px 20px;
+
+    border-radius: 10px;
+
+    background: #ef4444;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+.delete-confirm-btn:hover {
+
+    background: #dc2626;
+}
+
+.cancel-btn:hover {
+
+    background: #cbd5e1;
+}

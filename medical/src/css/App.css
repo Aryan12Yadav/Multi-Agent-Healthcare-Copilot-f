@@ -1,0 +1,192 @@
+* {
+
+    margin: 0;
+
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+body {
+
+    background: #f1f5f9;
+
+    font-family:
+    Inter,
+    sans-serif;
+
+    overflow-x: hidden;
+}
+
+a {
+
+    text-decoration: none;
+}
+
+.app-layout {
+
+    display: flex;
+
+    min-height: 100vh;
+}
+
+.main-content {
+
+    margin-left: 260px;
+
+    width: calc(100% - 260px);
+
+    min-height: 100vh;
+
+    padding: 20px;
+}
+
+.page-container {
+
+    width: 100%;
+}
+
+.page-title {
+
+    margin-bottom: 25px;
+}
+
+.page-title h2 {
+
+    color: #1e293b;
+
+    font-weight: 700;
+
+    margin-bottom: 5px;
+}
+
+.page-title p {
+
+    color: #64748b;
+}
+
+.card {
+
+    background: white;
+
+    border-radius: 20px;
+
+    border: none;
+
+    box-shadow:
+    0 5px 20px rgba(
+        0,
+        0,
+        0,
+        .05
+    );
+}
+
+.form-control {
+
+    border-radius: 12px;
+
+    min-height: 48px;
+
+    border:
+    1px solid #dbe2ea;
+}
+
+.form-control:focus {
+
+    box-shadow: none;
+
+    border-color: #4f46e5;
+}
+
+.btn-primary {
+
+    background: #4f46e5;
+
+    border: none;
+
+    border-radius: 12px;
+
+    min-height: 48px;
+
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+
+    background: #4338ca;
+}
+
+.btn-success {
+
+    border-radius: 12px;
+
+    font-weight: 600;
+}
+
+.loader-wrapper {
+
+    width: 100vw;
+
+    height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background: #f8fafc;
+}
+
+hr {
+
+    border-color: #e2e8f0;
+}
+
+.alert {
+
+    border-radius: 12px;
+}
+
+.table {
+
+    margin-bottom: 0;
+}
+
+.table th {
+
+    color: #475569;
+
+    font-weight: 700;
+}
+
+.table td {
+
+    vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+
+    .main-content {
+
+        margin-left: 75px;
+
+        width: calc(100% - 75px);
+
+        padding: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .main-content {
+
+        padding: 10px;
+    }
+
+    .page-container {
+
+        overflow-x: hidden;
+    }
+}

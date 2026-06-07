@@ -1,0 +1,49 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --primary:#4f46e5;
+    --secondary:#7c3aed;
+    --dark:#0f172a;
+    --sidebar:#1e293b;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --warning:#f59e0b;
+    --bg:#f4f7fb;
+    --card:#ffffff;
+}
+
+body{
+
+    background:var(--bg);
+
+    font-family:Arial,Helvetica,sans-serif;
+
+    overflow-x:hidden;
+}
+
+a{
+
+    text-decoration:none;
+}
+
+ul{
+
+    list-style:none;
+}
+
+button{
+
+    border:none;
+
+    outline:none;
+}
+
+.form-control:focus{
+
+    box-shadow:none;
+}

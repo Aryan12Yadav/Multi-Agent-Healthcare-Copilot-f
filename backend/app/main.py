@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.routes.admin import router as admin_router
 from fastapi.openapi.utils import get_openapi
 
 from app.core.database import Base
@@ -56,6 +56,7 @@ app.include_router(dashboard_router)
 
 app.include_router(patient_profile_router)
 
+app.include_router(admin_router)
 
 def custom_openapi():
 
