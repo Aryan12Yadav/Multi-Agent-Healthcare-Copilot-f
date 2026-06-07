@@ -268,6 +268,12 @@ def compare_report_api(
     token: str,
     db: Session = Depends(get_db)
 ):
+    if old_report_id == new_report_id:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Please select two different reports for comparison."
+        )
 
     current_user = get_current_user(
         token,
@@ -346,9 +352,11 @@ def compare_report_api(
     )
 
     return {
-    "success": True,
-    "old_score": result["old_score"],
-    "new_score": result["new_score"],
-    "difference": result["difference"],
-    "trend": result["trend"]
-}
+            "success": True,
+            "comparison": {
+                "old_score": result["old_score"],
+                "new_score": result["new_score"],
+                "difference": result["difference"],
+                "trend": result["trend"]
+            }
+        }
