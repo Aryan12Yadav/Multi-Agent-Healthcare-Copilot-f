@@ -30,15 +30,20 @@ function Auth() {
 
     useEffect(() => {
 
-        const token =
-            localStorage.getItem(
-                "token"
-            );
+            const token =
+                localStorage.getItem(
+                    "token"
+                );
 
-        if (token) {
+            const role =
+                localStorage.getItem(
+                    "role"
+                );
 
-            if (
-                    response.data.role === "admin"
+            if (token) {
+
+                if (
+                    role === "admin"
                 ) {
 
                     navigate(
@@ -51,9 +56,9 @@ function Auth() {
                         "/dashboard"
                     );
                 }
-        }
+            }
 
-    }, [navigate]);
+        }, [navigate]);
 
     function handleChange(event) {
 

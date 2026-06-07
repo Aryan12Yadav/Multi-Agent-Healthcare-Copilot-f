@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function AdminSidebar() {
+
+    const location =
+        useLocation();
 
     return (
 
@@ -13,7 +17,7 @@ function AdminSidebar() {
                 </h4>
 
                 <p>
-                    Admin Panel
+                    Admin Control Panel
                 </p>
 
             </div>
@@ -21,23 +25,40 @@ function AdminSidebar() {
             <div className="menu-section">
 
                 <Link
-                    className="menu-item"
                     to="/admin/dashboard"
+                    className={
+                        location.pathname === "/admin/dashboard"
+                        ? "menu-item active"
+                        : "menu-item"
+                    }
                 >
+                    <i className="bi bi-speedometer2"></i>
                     Dashboard
                 </Link>
 
                 <Link
-                    className="menu-item"
                     to="/admin/users"
+                    className={
+                        location.pathname === "/admin/users"
+                        ? "menu-item active"
+                        : "menu-item"
+                    }
                 >
+                    <i className="bi bi-people"></i>
                     Users
+                </Link>
+
+                <Link
+                    to="/reports"
+                    className="menu-item"
+                >
+                    <i className="bi bi-file-earmark-medical"></i>
+                    All Reports
                 </Link>
 
             </div>
 
         </div>
-
     );
 }
 
