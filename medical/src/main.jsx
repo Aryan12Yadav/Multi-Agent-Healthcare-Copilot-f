@@ -21,6 +21,7 @@ import "./css/upload-report.css";
 import "./css/App.css"
 import "./css/CompareReports.css";
 import "./css/notfound.css";
+import "./css/admin.css";
 
 
 ReactDOM.createRoot(

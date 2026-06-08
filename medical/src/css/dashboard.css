@@ -428,3 +428,22 @@
     border-left:
     4px solid #22c55e;
 }
+
+.page-header {
+
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+
+    margin: 0;
+
+    font-weight: 700;
+}
+
+.page-header p {
+
+    margin-top: 6px;
+
+    color: #64748b;
+}

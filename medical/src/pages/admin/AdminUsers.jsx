@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useState } from "react";
 
@@ -14,6 +15,15 @@ function AdminUsers() {
 
     const [users, setUsers] =
         useState([]);
+
+    const [search, setSearch] =
+        useState("");
+
+    const [showDeleteModal, setShowDeleteModal] =
+        useState(false);
+
+    const [selectedUserId, setSelectedUserId] =
+        useState(null);
 
     useEffect(() => {
 
@@ -54,7 +64,7 @@ function AdminUsers() {
                 `/admin/users/${userId}/block`
             );
 
-            loadUsers();
+            await loadUsers();
 
         } catch (error) {
 
@@ -72,7 +82,7 @@ function AdminUsers() {
                 `/admin/users/${userId}/unblock`
             );
 
-            loadUsers();
+            await loadUsers();
 
         } catch (error) {
 
@@ -80,31 +90,22 @@ function AdminUsers() {
         }
     }
 
-    async function deleteUser(
-        userId
-    ) {
-
-        const confirmed =
-            window.confirm(
-                "Delete this user?"
-            );
-
-        if (!confirmed) {
-
-            return;
-        }
+    async function deleteUser() {
 
         try {
 
             await api.delete(
-                `/admin/users/${userId}`
+                `/admin/users/${selectedUserId}`
             );
 
-            setUsers(
-                users.filter(
-                    user =>
-                    user.id !== userId
-                )
+            await loadUsers();
+
+            setShowDeleteModal(
+                false
+            );
+
+            setSelectedUserId(
+                null
             );
 
         } catch (error) {
@@ -112,6 +113,22 @@ function AdminUsers() {
             console.log(error);
         }
     }
+
+    const filteredUsers =
+        users.filter(
+            user =>
+                user.name
+                    ?.toLowerCase()
+                    .includes(
+                        search.toLowerCase()
+                    )
+                ||
+                user.email
+                    ?.toLowerCase()
+                    .includes(
+                        search.toLowerCase()
+                    )
+        );
 
     if (loading) {
 
@@ -143,6 +160,22 @@ function AdminUsers() {
                             </p>
 
                         </div>
+
+                    </div>
+
+                    <div className="mb-4">
+
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search user by name or email..."
+                            value={search}
+                            onChange={(e) =>
+                                setSearch(
+                                    e.target.value
+                                )
+                            }
+                        />
 
                     </div>
 
@@ -187,7 +220,7 @@ function AdminUsers() {
                             <tbody>
 
                                 {
-                                    users.map(
+                                    filteredUsers.map(
                                         (
                                             user
                                         ) => (
@@ -197,45 +230,36 @@ function AdminUsers() {
                                                     user.id
                                                 }
                                             >
+ 
 
                                                 <td>
-                                                    {
-                                                        user.id
-                                                    }
+                                                    {user.id}
                                                 </td>
 
                                                 <td>
-                                                    {
-                                                        user.name
-                                                    }
+                                                    {user.name}
                                                 </td>
 
                                                 <td>
-                                                    {
-                                                        user.email
-                                                    }
+                                                    {user.email}
                                                 </td>
 
                                                 <td>
-                                                    {
-                                                        user.role
-                                                    }
+                                                    {user.role}
                                                 </td>
 
                                                 <td>
 
                                                     {
                                                         user.is_blocked
-                                                        ?
-                                                        (
+                                                        ? (
                                                             <span
                                                                 className="risk-high"
                                                             >
                                                                 Blocked
                                                             </span>
                                                         )
-                                                        :
-                                                        (
+                                                        : (
                                                             <span
                                                                 className="risk-low"
                                                             >
@@ -250,8 +274,7 @@ function AdminUsers() {
 
                                                     {
                                                         user.is_blocked
-                                                        ?
-                                                        (
+                                                        ? (
                                                             <button
                                                                 className="btn btn-success btn-sm me-2"
                                                                 onClick={() =>
@@ -263,8 +286,7 @@ function AdminUsers() {
                                                                 Unblock
                                                             </button>
                                                         )
-                                                        :
-                                                        (
+                                                        : (
                                                             <button
                                                                 className="btn btn-warning btn-sm me-2"
                                                                 onClick={() =>
@@ -278,16 +300,27 @@ function AdminUsers() {
                                                         )
                                                     }
 
-                                                    <button
-                                                        className="btn btn-danger btn-sm"
-                                                        onClick={() =>
-                                                            deleteUser(
-                                                                user.id
-                                                            )
-                                                        }
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                    {
+                                                        user.role !== "admin"
+                                                        &&
+                                                        (
+                                                            <button
+                                                                className="btn btn-danger btn-sm"
+                                                                onClick={() => {
+
+                                                                    setSelectedUserId(
+                                                                        user.id
+                                                                    );
+
+                                                                    setShowDeleteModal(
+                                                                        true
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        )
+                                                    }
 
                                                 </td>
 
@@ -307,9 +340,56 @@ function AdminUsers() {
 
             </div>
 
+            {
+                showDeleteModal && (
+
+                    <div className="custom-modal-overlay">
+
+                        <div className="custom-modal">
+
+                            <h4>
+                                Delete User
+                            </h4>
+
+                            <p>
+                                Are you sure you want to delete this user?
+                            </p>
+
+                            <div className="modal-actions">
+
+                                <button
+                                    className="cancel-btn"
+                                    onClick={() =>
+                                        setShowDeleteModal(
+                                            false
+                                        )
+                                    }
+                                >
+                                    Cancel
+                                </button>
+
+                                <button
+                                    className="delete-confirm-btn"
+                                    onClick={
+                                        deleteUser
+                                    }
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                )
+            }
+
         </div>
 
     );
 }
 
 export default AdminUsers;
+ 

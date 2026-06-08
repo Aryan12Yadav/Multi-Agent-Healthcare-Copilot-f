@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 
 from app.models.user import User
-
+from app.models.report import Report
 from app.routes.auth import get_current_admin
+from app.models.medical_finding import MedicalFinding
 
 
 router = APIRouter(
@@ -166,6 +167,45 @@ def delete_user(
             status_code=400,
             detail="You cannot delete your own account"
         )
+    reports = (
+        db.query(Report)
+        .filter(
+            Report.user_id == user.id
+        )
+        .all()
+    )
+
+    for report in reports:
+
+        (
+            db.query(MedicalFinding)
+            .filter(
+                MedicalFinding.report_id == report.id
+            )
+            .delete()
+        )
+
+        db.delete(report)
+
+    reports = (
+        db.query(Report)
+        .filter(
+            Report.user_id == user.id
+        )
+        .all()
+    )
+
+    for report in reports:
+
+        (
+            db.query(MedicalFinding)
+            .filter(
+                MedicalFinding.report_id == report.id
+            )
+            .delete()
+        )
+
+        db.delete(report)
 
     db.delete(user)
 
@@ -209,9 +249,55 @@ def admin_stats(
         .count()
     )
 
+    total_reports = (
+    db.query(Report)
+    .count()
+    )
+
+    total_analyses = (
+        db.query(MedicalFinding)
+        .count()
+    )
+
     return {
         "success": True,
         "total_users": total_users,
         "blocked_users": blocked_users,
-        "admin_users": admin_users
+        "admin_users": admin_users,
+        "total_reports":total_reports,
+        "total_analyses":total_analyses
+
+    }
+
+@router.get("/recent-users")
+def recent_users(
+    token: str,
+    db: Session = Depends(get_db)
+):
+
+    get_current_admin(
+        token,
+        db
+    )
+
+    users = (
+        db.query(User)
+        .order_by(
+            User.id.desc()
+        )
+        .limit(5)
+        .all()
+    )
+
+    return {
+        "success": True,
+        "users": [
+            {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "role": user.role
+            }
+            for user in users
+        ]
     }
