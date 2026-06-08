@@ -192,7 +192,9 @@ def analyze_document(content: str):
 
                 "critical_findings": [],
 
-                "recommendations": []
+                "recommendations": [],
+
+                "take_doctor_concern" :[]
             }}
 
             IMPORTANT:
