@@ -26,7 +26,7 @@ def ask_llm(prompt: str):
                     "content": prompt
                 }
             ],
-            temperature=0.1,
+            temperature=0.3,
             max_tokens=4000
         )
 
