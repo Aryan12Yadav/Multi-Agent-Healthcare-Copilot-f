@@ -22,8 +22,11 @@ function Chat() {
     const [messages, setMessages] =
         useState([]);
 
-    const [userName, setUserName] =
-        useState("User");
+    const [userName] =
+        useState(() => {
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            return user?.name || "User";
+        });
 
     const chatEndRef =
         useRef(null);
@@ -32,19 +35,29 @@ function Chat() {
         useRef(null);
 
     useEffect(() => {
-
-        const user =
-            JSON.parse(
-                localStorage.getItem(
-                    "user"
-                ) || "{}"
-            );
-
-        if (user?.name) {
-
-            setUserName(
-                user.name
-            );
+        async function loadHistory() {
+            try {
+                const response = await api.get("/chat/history");
+                const history = response.data.messages || [];
+                const formattedMessages = [];
+                history.forEach((item) => {
+                    formattedMessages.push({
+                        role: "user",
+                        text: item.question,
+                        created_at: item.created_at
+                    });
+                    formattedMessages.push({
+                        role: "assistant",
+                        text: item.answer,
+                        created_at: item.created_at
+                    });
+                });
+                setMessages(formattedMessages);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
         }
 
         loadHistory();
@@ -58,55 +71,6 @@ function Chat() {
         });
 
     }, [messages]);
-
-    async function loadHistory() {
-
-        try {
-
-            const response =
-                await api.get(
-                    "/chat/history"
-                );
-
-            const history =
-                response.data.messages || [];
-
-            const formattedMessages =
-                [];
-
-            history.forEach(
-                (item) => {
-
-                    formattedMessages.push({
-                        role: "user",
-                        text: item.question,
-                        created_at:
-                        item.created_at
-                    });
-
-                    formattedMessages.push({
-                        role: "assistant",
-                        text: item.answer,
-                        created_at:
-                        item.created_at
-                    });
-
-                }
-            );
-
-            setMessages(
-                formattedMessages
-            );
-
-        } catch (error) {
-
-            console.log(error);
-
-        } finally {
-
-            setLoading(false);
-        }
-    }
 
     async function sendMessage() {
 

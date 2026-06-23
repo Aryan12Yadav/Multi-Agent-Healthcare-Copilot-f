@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,51 +10,31 @@ function Profile() {
     const navigate =
         useNavigate();
 
-    const [loading, setLoading] =
-        useState(true);
+    const [loading] =
+        useState(false);
 
-    const [user, setUser] =
-        useState({
-            id: "",
-            name: "",
-            email: ""
+    const [user] =
+        useState(() => {
+            try {
+                const storedUser =
+                    JSON.parse(
+                        localStorage.getItem(
+                            "user"
+                        ) || "{}"
+                    );
+                return {
+                    id: storedUser.id || "",
+                    name: storedUser.name || "User",
+                    email: storedUser.email || "-"
+                };
+            } catch {
+                return {
+                    id: "",
+                    name: "User",
+                    email: "-"
+                };
+            }
         });
-
-    useEffect(() => {
-
-        loadUser();
-
-    }, []);
-
-    function loadUser() {
-
-        try {
-
-            const storedUser =
-                JSON.parse(
-                    localStorage.getItem(
-                        "user"
-                    ) || "{}"
-                );
-
-            setUser({
-                id:
-                storedUser.id || "",
-                name:
-                storedUser.name || "User",
-                email:
-                storedUser.email || "-"
-            });
-
-        } catch (error) {
-
-            console.log(error);
-
-        } finally {
-
-            setLoading(false);
-        }
-    }
 
     function logout() {
 

@@ -15,38 +15,21 @@ function AdminDashboard() {
     useState([]);
 
     useEffect(() => {
+        async function loadStats() {
+            try {
+                const response = await api.get("/admin/stats");
+                setStats(response.data);
+
+                const usersResponse = await api.get("/admin/recent-users");
+                setRecentUsers(usersResponse.data.users || []);
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
         loadStats();
 
     }, []);
-
-    async function loadStats() {
-
-        try {
-
-            const response =
-                await api.get(
-                    "/admin/stats"
-                );
-
-            setStats(
-                response.data
-            );
-
-            const usersResponse =
-                await api.get(
-                    "/admin/recent-users"
-                );
-
-            setRecentUsers(
-                usersResponse.data.users || []
-            );
-
-        } catch (error) {
-
-            console.log(error);
-        }
-    }
 
     return (
 

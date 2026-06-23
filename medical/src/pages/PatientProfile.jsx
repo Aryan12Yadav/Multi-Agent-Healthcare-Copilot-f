@@ -28,49 +28,25 @@ function PatientProfile() {
         });
 
     useEffect(() => {
+        async function loadProfile() {
+            try {
+                const response = await api.get("/patient-profile");
+                setProfile({
+                    possible_conditions: response.data.profile?.possible_conditions || [],
+                    risk_factors: response.data.profile?.risk_factors || [],
+                    health_trends: response.data.profile?.health_trends || [],
+                    recommended_tests: response.data.profile?.recommended_tests || []
+                });
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        }
 
         loadProfile();
 
     }, []);
-
-    async function loadProfile() {
-
-        try {
-
-            const response =
-                await api.get(
-                    "/patient-profile"
-                );
-
-            setProfile({
-
-                possible_conditions:
-                    response.data.profile
-                    ?.possible_conditions || [],
-
-                risk_factors:
-                    response.data.profile
-                    ?.risk_factors || [],
-
-                health_trends:
-                    response.data.profile
-                    ?.health_trends || [],
-
-                recommended_tests:
-                    response.data.profile
-                    ?.recommended_tests || []
-
-            });
-
-        } catch (error) {
-
-            console.log(error);
-
-        } finally {
-
-            setLoading(false);
-        }
-    }
 
     if (loading) {
 

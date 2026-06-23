@@ -21,28 +21,6 @@ function FloatingChat() {
     const chatEndRef =
         useRef(null);
 
-    useEffect(() => {
-
-        if (isOpen) {
-
-            loadHistory();
-        }
-
-    }, [isOpen]);
-
-    useEffect(() => {
-
-        scrollToBottom();
-
-    }, [messages]);
-
-    function scrollToBottom() {
-
-        chatEndRef.current?.scrollIntoView({
-            behavior: "smooth"
-        });
-    }
-
     function getCurrentTime() {
 
         return new Date()
@@ -55,48 +33,46 @@ function FloatingChat() {
             );
     }
 
-    async function loadHistory() {
-
-        try {
-
-            const response =
-                await api.get(
-                    "/chat/history"
-                );
-
-            const history =
-                response.data.messages || [];
-
-            const formattedMessages =
-                [];
-
-            history.forEach(
-                (item) => {
-
+    useEffect(() => {
+        async function loadHistory() {
+            try {
+                const response = await api.get("/chat/history");
+                const history = response.data.messages || [];
+                const formattedMessages = [];
+                history.forEach((item) => {
                     formattedMessages.push({
                         role: "user",
                         text: item.question,
                         time: getCurrentTime()
                     });
-
                     formattedMessages.push({
                         role: "assistant",
                         text: item.answer,
                         time: getCurrentTime()
                     });
-
-                }
-            );
-
-            setMessages(
-                formattedMessages
-            );
-
-        } catch (error) {
-
-            console.log(error);
+                });
+                setMessages(formattedMessages);
+            } catch (error) {
+                console.log(error);
+            }
         }
-    }
+
+        if (isOpen) {
+            loadHistory();
+        }
+
+    }, [isOpen]);
+
+    useEffect(() => {
+        function scrollToBottom() {
+            chatEndRef.current?.scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+
+        scrollToBottom();
+
+    }, [messages]);
 
     async function sendMessage() {
 

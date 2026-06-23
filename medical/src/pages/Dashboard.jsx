@@ -37,92 +37,51 @@ function Dashboard() {
     const [alerts, setAlerts] =
         useState([]);
 
-    const [userName, setUserName] =
-        useState("User");
+    const [userName] =
+        useState(() => {
+            try {
+                const storedUser = JSON.parse(localStorage.getItem("user"));
+                return storedUser?.name || "User";
+            } catch {
+                return "User";
+            }
+        });
 
     const [chartData, setChartData] =
         useState([]);
 
     useEffect(() => {
+        async function loadDashboard() {
+            try {
+                const dashboardResponse = await api.get("/dashboard");
+                const trendResponse = await api.get("/dashboard/health-trends");
+                const alertResponse = await api.get("/dashboard/alerts");
+
+                setDashboard(dashboardResponse.data);
+                setTrend(trendResponse.data.trend || {});
+                setAlerts(alertResponse.data.alerts || []);
+
+                const trendData = trendResponse.data.trend || {};
+                setChartData([
+                    {
+                        name: "First",
+                        score: trendData.first_score || 0
+                    },
+                    {
+                        name: "Latest",
+                        score: trendData.latest_score || 0
+                    }
+                ]);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        }
 
         loadDashboard();
 
     }, []);
-
-    async function loadDashboard() {
-
-        try {
-
-            const storedUser =
-                JSON.parse(
-                    localStorage.getItem(
-                        "user"
-                    )
-                );
-
-            if (storedUser?.name) {
-
-                setUserName(
-                    storedUser.name
-                );
-            }
-
-            const dashboardResponse =
-                await api.get(
-                    "/dashboard"
-                );
-
-            const trendResponse =
-                await api.get(
-                    "/dashboard/health-trends"
-                );
-
-            const alertResponse =
-                await api.get(
-                    "/dashboard/alerts"
-                );
-
-            setDashboard(
-                dashboardResponse.data
-            );
-
-            setTrend(
-                trendResponse.data.trend || {}
-            );
-
-            setAlerts(
-                alertResponse.data.alerts || []
-            );
-
-            const trendData =
-                trendResponse.data.trend || {};
-
-            setChartData([
-                {
-                    name: "First",
-                    score:
-                        trendData.first_score || 0
-                },
-                {
-                    name: "Latest",
-                    score:
-                        trendData.latest_score || 0
-                }
-            ]);
-
-        } catch (error) {
-
-            console.log(
-                error
-            );
-
-        } finally {
-
-            setLoading(
-                false
-            );
-        }
-    }
 
     function getHealthStatus() {
 

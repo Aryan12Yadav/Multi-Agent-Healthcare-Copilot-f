@@ -59,6 +59,16 @@ const chatEndRef =
     useRef(null);
 
 useEffect(() => {
+    async function loadAnalysis() {
+        try {
+            const response = await api.get(`/reports/${id}/analysis`);
+            setAnalysis(response.data.analysis);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     loadAnalysis();
 
@@ -71,29 +81,6 @@ useEffect(() => {
     });
 
 }, [chatMessages]);
-
-async function loadAnalysis() {
-
-    try {
-
-        const response =
-            await api.get(
-                `/reports/${id}/analysis`
-            );
-
-        setAnalysis(
-            response.data.analysis
-        );
-
-    } catch (error) {
-
-        console.log(error);
-
-    } finally {
-
-        setLoading(false);
-    }
-}
 
 async function askReportAI() {
 

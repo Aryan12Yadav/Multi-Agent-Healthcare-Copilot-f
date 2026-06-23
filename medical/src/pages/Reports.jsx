@@ -31,37 +31,20 @@ function Reports() {
         useState(null);
 
     useEffect(() => {
+        async function loadReports() {
+            try {
+                const response = await api.get("/reports");
+                setReports(response.data.reports || []);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        }
 
         loadReports();
 
     }, []);
-
-    async function loadReports() {
-
-        try {
-
-            const response =
-                await api.get(
-                    "/reports"
-                );
-
-            setReports(
-                response.data.reports || []
-            );
-
-        } catch (error) {
-
-            console.log(
-                error
-            );
-
-        } finally {
-
-            setLoading(
-                false
-            );
-        }
-    }
 
     async function deleteReport() {
 
