@@ -86,7 +86,7 @@ jobs:
 
       - name: Create Env File for Vite Build
         run: |
-          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > medical/.env
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > medical/.env.production
 
       - name: Build Project Artifacts
         env:
