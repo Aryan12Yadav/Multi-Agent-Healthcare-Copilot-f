@@ -12,7 +12,7 @@ __pycache__/
 
 logs/
 
-storage/
+/backend/storage/
 
 .pytest_cache/
 
