@@ -71,10 +71,6 @@ jobs:
     needs: [frontend-ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./medical
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
