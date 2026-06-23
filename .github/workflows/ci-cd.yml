@@ -139,30 +139,57 @@ jobs:
             exit 1
           fi
 
+          # Helper function to trim leading and trailing spaces/tabs/newlines
+          trim() {
+            echo "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+          }
+
+          CLEAN_PYTHON_VERSION=$(trim "$PYTHON_VERSION")
+          CLEAN_APP_NAME=$(trim "$APP_NAME")
+          CLEAN_DEBUG=$(trim "$DEBUG")
+          CLEAN_SECRET_KEY=$(trim "$SECRET_KEY")
+          CLEAN_ACCESS_TOKEN_EXPIRE_MINUTES=$(trim "$ACCESS_TOKEN_EXPIRE_MINUTES")
+          CLEAN_JWT_ALGORITHM=$(trim "$JWT_ALGORITHM")
+          CLEAN_POSTGRES_USER=$(trim "$POSTGRES_USER")
+          CLEAN_POSTGRES_PASSWORD=$(trim "$POSTGRES_PASSWORD")
+          CLEAN_POSTGRES_HOST=$(trim "$POSTGRES_HOST")
+          CLEAN_POSTGRES_PORT=$(trim "$POSTGRES_PORT")
+          CLEAN_POSTGRES_DB=$(trim "$POSTGRES_DB")
+          CLEAN_ALLOWED_ORIGINS=$(trim "$ALLOWED_ORIGINS")
+          CLEAN_MONGO_URI=$(trim "$MONGO_URI")
+          CLEAN_MONGO_DATABASE=$(trim "$MONGO_DATABASE")
+          CLEAN_AWS_ACCESS_KEY=$(trim "$AWS_ACCESS_KEY")
+          CLEAN_AWS_SECRET_KEY=$(trim "$AWS_SECRET_KEY")
+          CLEAN_AWS_REGION=$(trim "$AWS_REGION")
+          CLEAN_AWS_BUCKET_NAME=$(trim "$AWS_BUCKET_NAME")
+          CLEAN_NVIDIA_API_KEY=$(trim "$NVIDIA_API_KEY")
+          CLEAN_NVIDIA_BASE_URL=$(trim "$NVIDIA_BASE_URL")
+          CLEAN_NVIDIA_MODEL=$(trim "$NVIDIA_MODEL")
+
           # Construct the JSON payload with environment variables using jq
           # This automatically handles escaping of special characters and maintains clean YAML indentation
           JSON_PAYLOAD=$(jq -n \
-            --arg python_version "$PYTHON_VERSION" \
-            --arg app_name "$APP_NAME" \
-            --arg debug "$DEBUG" \
-            --arg secret_key "$SECRET_KEY" \
-            --arg access_token_expire_minutes "$ACCESS_TOKEN_EXPIRE_MINUTES" \
-            --arg jwt_algorithm "$JWT_ALGORITHM" \
-            --arg postgres_user "$POSTGRES_USER" \
-            --arg postgres_password "$POSTGRES_PASSWORD" \
-            --arg postgres_host "$POSTGRES_HOST" \
-            --arg postgres_port "$POSTGRES_PORT" \
-            --arg postgres_db "$POSTGRES_DB" \
-            --arg allowed_origins "$ALLOWED_ORIGINS" \
-            --arg mongo_uri "$MONGO_URI" \
-            --arg mongo_database "$MONGO_DATABASE" \
-            --arg aws_access_key "$AWS_ACCESS_KEY" \
-            --arg aws_secret_key "$AWS_SECRET_KEY" \
-            --arg aws_region "$AWS_REGION" \
-            --arg aws_bucket_name "$AWS_BUCKET_NAME" \
-            --arg nvidia_api_key "$NVIDIA_API_KEY" \
-            --arg nvidia_base_url "$NVIDIA_BASE_URL" \
-            --arg nvidia_model "$NVIDIA_MODEL" \
+            --arg python_version "$CLEAN_PYTHON_VERSION" \
+            --arg app_name "$CLEAN_APP_NAME" \
+            --arg debug "$CLEAN_DEBUG" \
+            --arg secret_key "$CLEAN_SECRET_KEY" \
+            --arg access_token_expire_minutes "$CLEAN_ACCESS_TOKEN_EXPIRE_MINUTES" \
+            --arg jwt_algorithm "$CLEAN_JWT_ALGORITHM" \
+            --arg postgres_user "$CLEAN_POSTGRES_USER" \
+            --arg postgres_password "$CLEAN_POSTGRES_PASSWORD" \
+            --arg postgres_host "$CLEAN_POSTGRES_HOST" \
+            --arg postgres_port "$CLEAN_POSTGRES_PORT" \
+            --arg postgres_db "$CLEAN_POSTGRES_DB" \
+            --arg allowed_origins "$CLEAN_ALLOWED_ORIGINS" \
+            --arg mongo_uri "$CLEAN_MONGO_URI" \
+            --arg mongo_database "$CLEAN_MONGO_DATABASE" \
+            --arg aws_access_key "$CLEAN_AWS_ACCESS_KEY" \
+            --arg aws_secret_key "$CLEAN_AWS_SECRET_KEY" \
+            --arg aws_region "$CLEAN_AWS_REGION" \
+            --arg aws_bucket_name "$CLEAN_AWS_BUCKET_NAME" \
+            --arg nvidia_api_key "$CLEAN_NVIDIA_API_KEY" \
+            --arg nvidia_base_url "$CLEAN_NVIDIA_BASE_URL" \
+            --arg nvidia_model "$CLEAN_NVIDIA_MODEL" \
             '[
               {"key": "PYTHON_VERSION", "value": $python_version},
               {"key": "APP_NAME", "value": $app_name},
@@ -186,6 +213,7 @@ jobs:
               {"key": "NVIDIA_BASE_URL", "value": $nvidia_base_url},
               {"key": "NVIDIA_MODEL", "value": $nvidia_model}
             ]')
+
 
           echo "Syncing environment variables to Render Web Service..."
           HTTP_CODE_ENV=$(curl -s -o response_env.json -w "%{http_code}" -X PUT "https://api.render.com/v1/services/$CLEAN_RENDER_SERVICE_ID/env-vars" \
