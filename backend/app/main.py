@@ -20,6 +20,8 @@ from app.routes.dashboard import router as dashboard_router
 from app.routes.patient_profile import router as patient_profile_router
 
 
+from app.core.config import ALLOWED_ORIGINS
+
 Base.metadata.create_all(
     bind=engine
 )
@@ -34,10 +36,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
