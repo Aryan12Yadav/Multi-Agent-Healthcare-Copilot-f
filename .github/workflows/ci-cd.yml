@@ -84,6 +84,10 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Create Env File for Vite Build
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" > medical/.env
+
       - name: Build Project Artifacts
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
