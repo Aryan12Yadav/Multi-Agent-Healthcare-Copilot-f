@@ -112,15 +112,15 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
-          APP_NAME: "MedSphere AI"
-          DEBUG: "False"
+          APP_NAME: ${{ secrets.APP_NAME }}
+          DEBUG: ${{ secrets.DEBUG }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
-          JWT_ALGORITHM: "HS256"
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+          JWT_ALGORITHM: ${{ secrets.JWT_ALGORITHM }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_PORT: "5432"
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
           MONGO_URI: ${{ secrets.MONGO_URI }}
@@ -130,8 +130,8 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          NVIDIA_BASE_URL: "https://integrate.api.nvidia.com/v1"
-          NVIDIA_MODEL: "meta/llama-3.3-70b-instruct"
+          NVIDIA_BASE_URL: ${{ secrets.NVIDIA_BASE_URL }}
+          NVIDIA_MODEL: ${{ secrets.NVIDIA_MODEL }}
         run: |
           if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
             echo "Error: RENDER_API_KEY or RENDER_SERVICE_ID is not configured in GitHub Secrets."
