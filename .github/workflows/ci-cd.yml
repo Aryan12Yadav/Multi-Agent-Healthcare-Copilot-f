@@ -67,20 +67,23 @@ jobs:
           flake8 backend/app --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
   deploy-backend:
-    name: Deploy Backend to Render
+    name: Deploy Backend to Render (via API)
     needs: [frontend-ci, backend-ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger Render Deploy Hook
+      - name: Trigger Deploy via Render API
         env:
-          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
         run: |
-          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
-            echo "Error: RENDER_DEPLOY_HOOK_URL secret is not configured in GitHub Secrets."
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "Error: RENDER_API_KEY or RENDER_SERVICE_ID is not configured in GitHub Secrets."
             exit 1
           fi
           echo "Triggering Render deployment..."
-          curl -s -X POST "$RENDER_DEPLOY_HOOK"
-          echo "Deployment hook triggered successfully."
+          curl -s -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Accept: application/json"
+          echo "Deployment triggered successfully."

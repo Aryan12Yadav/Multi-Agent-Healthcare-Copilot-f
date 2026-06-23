@@ -9,7 +9,8 @@ Configure these in your GitHub repository under **Settings > Secrets and variabl
 
 | Secret Name | Purpose | Example Value / Format |
 | :--- | :--- | :--- |
-| `RENDER_DEPLOY_HOOK_URL` | Triggers auto-deployment on Render after CI checks pass. | `https://api.render.com/deploy/srv-d8o46i48aovs73ffpssg?key=wtuYCr...` |
+| `RENDER_API_KEY` | Render Account API Key for triggering deployment. Get it from Render Account Settings > API Keys. | `rnd_xxxxxxxxxxxxxxxxxxxxxxxx` |
+| `RENDER_SERVICE_ID` | Render Web Service ID for your backend. Get it from the Web Service dashboard URL or settings. | `srv-xxxxxxxxxxxxxxxx` |
 
 ---
 
