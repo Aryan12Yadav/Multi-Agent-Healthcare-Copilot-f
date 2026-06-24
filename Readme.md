@@ -135,9 +135,9 @@ Range:
 
 Interpretation:
 
-* 80–100 → Low Risk
-* 50–79 → Medium Risk
-* 0–49 → High Risk
+* 80-100 -> Low Risk
+* 50-79 -> Medium Risk
+* 0-49 -> High Risk
 
 The score provides a quick overview of report health status.
 
@@ -359,3 +359,24 @@ AI Processing Layer
 PostgreSQL Database
 
 This architecture ensures modularity, scalability, maintainability, and future expansion.
+
+---
+
+# CI/CD Deployment
+
+The project is configured with GitHub Actions to automate testing and deployment:
+
+* Every commit pushed to the main branch triggers the workflow pipeline.
+* The frontend React code is built and deployed directly to Vercel.
+* The backend FastAPI code environment variables are synced and a rolling redeployment is triggered on Render.
+
+---
+
+# Future Scope
+
+We plan to implement the following features to improve and expand the project:
+
+* Add visual graphs and charts on the user dashboard to track biomarker levels like cholesterol, glucose, and thyroid indicators over time.
+* Support multilingual report parsing and translations so users can get summaries and chat in their local languages.
+* Support HL7 FHIR standard data exporting to allow integration with electronic health records used in hospitals and clinics.
+* Add a telehealth option allowing users to share their AI-summarized health reports directly with verified doctors.
