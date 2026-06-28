@@ -1,6 +1,5 @@
-import { useEffect } from "react";
-import { useState } from "react";
-
+import { useEffect, useState, useContext } from "react";
+import { useLocation } from "react-router-dom";
 import {
     LineChart,
     Line,
@@ -16,42 +15,61 @@ import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
 
 import api from "../services/apiService";
+import { AuthContext } from "../context/AuthContext";
 
 function Dashboard() {
+    const { token, user, setShowAuthModal } = useContext(AuthContext);
+    const location = useLocation();
 
-    const [loading, setLoading] =
-        useState(true);
+    const [loading, setLoading] = useState(true);
+    const [dashboard, setDashboard] = useState({
+        total_reports: 0,
+        medical_reports: 0,
+        average_health_score: 0,
+        latest_health_score: 0,
+        high_risk_reports: 0
+    });
+    const [trend, setTrend] = useState({});
+    const [alerts, setAlerts] = useState([]);
+    const [chartData, setChartData] = useState([]);
 
-    const [dashboard, setDashboard] =
-        useState({
-            total_reports: 0,
-            medical_reports: 0,
-            average_health_score: 0,
-            latest_health_score: 0,
-            high_risk_reports: 0
-        });
+    const userName = user?.name || "Guest";
 
-    const [trend, setTrend] =
-        useState({});
-
-    const [alerts, setAlerts] =
-        useState([]);
-
-    const [userName] =
-        useState(() => {
-            try {
-                const storedUser = JSON.parse(localStorage.getItem("user"));
-                return storedUser?.name || "User";
-            } catch {
-                return "User";
-            }
-        });
-
-    const [chartData, setChartData] =
-        useState([]);
+    useEffect(() => {
+        if (location.search.includes("auth=required")) {
+            setShowAuthModal(true);
+        }
+    }, [location, setShowAuthModal]);
 
     useEffect(() => {
         async function loadDashboard() {
+            if (!token) {
+                // Set beautiful mock/demo data for Guest Mode
+                setDashboard({
+                    total_reports: 3,
+                    medical_reports: 3,
+                    average_health_score: 78,
+                    latest_health_score: 85,
+                    high_risk_reports: 0
+                });
+                setTrend({
+                    trend: "Improving",
+                    change: 15,
+                    first_score: 70,
+                    latest_score: 85
+                });
+                setAlerts([
+                    { report_id: 1, message: "Vitamin D level is slightly low (24 ng/mL). Consider sunlight exposure." }
+                ]);
+                setChartData([
+                    { name: "First Report", score: 70 },
+                    { name: "Second Report", score: 75 },
+                    { name: "Latest Report", score: 85 }
+                ]);
+                setLoading(false);
+                return;
+            }
+
             try {
                 const dashboardResponse = await api.get("/dashboard");
                 const trendResponse = await api.get("/dashboard/health-trends");
@@ -80,29 +98,16 @@ function Dashboard() {
         }
 
         loadDashboard();
-
-    }, []);
+    }, [token]);
 
     function getHealthStatus() {
-
-        const score =
-            dashboard.latest_health_score;
-
-        if (score >= 80) {
-
-            return "Excellent";
-        }
-
-        if (score >= 50) {
-
-            return "Moderate";
-        }
-
+        const score = dashboard.latest_health_score;
+        if (score >= 80) return "Excellent";
+        if (score >= 50) return "Moderate";
         return "Needs Attention";
     }
 
     if (loading) {
-
         return <Loader />;
     }
 
@@ -117,6 +122,18 @@ function Dashboard() {
                 <Navbar />
 
                 <div className="page-container">
+
+                    {!token && (
+                        <div className="guest-cta-banner mb-4">
+                            <div className="guest-cta-content">
+                                <h3><i className="bi bi-shield-lock-fill"></i> You are viewing the dashboard in Guest Mode</h3>
+                                <p>Unlock the full potential of MedSphere AI. Upload, analyze, and chat with your own medical reports securely.</p>
+                            </div>
+                            <button className="btn guest-cta-btn" onClick={() => setShowAuthModal(true)}>
+                                Get Started Now
+                            </button>
+                        </div>
+                    )}
 
                     <div className="hero-banner">
 

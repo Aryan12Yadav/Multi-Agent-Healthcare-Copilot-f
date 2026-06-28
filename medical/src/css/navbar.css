@@ -176,3 +176,28 @@
         padding: 10px 14px;
     }
 }
+
+.login-btn {
+    border: none;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, #4338ca, #6d28d9);
+    transform: translateY(-2px);
+}
+
+.login-btn i {
+    font-size: 15px;
+}

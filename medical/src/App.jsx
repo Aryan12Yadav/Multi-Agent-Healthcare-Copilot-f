@@ -1,11 +1,9 @@
-import { BrowserRouter } from "react-router-dom";
-import { Routes } from "react-router-dom";
-import { Route } from "react-router-dom";
+import { useContext } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
-import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import ReportDetails from "./pages/ReportDetails";
 import PatientProfile from "./pages/PatientProfile";
@@ -16,30 +14,24 @@ import CompareReports from "./pages/CompareReports";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
-
 import AdminRoute from "./components/AdminRoute";
-
+import AuthModal from "./components/AuthModal";
+import { AuthContext } from "./context/AuthContext";
 
 function App() {
+    const { token } = useContext(AuthContext);
 
     return (
-
         <BrowserRouter>
-
             <Routes>
-
                 <Route
                     path="/"
-                    element={<Auth />}
+                    element={<Dashboard />}
                 />
 
                 <Route
                     path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
+                    element={<Dashboard />}
                 />
 
                 <Route
@@ -87,24 +79,6 @@ function App() {
                     }
                 />
 
-               
-
-
-                    <Route
-                        path="/compare-reports"
-                        element={
-                            <ProtectedRoute>
-                                <CompareReports />
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    <Route
-                        path="*"
-                        element={<NotFound />}
-                    />
-
-
                 <Route
                     path="/upload"
                     element={
@@ -140,16 +114,15 @@ function App() {
                     }
                 />
 
+                <Route
+                    path="*"
+                    element={<NotFound />}
+                />
             </Routes>
 
-            {
-                localStorage.getItem("token")
-                &&
-                <FloatingChat />
-            }
-
+            {token && <FloatingChat />}
+            <AuthModal />
         </BrowserRouter>
-
     );
 }
 
